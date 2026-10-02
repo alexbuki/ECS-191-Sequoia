@@ -1,0 +1,247 @@
+name: Sequoia
+options:
+  bundleIdPrefix: app.sequoia
+  deploymentTarget:
+    iOS: "17.0"
+    watchOS: "10.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: NO
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    DEAD_CODE_STRIPPING: YES
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: UGWCHMHVJX
+  configs:
+    Debug:
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: "DEBUG SEQUOIA_DEV"
+    Release:
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: ""
+packages:
+  SequoiaKit:
+    path: Packages/SequoiaKit
+targets:
+  Sequoia:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sequoia
+    dependencies:
+      - package: SequoiaKit
+        product: SequoiaCore
+      - package: SequoiaKit
+        product: DesignSystem
+      - target: SequoiaSocial
+      # Embedded but not linked: loaded after launch (see DeferredGameCenterBackend).
+      - target: SequoiaGameCenter
+        link: false
+      - target: SequoiaWidgets
+      # Temporarily not embedded: the watch App ID can't be registered until the
+      # free account's 10-per-week App ID limit resets (about 2026-10-08).
+      # - target: SequoiaWatch
+    entitlements:
+      path: Sequoia/Sequoia.entitlements
+      properties:
+        com.apple.security.application-groups: [group.app.sequoia.Sequoia]
+        com.apple.developer.game-center: true
+    info:
+      path: Sequoia/Info.plist
+      properties:
+        CFBundleDisplayName: Sequoia
+        CFBundleURLTypes:
+          - CFBundleURLName: app.sequoia.Sequoia
+            CFBundleURLSchemes: [sequoia]
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.sequoia.Sequoia
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Sequoia
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.education
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+  SequoiaSocial:
+    type: framework
+    platform: iOS
+    sources: [SequoiaSocial]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.sequoia.Sequoia.Social
+        GENERATE_INFOPLIST_FILE: YES
+        SKIP_INSTALL: YES
+        TARGETED_DEVICE_FAMILY: "1"
+  SequoiaGameCenter:
+    type: framework
+    platform: iOS
+    sources: [SequoiaGameCenter]
+    dependencies:
+      - target: SequoiaSocial
+        embed: false
+      - sdk: GameKit.framework
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.sequoia.Sequoia.GameCenter
+        GENERATE_INFOPLIST_FILE: YES
+        SKIP_INSTALL: YES
+        TARGETED_DEVICE_FAMILY: "1"
+  SequoiaWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: SequoiaWidgets
+    dependencies:
+      - package: SequoiaKit
+        product: SequoiaCore
+      - package: SequoiaKit
+        product: DesignSystem
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
+    entitlements:
+      path: SequoiaWidgets/SequoiaWidgets.entitlements
+      properties:
+        com.apple.security.application-groups: [group.app.sequoia.Sequoia]
+    info:
+      path: SequoiaWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: Sequoia
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.sequoia.Sequoia.WidgetExtension
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Sequoia
+        TARGETED_DEVICE_FAMILY: "1"
+        SKIP_INSTALL: YES
+        ENABLE_PREVIEWS: YES
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
+  SequoiaWatch:
+    type: application
+    platform: watchOS
+    sources:
+      - path: SequoiaWatch
+    dependencies:
+      - package: SequoiaKit
+        product: SequoiaCore
+      - package: SequoiaKit
+        product: DesignSystem
+      - target: SequoiaWatchWidgets
+    entitlements:
+      path: SequoiaWatch/SequoiaWatch.entitlements
+      properties:
+        com.apple.security.application-groups: [group.app.sequoia.Sequoia]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.sequoia.Sequoia.watchkitapp
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Sequoia
+        INFOPLIST_KEY_WKCompanionAppBundleIdentifier: app.sequoia.Sequoia
+        INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp: NO
+        SKIP_INSTALL: YES
+        ENABLE_PREVIEWS: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+  SequoiaWatchWidgets:
+    type: app-extension
+    platform: watchOS
+    sources:
+      - path: SequoiaWatchWidgets
+    dependencies:
+      - package: SequoiaKit
+        product: SequoiaCore
+      - package: SequoiaKit
+        product: DesignSystem
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
+    entitlements:
+      path: SequoiaWatchWidgets/SequoiaWatchWidgets.entitlements
+      properties:
+        com.apple.security.application-groups: [group.app.sequoia.Sequoia]
+    info:
+      path: SequoiaWatchWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: Sequoia
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.sequoia.Sequoia.watchkitapp.Complications
+        GENERATE_INFOPLIST_FILE: YES
+        SKIP_INSTALL: YES
+        ENABLE_PREVIEWS: YES
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
+  SequoiaWatchUITests:
+    type: bundle.ui-testing
+    platform: watchOS
+    sources: [SequoiaWatchUITests]
+    dependencies:
+      - target: SequoiaWatch
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: SequoiaWatch
+  SequoiaTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [SequoiaTests]
+    dependencies:
+      - target: Sequoia
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+  SequoiaUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [SequoiaUITests]
+    dependencies:
+      - target: Sequoia
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Sequoia
+schemes:
+  Sequoia:
+    build:
+      targets:
+        Sequoia: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - SequoiaTests
+        - SequoiaUITests
+        - package: SequoiaKit/SequoiaCoreTests
+        - package: SequoiaKit/DesignSystemTests
+    archive:
+      config: Release
+  SequoiaWatch:
+    build:
+      targets:
+        SequoiaWatch: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - SequoiaWatchUITests
+    archive:
+      config: Release

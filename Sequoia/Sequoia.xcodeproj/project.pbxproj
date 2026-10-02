@@ -3,126 +3,1011 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 110;
+	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0387BE73D0E327BE6AD03F6C /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4C1DEDB4F8F8EB500BD4488 /* WidgetKit.framework */; };
+		091FB2CCC51F39A634318C49 /* DeveloperPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A3961D54377D11B4C9EDE3 /* DeveloperPanelView.swift */; };
+		12FCEB71EA833EAA69318E66 /* PracticeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC975414C8CF6343E13D42DB /* PracticeViewModel.swift */; };
+		1E4369A4AA5E1A3A97BA5A9C /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 45E29BE9DD7CF5BD9D7432F5 /* DesignSystem */; };
+		27DF2E42AE0A8450667E43B0 /* DeferredGameCenterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21A6C1DC502472974310D87 /* DeferredGameCenterBackend.swift */; };
+		329A135E2EAA6909A0D73416 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 9AA26B289CE1B66548433A64 /* DesignSystem */; };
+		37066A3C28A94348796604EB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3B989520859D90B26C11E406 /* Assets.xcassets */; };
+		3957571A9DD38643ADBAA96D /* SequoiaWatchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926F16B41CEB1239DFE772A2 /* SequoiaWatchUITests.swift */; };
+		3AFEFE1794E64E16F723CB20 /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD366CFC9F7E6179E913FEA /* AppTab.swift */; };
+		3D5EFBA0D162AB96E5CF95D9 /* SequoiaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78A4E281EC2B5C5B4BACA4C6 /* SequoiaApp.swift */; };
+		43B5576098F0A560AA991357 /* WatchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F5045BD99FD07B0FED2A59 /* WatchModel.swift */; };
+		455427CE11A7F139E4772286 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBA606C96F83BB11DED39E17 /* OnboardingView.swift */; };
+		47D708D0A9A9AC41D71DE06B /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D9738ECBFCEDD69E70405F /* NotificationService.swift */; };
+		4B9BEBF118BA8798DD82FADB /* PronunciationPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDAB8E33B5583AEFD5927CFD /* PronunciationPlayer.swift */; };
+		4ED3C9C7EA3907FDED0CC700 /* SequoiaUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FDEB041C4F1B95350FF25E /* SequoiaUITests.swift */; };
+		4F3D78484AECC4A9A8F9EF80 /* GotItIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C33C22EFF12936BBFABAE4 /* GotItIntent.swift */; };
+		50F591777AA9B749C0D0B2C8 /* ForestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F6E0A3AF4591E3BB7C075E7 /* ForestViewModel.swift */; };
+		56B74BF2A31E121264597B22 /* WidgetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABE1A4DC442F843D4A753B0 /* WidgetUITests.swift */; };
+		59756EDD9D17AB3B70F874EE /* DevModeBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A593996D17DA7CDFD15C5E18 /* DevModeBadge.swift */; };
+		5B30F249FACD0F74EEFE2CDA /* WatchSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE9660DEAA5BC7CF8232A31 /* WatchSyncService.swift */; };
+		5BD51D8A1203ACB3D6E39C07 /* DevModeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7944AC85C1E89DA5C586EC5 /* DevModeController.swift */; };
+		65677DD8E6391EFCA4B777B7 /* SocialModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23CB7FEDED011D152F41398 /* SocialModel.swift */; };
+		6643DDE359A8B7C5AEDF7391 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C9D23232F64B23E39193EA /* LibraryView.swift */; };
+		6AEC4F16F870849814F96234 /* SequoiaCore in Frameworks */ = {isa = PBXBuildFile; productRef = E16679957C9006655E99F204 /* SequoiaCore */; };
+		6ED68CE1F7AB28349C0DD836 /* TodayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8AE27BB50917F4B8644C304 /* TodayViewModel.swift */; };
+		6F1622242B8A9B0385D406A2 /* LaunchTiming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F86E7D8ACA881F8A5A0226 /* LaunchTiming.swift */; };
+		6FAE13DCBADA1144DF87B1A0 /* ForestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7016AC5EFD371847128B29 /* ForestView.swift */; };
+		707403B17C9F32640C31CBE2 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFBD1F521E7E6A07B941ED4 /* AboutView.swift */; };
+		70CA432870E2BBBBB2C0E76E /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A4347A8ACBC9C03E2D10688A /* Localizable.xcstrings */; };
+		71EFC6420C8D99326FA7DA3E /* WordWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBFB75F02D94E3AD2C833467 /* WordWidget.swift */; };
+		72D77BEF1C514FB13A97BE6C /* DevLaunchActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1190E18848081C92E5DBB7FA /* DevLaunchActions.swift */; };
+		7899F4611B80B79AEC9732CB /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 438BC97604ADA748C999DB3E /* GameKit.framework */; };
+		794D5322995D6ED8454FAFE7 /* SequoiaSocial.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9154838A3CF5F4B14A20A0A5 /* SequoiaSocial.framework */; };
+		7A4D284D0548C8F616B3029E /* StreakWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3996D2A404464A9540AD818C /* StreakWidget.swift */; };
+		7E21D6EFF2569AF560B5D55E /* SequoiaGameCenter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F1649958CE65DD9E6501A52C /* SequoiaGameCenter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		80AC002C6EA401CA4534B1B2 /* SequoiaCore in Frameworks */ = {isa = PBXBuildFile; productRef = AEC636F98F01BD79D23D3B10 /* SequoiaCore */; };
+		82147D9B082FF5D3CAC97798 /* SequoiaWatchWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0BADD2D87693C29D82913959 /* SequoiaWatchWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		855F5FC89E80B839763ED146 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = A14025659DDE29B1470474BA /* DesignSystem */; };
+		889C9DEF6B51703A2AE3B218 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 79235F7D6BE9EB002558984E /* Assets.xcassets */; };
+		8F2A7867E037DA6929F11C96 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D98BBE25B175C6AB85A69B4B /* RootView.swift */; };
+		8FBC8D6A595F1F3EC8AE8A68 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 519E88A77D8A5F5612C8AF08 /* DesignSystem */; };
+		95134D50D0D69BB44D1D4470 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24E01A1BA93071AE87693285 /* SwiftUI.framework */; };
+		95782B34FA87388EAC7B6516 /* SequoiaSocial.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9154838A3CF5F4B14A20A0A5 /* SequoiaSocial.framework */; };
+		A4A5AD1D53AA0DD170AB2E43 /* SocialBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D21F59574D028E4678383E0 /* SocialBackend.swift */; };
+		A545B10228384EB2EAD97560 /* SequoiaWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F6E2BAD595F1BCBA485E91CB /* SequoiaWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A8956AF58B47F6ACD33A39FB /* LibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8014DF0B13CAACB68A23A3 /* LibraryViewModel.swift */; };
+		ACC9A9B798A23588531BF6F6 /* ShareRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8076A34C4AD0C9216C69FC /* ShareRenderer.swift */; };
+		AD70A0EF84F3F5CCD7BFF1F9 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24E01A1BA93071AE87693285 /* SwiftUI.framework */; };
+		B09EA1F94A23A7102BFCB20B /* SequoiaWatchWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60AB6E96F104BDC3BA927E20 /* SequoiaWatchWidgets.swift */; };
+		B2D15A692B96D2052E6EE263 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40551EAD3108A101B4EBE10E /* SettingsView.swift */; };
+		B37297AABC8F492E524A2E9F /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D367B1017ADA8B148A6BEE2 /* TodayView.swift */; };
+		B85AE3AB3713E495697E7521 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4C1DEDB4F8F8EB500BD4488 /* WidgetKit.framework */; };
+		D1BE122BFBFBC1CDFD2B0C87 /* WordTimelineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E299AB3E1AC946276BB6D0F /* WordTimelineProvider.swift */; };
+		D5A49B913EAD0F4738176E76 /* SequoiaWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE9B468F30728F01468EC35 /* SequoiaWidgetsBundle.swift */; };
+		D8A7CC66D49E8AD19584511F /* SequoiaWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C152BC619DD15327009997 /* SequoiaWatchApp.swift */; };
+		D8FBD9481296BC574FAE63F8 /* SequoiaCore in Frameworks */ = {isa = PBXBuildFile; productRef = E68014313CEC9D991EBA7D08 /* SequoiaCore */; };
+		D9EA9A9A615EBD5A371A4AC4 /* PracticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F6DB480D1B256E1FD0BFAB5 /* PracticeView.swift */; };
+		DC06AC16015B7A59D70C5E16 /* ForestDescriptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600CA96E9A6C6E8462BC02D8 /* ForestDescriptionTests.swift */; };
+		DD337A486BF2F948B413551B /* MockSocialBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB6E153383FE6EE1042559C /* MockSocialBackend.swift */; };
+		E1B54B441D7DA24BEE6A26F4 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFFEA87C0869C537A75F6E43 /* AppModel.swift */; };
+		E4D397AC68B26A6E5EFA0B81 /* Previews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41904716FCDA57918A572A8 /* Previews.swift */; };
+		E8F649370AF0B32DBA10085B /* SequoiaCore in Frameworks */ = {isa = PBXBuildFile; productRef = B4A1906EBE8325D7CD715D4A /* SequoiaCore */; };
+		EE536B36FBF8B3D75FBD2D7D /* WatchTodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4520194AC9A1B8ABC4A478 /* WatchTodayView.swift */; };
+		F19F9E3D16F8203712612497 /* AppShellTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3CC12600F76759EE19525D7 /* AppShellTests.swift */; };
+		F1B2BB61E6443C2EBC73C94D /* SequoiaSocial.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9154838A3CF5F4B14A20A0A5 /* SequoiaSocial.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FB635E8C700863788C1FA978 /* GameCenterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F18D986C6320DC9878FF1A /* GameCenterBackend.swift */; };
+		FBC6228A27C8AF77AB862154 /* AppIconRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3A47EBEA296ED8EA09E112 /* AppIconRenderer.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		625E7BB828021DFDCF631BE3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1632991557C7D18E445D5917 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 39D215BC6252B220E6C786C7;
+			remoteInfo = SequoiaGameCenter;
+		};
+		81C89D14E674F0F7B14D7DB3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1632991557C7D18E445D5917 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1109F4F056DE6B4E64138EC2;
+			remoteInfo = SequoiaWatchWidgets;
+		};
+		8B0F2C2ED37846D2D634D36A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1632991557C7D18E445D5917 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7DD0CF0754C7A1C8A295FCFB;
+			remoteInfo = Sequoia;
+		};
+		A7003BE6BEC5EB2296C1B7EB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1632991557C7D18E445D5917 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6FF9145DF1C8889BBAF35E7F;
+			remoteInfo = SequoiaSocial;
+		};
+		B66B7F273F42AC0193BD5148 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1632991557C7D18E445D5917 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6FF9145DF1C8889BBAF35E7F;
+			remoteInfo = SequoiaSocial;
+		};
+		C809A7619B04D2CA667C8AB4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1632991557C7D18E445D5917 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 41AAF6D28D9FBBBA3EE33837;
+			remoteInfo = SequoiaWidgets;
+		};
+		DA31DD1857D4D5325CB879DA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1632991557C7D18E445D5917 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D3C829C26264DB7A521C370;
+			remoteInfo = SequoiaWatch;
+		};
+		DB2F9C622BB7ADF2D48053CC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1632991557C7D18E445D5917 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7DD0CF0754C7A1C8A295FCFB;
+			remoteInfo = Sequoia;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		53B2F43A9B8F15103EACA1EB /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				82147D9B082FF5D3CAC97798 /* SequoiaWatchWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		955CF2CD91F956068B8BB65F /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A545B10228384EB2EAD97560 /* SequoiaWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E73B77BA7ADC68E65B3CD641 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				F1B2BB61E6443C2EBC73C94D /* SequoiaSocial.framework in Embed Frameworks */,
+				7E21D6EFF2569AF560B5D55E /* SequoiaGameCenter.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		E4147542306E11F900846B1B /* Sequoia.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sequoia.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		00E453AD0E1337BDC3ADE2C3 /* SequoiaWatchWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SequoiaWatchWidgets.entitlements; sourceTree = "<group>"; };
+		0BADD2D87693C29D82913959 /* SequoiaWatchWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SequoiaWatchWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		0DE9660DEAA5BC7CF8232A31 /* WatchSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSyncService.swift; sourceTree = "<group>"; };
+		0E13A10658D17CA74C4E0091 /* SequoiaWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SequoiaWidgets.entitlements; sourceTree = "<group>"; };
+		1190E18848081C92E5DBB7FA /* DevLaunchActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevLaunchActions.swift; sourceTree = "<group>"; };
+		1802828E01CECB8A815682D8 /* Sequoia.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Sequoia.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F179AD0F0D678398B9818D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		24E01A1BA93071AE87693285 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		2F6DB480D1B256E1FD0BFAB5 /* PracticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeView.swift; sourceTree = "<group>"; };
+		2F6E0A3AF4591E3BB7C075E7 /* ForestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForestViewModel.swift; sourceTree = "<group>"; };
+		30FC1C435DD601D3DCBCC59E /* SequoiaWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SequoiaWatch.entitlements; sourceTree = "<group>"; };
+		311B9F6C8541AC99045D911A /* Sequoia.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Sequoia.entitlements; sourceTree = "<group>"; };
+		3996D2A404464A9540AD818C /* StreakWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakWidget.swift; sourceTree = "<group>"; };
+		3B989520859D90B26C11E406 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3E299AB3E1AC946276BB6D0F /* WordTimelineProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTimelineProvider.swift; sourceTree = "<group>"; };
+		3FB6E153383FE6EE1042559C /* MockSocialBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSocialBackend.swift; sourceTree = "<group>"; };
+		40551EAD3108A101B4EBE10E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		42EEC185ABE6AA185CD29D7B /* SequoiaKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SequoiaKit; path = Packages/SequoiaKit; sourceTree = SOURCE_ROOT; };
+		438BC97604ADA748C999DB3E /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
+		43C9D23232F64B23E39193EA /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+		49C152BC619DD15327009997 /* SequoiaWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequoiaWatchApp.swift; sourceTree = "<group>"; };
+		4D4520194AC9A1B8ABC4A478 /* WatchTodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTodayView.swift; sourceTree = "<group>"; };
+		52F86E7D8ACA881F8A5A0226 /* LaunchTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchTiming.swift; sourceTree = "<group>"; };
+		5D367B1017ADA8B148A6BEE2 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		600CA96E9A6C6E8462BC02D8 /* ForestDescriptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForestDescriptionTests.swift; sourceTree = "<group>"; };
+		60AB6E96F104BDC3BA927E20 /* SequoiaWatchWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequoiaWatchWidgets.swift; sourceTree = "<group>"; };
+		63FDEB041C4F1B95350FF25E /* SequoiaUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequoiaUITests.swift; sourceTree = "<group>"; };
+		69C33C22EFF12936BBFABAE4 /* GotItIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GotItIntent.swift; sourceTree = "<group>"; };
+		6D21F59574D028E4678383E0 /* SocialBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialBackend.swift; sourceTree = "<group>"; };
+		6D3A47EBEA296ED8EA09E112 /* AppIconRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconRenderer.swift; sourceTree = "<group>"; };
+		78A4E281EC2B5C5B4BACA4C6 /* SequoiaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequoiaApp.swift; sourceTree = "<group>"; };
+		79235F7D6BE9EB002558984E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7CFBD1F521E7E6A07B941ED4 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		819EE4E8501FAFC6004D4047 /* SequoiaUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SequoiaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		81F5045BD99FD07B0FED2A59 /* WatchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchModel.swift; sourceTree = "<group>"; };
+		8A26848DE4E5A132B102CED8 /* SequoiaWatchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SequoiaWatchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9154838A3CF5F4B14A20A0A5 /* SequoiaSocial.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SequoiaSocial.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		926F16B41CEB1239DFE772A2 /* SequoiaWatchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequoiaWatchUITests.swift; sourceTree = "<group>"; };
+		A4347A8ACBC9C03E2D10688A /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		A593996D17DA7CDFD15C5E18 /* DevModeBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevModeBadge.swift; sourceTree = "<group>"; };
+		A7944AC85C1E89DA5C586EC5 /* DevModeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevModeController.swift; sourceTree = "<group>"; };
+		A8AE27BB50917F4B8644C304 /* TodayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewModel.swift; sourceTree = "<group>"; };
+		AABE1A4DC442F843D4A753B0 /* WidgetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetUITests.swift; sourceTree = "<group>"; };
+		AC8076A34C4AD0C9216C69FC /* ShareRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareRenderer.swift; sourceTree = "<group>"; };
+		B4C1DEDB4F8F8EB500BD4488 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		B6A3961D54377D11B4C9EDE3 /* DeveloperPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperPanelView.swift; sourceTree = "<group>"; };
+		B6D9738ECBFCEDD69E70405F /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		BBA606C96F83BB11DED39E17 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		BC7016AC5EFD371847128B29 /* ForestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForestView.swift; sourceTree = "<group>"; };
+		BC975414C8CF6343E13D42DB /* PracticeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeViewModel.swift; sourceTree = "<group>"; };
+		CB2DE0B278A610D439BB5FF3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		CBFB75F02D94E3AD2C833467 /* WordWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordWidget.swift; sourceTree = "<group>"; };
+		CDD366CFC9F7E6179E913FEA /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
+		D98BBE25B175C6AB85A69B4B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		E21A6C1DC502472974310D87 /* DeferredGameCenterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredGameCenterBackend.swift; sourceTree = "<group>"; };
+		E41904716FCDA57918A572A8 /* Previews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Previews.swift; sourceTree = "<group>"; };
+		E441C02BD3D2FF20CB48A349 /* SequoiaWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SequoiaWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8F18D986C6320DC9878FF1A /* GameCenterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameCenterBackend.swift; sourceTree = "<group>"; };
+		EA8014DF0B13CAACB68A23A3 /* LibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewModel.swift; sourceTree = "<group>"; };
+		EAE9B468F30728F01468EC35 /* SequoiaWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequoiaWidgetsBundle.swift; sourceTree = "<group>"; };
+		EDAB8E33B5583AEFD5927CFD /* PronunciationPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PronunciationPlayer.swift; sourceTree = "<group>"; };
+		EF584E36DE200FD66087E767 /* SequoiaTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SequoiaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		EF604E0C33F1A1E3F421A485 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		EFFEA87C0869C537A75F6E43 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		F1649958CE65DD9E6501A52C /* SequoiaGameCenter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SequoiaGameCenter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F23CB7FEDED011D152F41398 /* SocialModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialModel.swift; sourceTree = "<group>"; };
+		F3CC12600F76759EE19525D7 /* AppShellTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellTests.swift; sourceTree = "<group>"; };
+		F6E2BAD595F1BCBA485E91CB /* SequoiaWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SequoiaWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		E4147544306E11F900846B1B /* Sequoia */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Sequoia;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
-
 /* Begin PBXFrameworksBuildPhase section */
-		E414753F306E11F900846B1B /* Frameworks */ = {
+		0F415675E3959726A9534FD3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
+				80AC002C6EA401CA4534B1B2 /* SequoiaCore in Frameworks */,
+				329A135E2EAA6909A0D73416 /* DesignSystem in Frameworks */,
+				95782B34FA87388EAC7B6516 /* SequoiaSocial.framework in Frameworks */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F0E66EECF77E25FF79109D5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D8FBD9481296BC574FAE63F8 /* SequoiaCore in Frameworks */,
+				855F5FC89E80B839763ED146 /* DesignSystem in Frameworks */,
+				0387BE73D0E327BE6AD03F6C /* WidgetKit.framework in Frameworks */,
+				95134D50D0D69BB44D1D4470 /* SwiftUI.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22747283861594410B365955 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8F649370AF0B32DBA10085B /* SequoiaCore in Frameworks */,
+				1E4369A4AA5E1A3A97BA5A9C /* DesignSystem in Frameworks */,
+				B85AE3AB3713E495697E7521 /* WidgetKit.framework in Frameworks */,
+				AD70A0EF84F3F5CCD7BFF1F9 /* SwiftUI.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6B456F848F6DD819E5A50144 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6AEC4F16F870849814F96234 /* SequoiaCore in Frameworks */,
+				8FBC8D6A595F1F3EC8AE8A68 /* DesignSystem in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B4989511240C36896764408D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				794D5322995D6ED8454FAFE7 /* SequoiaSocial.framework in Frameworks */,
+				7899F4611B80B79AEC9732CB /* GameKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		E4147539306E11F900846B1B = {
+		042C2EBBACAD8E1FD2CD617E /* Social */ = {
 			isa = PBXGroup;
 			children = (
-				E4147544306E11F900846B1B /* Sequoia */,
-				E4147543306E11F900846B1B /* Products */,
+				E21A6C1DC502472974310D87 /* DeferredGameCenterBackend.swift */,
+				3FB6E153383FE6EE1042559C /* MockSocialBackend.swift */,
+				F23CB7FEDED011D152F41398 /* SocialModel.swift */,
+			);
+			path = Social;
+			sourceTree = "<group>";
+		};
+		0ABBCD020E830B7B7A0C8AF2 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				BBA606C96F83BB11DED39E17 /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		0B00A013719489E3F6EEA21A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				79235F7D6BE9EB002558984E /* Assets.xcassets */,
+				A4347A8ACBC9C03E2D10688A /* Localizable.xcstrings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		0D981EF60CBC5DDB8AB5BC12 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				43C9D23232F64B23E39193EA /* LibraryView.swift */,
+				EA8014DF0B13CAACB68A23A3 /* LibraryViewModel.swift */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
+		1EDD00A6C18AD8C4EF7D70EA /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				7CFBD1F521E7E6A07B941ED4 /* AboutView.swift */,
+				40551EAD3108A101B4EBE10E /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		2423D8911658FC7F8F8E76D9 /* Developer */ = {
+			isa = PBXGroup;
+			children = (
+				B6A3961D54377D11B4C9EDE3 /* DeveloperPanelView.swift */,
+				1190E18848081C92E5DBB7FA /* DevLaunchActions.swift */,
+				A593996D17DA7CDFD15C5E18 /* DevModeBadge.swift */,
+				A7944AC85C1E89DA5C586EC5 /* DevModeController.swift */,
+				52F86E7D8ACA881F8A5A0226 /* LaunchTiming.swift */,
+			);
+			path = Developer;
+			sourceTree = "<group>";
+		};
+		25873F1590BDAEA4C0EB887E /* SequoiaWatchWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				EF604E0C33F1A1E3F421A485 /* Info.plist */,
+				00E453AD0E1337BDC3ADE2C3 /* SequoiaWatchWidgets.entitlements */,
+				60AB6E96F104BDC3BA927E20 /* SequoiaWatchWidgets.swift */,
+			);
+			path = SequoiaWatchWidgets;
+			sourceTree = "<group>";
+		};
+		34896F8089F20A1AD60E8ADC /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				42EEC185ABE6AA185CD29D7B /* SequoiaKit */,
+			);
+			path = Packages;
+			sourceTree = "<group>";
+		};
+		388DE835A52B2E4DA411F951 /* SequoiaTests */ = {
+			isa = PBXGroup;
+			children = (
+				6D3A47EBEA296ED8EA09E112 /* AppIconRenderer.swift */,
+				F3CC12600F76759EE19525D7 /* AppShellTests.swift */,
+				600CA96E9A6C6E8462BC02D8 /* ForestDescriptionTests.swift */,
+			);
+			path = SequoiaTests;
+			sourceTree = "<group>";
+		};
+		3E35E36B687ED5C1486FD51B /* Sequoia */ = {
+			isa = PBXGroup;
+			children = (
+				1F179AD0F0D678398B9818D5 /* Info.plist */,
+				311B9F6C8541AC99045D911A /* Sequoia.entitlements */,
+				B5D8B5623AA60AD87D59C0EA /* App */,
+				FDB8EF34A9CF307DC2CE9020 /* Core */,
+				F4A5112190AE3ECD009B0D67 /* Features */,
+				0B00A013719489E3F6EEA21A /* Resources */,
+			);
+			path = Sequoia;
+			sourceTree = "<group>";
+		};
+		4846E2501BE5BF4057DB39AF /* Today */ = {
+			isa = PBXGroup;
+			children = (
+				5D367B1017ADA8B148A6BEE2 /* TodayView.swift */,
+				A8AE27BB50917F4B8644C304 /* TodayViewModel.swift */,
+			);
+			path = Today;
+			sourceTree = "<group>";
+		};
+		4C10B61F2ACE9D098D5C9B35 /* Practice */ = {
+			isa = PBXGroup;
+			children = (
+				2F6DB480D1B256E1FD0BFAB5 /* PracticeView.swift */,
+				BC975414C8CF6343E13D42DB /* PracticeViewModel.swift */,
+			);
+			path = Practice;
+			sourceTree = "<group>";
+		};
+		72FF009AFBD348779D97B66E = {
+			isa = PBXGroup;
+			children = (
+				34896F8089F20A1AD60E8ADC /* Packages */,
+				3E35E36B687ED5C1486FD51B /* Sequoia */,
+				990AFB284B57DB2A9358903E /* SequoiaGameCenter */,
+				EAC13561CD85AAA733CD4BA4 /* SequoiaSocial */,
+				388DE835A52B2E4DA411F951 /* SequoiaTests */,
+				AE3BBC4BD0F98DE2D36A2148 /* SequoiaUITests */,
+				FC494946FF86FD34D26561CF /* SequoiaWatch */,
+				F08FA0E549010735684E3B39 /* SequoiaWatchUITests */,
+				25873F1590BDAEA4C0EB887E /* SequoiaWatchWidgets */,
+				DE7C91F8B028913D2E733AC0 /* SequoiaWidgets */,
+				BAFDFCC176E60EBAD436EBCD /* Frameworks */,
+				8806BE882C7C6CA80A0B8255 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		E4147543306E11F900846B1B /* Products */ = {
+		8806BE882C7C6CA80A0B8255 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E4147542306E11F900846B1B /* Sequoia.app */,
+				1802828E01CECB8A815682D8 /* Sequoia.app */,
+				F1649958CE65DD9E6501A52C /* SequoiaGameCenter.framework */,
+				9154838A3CF5F4B14A20A0A5 /* SequoiaSocial.framework */,
+				EF584E36DE200FD66087E767 /* SequoiaTests.xctest */,
+				819EE4E8501FAFC6004D4047 /* SequoiaUITests.xctest */,
+				E441C02BD3D2FF20CB48A349 /* SequoiaWatch.app */,
+				8A26848DE4E5A132B102CED8 /* SequoiaWatchUITests.xctest */,
+				0BADD2D87693C29D82913959 /* SequoiaWatchWidgets.appex */,
+				F6E2BAD595F1BCBA485E91CB /* SequoiaWidgets.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		990AFB284B57DB2A9358903E /* SequoiaGameCenter */ = {
+			isa = PBXGroup;
+			children = (
+				E8F18D986C6320DC9878FF1A /* GameCenterBackend.swift */,
+			);
+			path = SequoiaGameCenter;
+			sourceTree = "<group>";
+		};
+		AE3BBC4BD0F98DE2D36A2148 /* SequoiaUITests */ = {
+			isa = PBXGroup;
+			children = (
+				63FDEB041C4F1B95350FF25E /* SequoiaUITests.swift */,
+				AABE1A4DC442F843D4A753B0 /* WidgetUITests.swift */,
+			);
+			path = SequoiaUITests;
+			sourceTree = "<group>";
+		};
+		B5D8B5623AA60AD87D59C0EA /* App */ = {
+			isa = PBXGroup;
+			children = (
+				EFFEA87C0869C537A75F6E43 /* AppModel.swift */,
+				CDD366CFC9F7E6179E913FEA /* AppTab.swift */,
+				E41904716FCDA57918A572A8 /* Previews.swift */,
+				D98BBE25B175C6AB85A69B4B /* RootView.swift */,
+				78A4E281EC2B5C5B4BACA4C6 /* SequoiaApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		BAFDFCC176E60EBAD436EBCD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				438BC97604ADA748C999DB3E /* GameKit.framework */,
+				24E01A1BA93071AE87693285 /* SwiftUI.framework */,
+				B4C1DEDB4F8F8EB500BD4488 /* WidgetKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DE7C91F8B028913D2E733AC0 /* SequoiaWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				69C33C22EFF12936BBFABAE4 /* GotItIntent.swift */,
+				CB2DE0B278A610D439BB5FF3 /* Info.plist */,
+				0E13A10658D17CA74C4E0091 /* SequoiaWidgets.entitlements */,
+				EAE9B468F30728F01468EC35 /* SequoiaWidgetsBundle.swift */,
+				3996D2A404464A9540AD818C /* StreakWidget.swift */,
+				3E299AB3E1AC946276BB6D0F /* WordTimelineProvider.swift */,
+				CBFB75F02D94E3AD2C833467 /* WordWidget.swift */,
+			);
+			path = SequoiaWidgets;
+			sourceTree = "<group>";
+		};
+		EAC13561CD85AAA733CD4BA4 /* SequoiaSocial */ = {
+			isa = PBXGroup;
+			children = (
+				6D21F59574D028E4678383E0 /* SocialBackend.swift */,
+			);
+			path = SequoiaSocial;
+			sourceTree = "<group>";
+		};
+		F08FA0E549010735684E3B39 /* SequoiaWatchUITests */ = {
+			isa = PBXGroup;
+			children = (
+				926F16B41CEB1239DFE772A2 /* SequoiaWatchUITests.swift */,
+			);
+			path = SequoiaWatchUITests;
+			sourceTree = "<group>";
+		};
+		F4A5112190AE3ECD009B0D67 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				2423D8911658FC7F8F8E76D9 /* Developer */,
+				FF484B4AD81C859A1E3D9F17 /* Forest */,
+				0D981EF60CBC5DDB8AB5BC12 /* Library */,
+				0ABBCD020E830B7B7A0C8AF2 /* Onboarding */,
+				4C10B61F2ACE9D098D5C9B35 /* Practice */,
+				1EDD00A6C18AD8C4EF7D70EA /* Settings */,
+				4846E2501BE5BF4057DB39AF /* Today */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		FC494946FF86FD34D26561CF /* SequoiaWatch */ = {
+			isa = PBXGroup;
+			children = (
+				3B989520859D90B26C11E406 /* Assets.xcassets */,
+				30FC1C435DD601D3DCBCC59E /* SequoiaWatch.entitlements */,
+				49C152BC619DD15327009997 /* SequoiaWatchApp.swift */,
+				81F5045BD99FD07B0FED2A59 /* WatchModel.swift */,
+				4D4520194AC9A1B8ABC4A478 /* WatchTodayView.swift */,
+			);
+			path = SequoiaWatch;
+			sourceTree = "<group>";
+		};
+		FDB8EF34A9CF307DC2CE9020 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				B6D9738ECBFCEDD69E70405F /* NotificationService.swift */,
+				EDAB8E33B5583AEFD5927CFD /* PronunciationPlayer.swift */,
+				AC8076A34C4AD0C9216C69FC /* ShareRenderer.swift */,
+				0DE9660DEAA5BC7CF8232A31 /* WatchSyncService.swift */,
+				042C2EBBACAD8E1FD2CD617E /* Social */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		FF484B4AD81C859A1E3D9F17 /* Forest */ = {
+			isa = PBXGroup;
+			children = (
+				BC7016AC5EFD371847128B29 /* ForestView.swift */,
+				2F6E0A3AF4591E3BB7C075E7 /* ForestViewModel.swift */,
+			);
+			path = Forest;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E4147541306E11F900846B1B /* Sequoia */ = {
+		1109F4F056DE6B4E64138EC2 /* SequoiaWatchWidgets */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E414754D306E11FA00846B1B /* Build configuration list for PBXNativeTarget "Sequoia" */;
+			buildConfigurationList = 379CD7C0600BC722C8B02DD6 /* Build configuration list for PBXNativeTarget "SequoiaWatchWidgets" */;
 			buildPhases = (
-				E414753E306E11F900846B1B /* Sources */,
-				E414753F306E11F900846B1B /* Frameworks */,
-				E4147540306E11F900846B1B /* Resources */,
+				B5334A9415FD862E535F1B80 /* Sources */,
+				22747283861594410B365955 /* Frameworks */,
 			);
 			buildRules = (
 			);
-			fileSystemSynchronizedGroups = (
-				E4147544306E11F900846B1B /* Sequoia */,
+			dependencies = (
+			);
+			name = SequoiaWatchWidgets;
+			packageProductDependencies = (
+				B4A1906EBE8325D7CD715D4A /* SequoiaCore */,
+				45E29BE9DD7CF5BD9D7432F5 /* DesignSystem */,
+			);
+			productName = SequoiaWatchWidgets;
+			productReference = 0BADD2D87693C29D82913959 /* SequoiaWatchWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		39D215BC6252B220E6C786C7 /* SequoiaGameCenter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE300A2B1945B2BAAD9E7E27 /* Build configuration list for PBXNativeTarget "SequoiaGameCenter" */;
+			buildPhases = (
+				91839A2DC0BDF733B2174A04 /* Sources */,
+				B4989511240C36896764408D /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C30D144E3C2C1F6090B71018 /* PBXTargetDependency */,
+			);
+			name = SequoiaGameCenter;
+			packageProductDependencies = (
+			);
+			productName = SequoiaGameCenter;
+			productReference = F1649958CE65DD9E6501A52C /* SequoiaGameCenter.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		41AAF6D28D9FBBBA3EE33837 /* SequoiaWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F84E44C0E26BC6E833D4160B /* Build configuration list for PBXNativeTarget "SequoiaWidgets" */;
+			buildPhases = (
+				6861887FAC7128772E229087 /* Sources */,
+				1F0E66EECF77E25FF79109D5 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SequoiaWidgets;
+			packageProductDependencies = (
+				E68014313CEC9D991EBA7D08 /* SequoiaCore */,
+				A14025659DDE29B1470474BA /* DesignSystem */,
+			);
+			productName = SequoiaWidgets;
+			productReference = F6E2BAD595F1BCBA485E91CB /* SequoiaWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		6561ECD563FF9FE3CF5BD5CD /* SequoiaWatchUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 32E9D5188FA22FAAE603DF11 /* Build configuration list for PBXNativeTarget "SequoiaWatchUITests" */;
+			buildPhases = (
+				56E1AB8614B134C90910D851 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1B59FDF9D09BBAD4CA74ECB5 /* PBXTargetDependency */,
+			);
+			name = SequoiaWatchUITests;
+			packageProductDependencies = (
+			);
+			productName = SequoiaWatchUITests;
+			productReference = 8A26848DE4E5A132B102CED8 /* SequoiaWatchUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		6FF9145DF1C8889BBAF35E7F /* SequoiaSocial */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6B142702A1764ED6E0BF77AA /* Build configuration list for PBXNativeTarget "SequoiaSocial" */;
+			buildPhases = (
+				9B5DE1918DF74FCD2051513A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SequoiaSocial;
+			packageProductDependencies = (
+			);
+			productName = SequoiaSocial;
+			productReference = 9154838A3CF5F4B14A20A0A5 /* SequoiaSocial.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		7DD0CF0754C7A1C8A295FCFB /* Sequoia */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0CD625F489C6AF435B1D8060 /* Build configuration list for PBXNativeTarget "Sequoia" */;
+			buildPhases = (
+				2811F30C99D8662A1D3C0D22 /* Sources */,
+				615E876C0BA7D1552F238D5E /* Resources */,
+				0F415675E3959726A9534FD3 /* Frameworks */,
+				955CF2CD91F956068B8BB65F /* Embed Foundation Extensions */,
+				E73B77BA7ADC68E65B3CD641 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A9E9545E442E7921D32840D0 /* PBXTargetDependency */,
+				65C4458DF8BF75C424E0BA44 /* PBXTargetDependency */,
+				9D8F9BCA6DCE7338DDC54D70 /* PBXTargetDependency */,
 			);
 			name = Sequoia;
+			packageProductDependencies = (
+				AEC636F98F01BD79D23D3B10 /* SequoiaCore */,
+				9AA26B289CE1B66548433A64 /* DesignSystem */,
+			);
 			productName = Sequoia;
-			productReference = E4147542306E11F900846B1B /* Sequoia.app */;
+			productReference = 1802828E01CECB8A815682D8 /* Sequoia.app */;
 			productType = "com.apple.product-type.application";
+		};
+		8D3C829C26264DB7A521C370 /* SequoiaWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4DFDED2E9B325F80A191346F /* Build configuration list for PBXNativeTarget "SequoiaWatch" */;
+			buildPhases = (
+				A7EB21FE3BB2A8373F1B4D52 /* Sources */,
+				52C8345EC32CBE6EA79AFDE2 /* Resources */,
+				6B456F848F6DD819E5A50144 /* Frameworks */,
+				53B2F43A9B8F15103EACA1EB /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A2CE0D6DB884F109213457B5 /* PBXTargetDependency */,
+			);
+			name = SequoiaWatch;
+			packageProductDependencies = (
+				E16679957C9006655E99F204 /* SequoiaCore */,
+				519E88A77D8A5F5612C8AF08 /* DesignSystem */,
+			);
+			productName = SequoiaWatch;
+			productReference = E441C02BD3D2FF20CB48A349 /* SequoiaWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9F4820289241F624571F6BEC /* SequoiaUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B75FD16ACBB91A9497B5E91C /* Build configuration list for PBXNativeTarget "SequoiaUITests" */;
+			buildPhases = (
+				3D94EB677AF3C8E503655A0B /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8E252F318A51FE2978C0C78A /* PBXTargetDependency */,
+			);
+			name = SequoiaUITests;
+			packageProductDependencies = (
+			);
+			productName = SequoiaUITests;
+			productReference = 819EE4E8501FAFC6004D4047 /* SequoiaUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		C1CEF1BC77F17FAA264FA133 /* SequoiaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F87001D8972EE6197ACEA610 /* Build configuration list for PBXNativeTarget "SequoiaTests" */;
+			buildPhases = (
+				BDCD97C26B7B85FE375144E0 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				92E3CB5B06BDE2FAD5C052CA /* PBXTargetDependency */,
+			);
+			name = SequoiaTests;
+			packageProductDependencies = (
+			);
+			productName = SequoiaTests;
+			productReference = EF584E36DE200FD66087E767 /* SequoiaTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		E414753A306E11F900846B1B /* Project object */ = {
+		1632991557C7D18E445D5917 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2700;
-				LastUpgradeCheck = 2700;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
-					E4147541306E11F900846B1B = {
-						CreatedOnToolsVersion = 27.0;
+					1109F4F056DE6B4E64138EC2 = {
+						DevelopmentTeam = UGWCHMHVJX;
+						ProvisioningStyle = Automatic;
+					};
+					39D215BC6252B220E6C786C7 = {
+						DevelopmentTeam = UGWCHMHVJX;
+						ProvisioningStyle = Automatic;
+					};
+					41AAF6D28D9FBBBA3EE33837 = {
+						DevelopmentTeam = UGWCHMHVJX;
+						ProvisioningStyle = Automatic;
+					};
+					6561ECD563FF9FE3CF5BD5CD = {
+						DevelopmentTeam = UGWCHMHVJX;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 8D3C829C26264DB7A521C370;
+					};
+					6FF9145DF1C8889BBAF35E7F = {
+						DevelopmentTeam = UGWCHMHVJX;
+						ProvisioningStyle = Automatic;
+					};
+					7DD0CF0754C7A1C8A295FCFB = {
+						DevelopmentTeam = UGWCHMHVJX;
+						ProvisioningStyle = Automatic;
+					};
+					8D3C829C26264DB7A521C370 = {
+						DevelopmentTeam = UGWCHMHVJX;
+						ProvisioningStyle = Automatic;
+					};
+					9F4820289241F624571F6BEC = {
+						DevelopmentTeam = UGWCHMHVJX;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 7DD0CF0754C7A1C8A295FCFB;
+					};
+					C1CEF1BC77F17FAA264FA133 = {
+						DevelopmentTeam = UGWCHMHVJX;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
-			buildConfigurationList = E414753D306E11F900846B1B /* Build configuration list for PBXProject "Sequoia" */;
+			buildConfigurationList = 0ACD2A0A9C1C1FC8FEA1B18D /* Build configuration list for PBXProject "Sequoia" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				Base,
+				en,
 			);
-			mainGroup = E4147539306E11F900846B1B;
+			mainGroup = 72FF009AFBD348779D97B66E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3D27599441A1EA6B5DAC79B3 /* XCLocalSwiftPackageReference "Packages/SequoiaKit" */,
+			);
 			preferredProjectObjectVersion = 77;
-			productRefGroup = E4147543306E11F900846B1B /* Products */;
+			productRefGroup = 8806BE882C7C6CA80A0B8255 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E4147541306E11F900846B1B /* Sequoia */,
+				7DD0CF0754C7A1C8A295FCFB /* Sequoia */,
+				6FF9145DF1C8889BBAF35E7F /* SequoiaSocial */,
+				39D215BC6252B220E6C786C7 /* SequoiaGameCenter */,
+				41AAF6D28D9FBBBA3EE33837 /* SequoiaWidgets */,
+				8D3C829C26264DB7A521C370 /* SequoiaWatch */,
+				1109F4F056DE6B4E64138EC2 /* SequoiaWatchWidgets */,
+				6561ECD563FF9FE3CF5BD5CD /* SequoiaWatchUITests */,
+				C1CEF1BC77F17FAA264FA133 /* SequoiaTests */,
+				9F4820289241F624571F6BEC /* SequoiaUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		E4147540306E11F900846B1B /* Resources */ = {
+		52C8345EC32CBE6EA79AFDE2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
+				37066A3C28A94348796604EB /* Assets.xcassets in Resources */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		615E876C0BA7D1552F238D5E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				889C9DEF6B51703A2AE3B218 /* Assets.xcassets in Resources */,
+				70CA432870E2BBBBB2C0E76E /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		E414753E306E11F900846B1B /* Sources */ = {
+		2811F30C99D8662A1D3C0D22 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
+				707403B17C9F32640C31CBE2 /* AboutView.swift in Sources */,
+				E1B54B441D7DA24BEE6A26F4 /* AppModel.swift in Sources */,
+				3AFEFE1794E64E16F723CB20 /* AppTab.swift in Sources */,
+				27DF2E42AE0A8450667E43B0 /* DeferredGameCenterBackend.swift in Sources */,
+				72D77BEF1C514FB13A97BE6C /* DevLaunchActions.swift in Sources */,
+				59756EDD9D17AB3B70F874EE /* DevModeBadge.swift in Sources */,
+				5BD51D8A1203ACB3D6E39C07 /* DevModeController.swift in Sources */,
+				091FB2CCC51F39A634318C49 /* DeveloperPanelView.swift in Sources */,
+				6FAE13DCBADA1144DF87B1A0 /* ForestView.swift in Sources */,
+				50F591777AA9B749C0D0B2C8 /* ForestViewModel.swift in Sources */,
+				6F1622242B8A9B0385D406A2 /* LaunchTiming.swift in Sources */,
+				6643DDE359A8B7C5AEDF7391 /* LibraryView.swift in Sources */,
+				A8956AF58B47F6ACD33A39FB /* LibraryViewModel.swift in Sources */,
+				DD337A486BF2F948B413551B /* MockSocialBackend.swift in Sources */,
+				47D708D0A9A9AC41D71DE06B /* NotificationService.swift in Sources */,
+				455427CE11A7F139E4772286 /* OnboardingView.swift in Sources */,
+				D9EA9A9A615EBD5A371A4AC4 /* PracticeView.swift in Sources */,
+				12FCEB71EA833EAA69318E66 /* PracticeViewModel.swift in Sources */,
+				E4D397AC68B26A6E5EFA0B81 /* Previews.swift in Sources */,
+				4B9BEBF118BA8798DD82FADB /* PronunciationPlayer.swift in Sources */,
+				8F2A7867E037DA6929F11C96 /* RootView.swift in Sources */,
+				3D5EFBA0D162AB96E5CF95D9 /* SequoiaApp.swift in Sources */,
+				B2D15A692B96D2052E6EE263 /* SettingsView.swift in Sources */,
+				ACC9A9B798A23588531BF6F6 /* ShareRenderer.swift in Sources */,
+				65677DD8E6391EFCA4B777B7 /* SocialModel.swift in Sources */,
+				B37297AABC8F492E524A2E9F /* TodayView.swift in Sources */,
+				6ED68CE1F7AB28349C0DD836 /* TodayViewModel.swift in Sources */,
+				5B30F249FACD0F74EEFE2CDA /* WatchSyncService.swift in Sources */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D94EB677AF3C8E503655A0B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4ED3C9C7EA3907FDED0CC700 /* SequoiaUITests.swift in Sources */,
+				56B74BF2A31E121264597B22 /* WidgetUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		56E1AB8614B134C90910D851 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3957571A9DD38643ADBAA96D /* SequoiaWatchUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6861887FAC7128772E229087 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4F3D78484AECC4A9A8F9EF80 /* GotItIntent.swift in Sources */,
+				D5A49B913EAD0F4738176E76 /* SequoiaWidgetsBundle.swift in Sources */,
+				7A4D284D0548C8F616B3029E /* StreakWidget.swift in Sources */,
+				D1BE122BFBFBC1CDFD2B0C87 /* WordTimelineProvider.swift in Sources */,
+				71EFC6420C8D99326FA7DA3E /* WordWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		91839A2DC0BDF733B2174A04 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB635E8C700863788C1FA978 /* GameCenterBackend.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9B5DE1918DF74FCD2051513A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4A5AD1D53AA0DD170AB2E43 /* SocialBackend.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A7EB21FE3BB2A8373F1B4D52 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D8A7CC66D49E8AD19584511F /* SequoiaWatchApp.swift in Sources */,
+				43B5576098F0A560AA991357 /* WatchModel.swift in Sources */,
+				EE536B36FBF8B3D75FBD2D7D /* WatchTodayView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B5334A9415FD862E535F1B80 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B09EA1F94A23A7102BFCB20B /* SequoiaWatchWidgets.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BDCD97C26B7B85FE375144E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FBC6228A27C8AF77AB862154 /* AppIconRenderer.swift in Sources */,
+				F19F9E3D16F8203712612497 /* AppShellTests.swift in Sources */,
+				DC06AC16015B7A59D70C5E16 /* ForestDescriptionTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		1B59FDF9D09BBAD4CA74ECB5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D3C829C26264DB7A521C370 /* SequoiaWatch */;
+			targetProxy = DA31DD1857D4D5325CB879DA /* PBXContainerItemProxy */;
+		};
+		65C4458DF8BF75C424E0BA44 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 39D215BC6252B220E6C786C7 /* SequoiaGameCenter */;
+			targetProxy = 625E7BB828021DFDCF631BE3 /* PBXContainerItemProxy */;
+		};
+		8E252F318A51FE2978C0C78A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7DD0CF0754C7A1C8A295FCFB /* Sequoia */;
+			targetProxy = 8B0F2C2ED37846D2D634D36A /* PBXContainerItemProxy */;
+		};
+		92E3CB5B06BDE2FAD5C052CA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7DD0CF0754C7A1C8A295FCFB /* Sequoia */;
+			targetProxy = DB2F9C622BB7ADF2D48053CC /* PBXContainerItemProxy */;
+		};
+		9D8F9BCA6DCE7338DDC54D70 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 41AAF6D28D9FBBBA3EE33837 /* SequoiaWidgets */;
+			targetProxy = C809A7619B04D2CA667C8AB4 /* PBXContainerItemProxy */;
+		};
+		A2CE0D6DB884F109213457B5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1109F4F056DE6B4E64138EC2 /* SequoiaWatchWidgets */;
+			targetProxy = 81C89D14E674F0F7B14D7DB3 /* PBXContainerItemProxy */;
+		};
+		A9E9545E442E7921D32840D0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6FF9145DF1C8889BBAF35E7F /* SequoiaSocial */;
+			targetProxy = B66B7F273F42AC0193BD5148 /* PBXContainerItemProxy */;
+		};
+		C30D144E3C2C1F6090B71018 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6FF9145DF1C8889BBAF35E7F /* SequoiaSocial */;
+			targetProxy = A7003BE6BEC5EB2296C1B7EB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
-		E414754B306E11FA00846B1B /* Debug configuration for PBXProject "Sequoia" */ = {
+		107566D87096BEE3B0EF7F14 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -148,18 +1033,382 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = UGWCHMHVJX;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = NO;
+				SWIFT_VERSION = 6.0;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		2DF27DECDDFE12F1BA91D35E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.Sequoia.Social;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		3F3F48D59B8631C409F20A12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.Sequoia.GameCenter;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		5745123A8FD8EE12448A63BD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SequoiaWidgets/SequoiaWidgets.entitlements;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SequoiaWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Sequoia;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.Sequoia.WidgetExtension;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		5E1F5C9D6EE40AD6563018A2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sequoia/Sequoia.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sequoia/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Sequoia;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.Sequoia;
+				SDKROOT = iphoneos;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		64E72A7525EA4894C167087A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.SequoiaWatchUITests;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = SequoiaWatch;
+			};
+			name = Release;
+		};
+		6A0D7BD9E50A08C3E9BB59F0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.Sequoia.GameCenter;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		7BE880B56E03CC8839C09BC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sequoia/Sequoia.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sequoia/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Sequoia;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.Sequoia;
+				SDKROOT = iphoneos;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		832D422DF74DB6B1C022C36E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SequoiaWidgets/SequoiaWidgets.entitlements;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SequoiaWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Sequoia;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.Sequoia.WidgetExtension;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		837573E8A57752989B44FA96 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SequoiaWatch/SequoiaWatch.entitlements;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Sequoia;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = app.sequoia.Sequoia;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.Sequoia.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+		85DB98E6C336E7700A2AA968 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SequoiaWatchWidgets/SequoiaWatchWidgets.entitlements;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SequoiaWatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.Sequoia.watchkitapp.Complications;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+		87C616DCF490F0C99C442F75 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SequoiaWatch/SequoiaWatch.entitlements;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Sequoia;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = app.sequoia.Sequoia;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.Sequoia.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
+		};
+		90CA243BC88956D1ADBB2642 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.SequoiaTests;
+				SDKROOT = iphoneos;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Sequoia.app/Sequoia";
+			};
+			name = Release;
+		};
+		A6A4E60FD87EC851C17A4259 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.SequoiaUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Sequoia;
+			};
+			name = Release;
+		};
+		AB6C5CC6AA1ED794C53673F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SequoiaWatchWidgets/SequoiaWatchWidgets.entitlements;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SequoiaWatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.Sequoia.watchkitapp.Complications;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
+		};
+		B9ADF31EFD996D3A8519F94E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.SequoiaWatchUITests;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = SequoiaWatch;
+			};
+			name = Debug;
+		};
+		CCA57AAA000DD9B92D9DDF51 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = UGWCHMHVJX;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
 					"$(inherited)",
+					"DEBUG=1",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -167,156 +1416,217 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG SEQUOIA_DEV";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = NO;
+				SWIFT_VERSION = 6.0;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
 		};
-		E414754C306E11FA00846B1B /* Release configuration for PBXProject "Sequoia" */ = {
+		D29FE934D7DFE76D8C52F16A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.SequoiaTests;
 				SDKROOT = iphoneos;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		E414754E306E11FA00846B1B /* Debug configuration for PBXNativeTarget "Sequoia" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.alexbuki.Sequoia;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Sequoia.app/Sequoia";
 			};
 			name = Debug;
 		};
-		E414754F306E11FA00846B1B /* Release configuration for PBXNativeTarget "Sequoia" */ = {
+		F20E078052BF4693AE60944F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "";
 				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_PREVIEWS = YES;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.alexbuki.Sequoia;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.Sequoia.Social;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+				VERSIONING_SYSTEM = "apple-generic";
 			};
-			name = Release;
+			name = Debug;
+		};
+		F21ED9B672827D2FBE52D37B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.sequoia.SequoiaUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Sequoia;
+			};
+			name = Debug;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E414753D306E11F900846B1B /* Build configuration list for PBXProject "Sequoia" */ = {
+		0ACD2A0A9C1C1FC8FEA1B18D /* Build configuration list for PBXProject "Sequoia" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E414754B306E11FA00846B1B /* Debug configuration for PBXProject "Sequoia" */,
-				E414754C306E11FA00846B1B /* Release configuration for PBXProject "Sequoia" */,
+				CCA57AAA000DD9B92D9DDF51 /* Debug */,
+				107566D87096BEE3B0EF7F14 /* Release */,
 			);
-			defaultConfigurationName = Release;
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
 		};
-		E414754D306E11FA00846B1B /* Build configuration list for PBXNativeTarget "Sequoia" */ = {
+		0CD625F489C6AF435B1D8060 /* Build configuration list for PBXNativeTarget "Sequoia" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E414754E306E11FA00846B1B /* Debug configuration for PBXNativeTarget "Sequoia" */,
-				E414754F306E11FA00846B1B /* Release configuration for PBXNativeTarget "Sequoia" */,
+				7BE880B56E03CC8839C09BC3 /* Debug */,
+				5E1F5C9D6EE40AD6563018A2 /* Release */,
 			);
-			defaultConfigurationName = Release;
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		32E9D5188FA22FAAE603DF11 /* Build configuration list for PBXNativeTarget "SequoiaWatchUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B9ADF31EFD996D3A8519F94E /* Debug */,
+				64E72A7525EA4894C167087A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		379CD7C0600BC722C8B02DD6 /* Build configuration list for PBXNativeTarget "SequoiaWatchWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85DB98E6C336E7700A2AA968 /* Debug */,
+				AB6C5CC6AA1ED794C53673F8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		4DFDED2E9B325F80A191346F /* Build configuration list for PBXNativeTarget "SequoiaWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				837573E8A57752989B44FA96 /* Debug */,
+				87C616DCF490F0C99C442F75 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		6B142702A1764ED6E0BF77AA /* Build configuration list for PBXNativeTarget "SequoiaSocial" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F20E078052BF4693AE60944F /* Debug */,
+				2DF27DECDDFE12F1BA91D35E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B75FD16ACBB91A9497B5E91C /* Build configuration list for PBXNativeTarget "SequoiaUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F21ED9B672827D2FBE52D37B /* Debug */,
+				A6A4E60FD87EC851C17A4259 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CE300A2B1945B2BAAD9E7E27 /* Build configuration list for PBXNativeTarget "SequoiaGameCenter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A0D7BD9E50A08C3E9BB59F0 /* Debug */,
+				3F3F48D59B8631C409F20A12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F84E44C0E26BC6E833D4160B /* Build configuration list for PBXNativeTarget "SequoiaWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				832D422DF74DB6B1C022C36E /* Debug */,
+				5745123A8FD8EE12448A63BD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F87001D8972EE6197ACEA610 /* Build configuration list for PBXNativeTarget "SequoiaTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D29FE934D7DFE76D8C52F16A /* Debug */,
+				90CA243BC88956D1ADBB2642 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		3D27599441A1EA6B5DAC79B3 /* XCLocalSwiftPackageReference "Packages/SequoiaKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/SequoiaKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		45E29BE9DD7CF5BD9D7432F5 /* DesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DesignSystem;
+		};
+		519E88A77D8A5F5612C8AF08 /* DesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DesignSystem;
+		};
+		9AA26B289CE1B66548433A64 /* DesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DesignSystem;
+		};
+		A14025659DDE29B1470474BA /* DesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DesignSystem;
+		};
+		AEC636F98F01BD79D23D3B10 /* SequoiaCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SequoiaCore;
+		};
+		B4A1906EBE8325D7CD715D4A /* SequoiaCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SequoiaCore;
+		};
+		E16679957C9006655E99F204 /* SequoiaCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SequoiaCore;
+		};
+		E68014313CEC9D991EBA7D08 /* SequoiaCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SequoiaCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
-	rootObject = E414753A306E11F900846B1B /* Project object */;
-	validationLevel = 1;
+	rootObject = 1632991557C7D18E445D5917 /* Project object */;
 }
