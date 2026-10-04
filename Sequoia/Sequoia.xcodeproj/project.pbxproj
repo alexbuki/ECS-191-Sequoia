@@ -42,6 +42,7 @@
 		794D5322995D6ED8454FAFE7 /* SequoiaSocial.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9154838A3CF5F4B14A20A0A5 /* SequoiaSocial.framework */; };
 		7A4D284D0548C8F616B3029E /* StreakWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3996D2A404464A9540AD818C /* StreakWidget.swift */; };
 		7E21D6EFF2569AF560B5D55E /* SequoiaGameCenter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F1649958CE65DD9E6501A52C /* SequoiaGameCenter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		803400AC63E495793FF8950B /* PlantedTreesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DBC66FFD2B33B4D643919C /* PlantedTreesView.swift */; };
 		80AC002C6EA401CA4534B1B2 /* SequoiaCore in Frameworks */ = {isa = PBXBuildFile; productRef = AEC636F98F01BD79D23D3B10 /* SequoiaCore */; };
 		82147D9B082FF5D3CAC97798 /* SequoiaWatchWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0BADD2D87693C29D82913959 /* SequoiaWatchWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		855F5FC89E80B839763ED146 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = A14025659DDE29B1470474BA /* DesignSystem */; };
@@ -72,6 +73,8 @@
 		EE536B36FBF8B3D75FBD2D7D /* WatchTodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4520194AC9A1B8ABC4A478 /* WatchTodayView.swift */; };
 		F19F9E3D16F8203712612497 /* AppShellTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3CC12600F76759EE19525D7 /* AppShellTests.swift */; };
 		F1B2BB61E6443C2EBC73C94D /* SequoiaSocial.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9154838A3CF5F4B14A20A0A5 /* SequoiaSocial.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		F458AAAF880C83C86D715FCE /* ForestAtmosphere+Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5DF1A160CA93DEA18A2DC46 /* ForestAtmosphere+Store.swift */; };
+		F8A2F3EB9FB546CFAF98E9EF /* PlantingCeremonyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA6355E3E4C27EA2C9B1B356 /* PlantingCeremonyView.swift */; };
 		FB635E8C700863788C1FA978 /* GameCenterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F18D986C6320DC9878FF1A /* GameCenterBackend.swift */; };
 		FBC6228A27C8AF77AB862154 /* AppIconRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D3A47EBEA296ED8EA09E112 /* AppIconRenderer.swift */; };
 /* End PBXBuildFile section */
@@ -211,6 +214,7 @@
 		8A26848DE4E5A132B102CED8 /* SequoiaWatchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SequoiaWatchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9154838A3CF5F4B14A20A0A5 /* SequoiaSocial.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SequoiaSocial.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		926F16B41CEB1239DFE772A2 /* SequoiaWatchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequoiaWatchUITests.swift; sourceTree = "<group>"; };
+		97DBC66FFD2B33B4D643919C /* PlantedTreesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantedTreesView.swift; sourceTree = "<group>"; };
 		A4347A8ACBC9C03E2D10688A /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		A593996D17DA7CDFD15C5E18 /* DevModeBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevModeBadge.swift; sourceTree = "<group>"; };
 		A7944AC85C1E89DA5C586EC5 /* DevModeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevModeController.swift; sourceTree = "<group>"; };
@@ -226,6 +230,7 @@
 		CB2DE0B278A610D439BB5FF3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		CBFB75F02D94E3AD2C833467 /* WordWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordWidget.swift; sourceTree = "<group>"; };
 		CDD366CFC9F7E6179E913FEA /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
+		D5DF1A160CA93DEA18A2DC46 /* ForestAtmosphere+Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ForestAtmosphere+Store.swift"; sourceTree = "<group>"; };
 		D98BBE25B175C6AB85A69B4B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		E21A6C1DC502472974310D87 /* DeferredGameCenterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredGameCenterBackend.swift; sourceTree = "<group>"; };
 		E41904716FCDA57918A572A8 /* Previews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Previews.swift; sourceTree = "<group>"; };
@@ -241,6 +246,7 @@
 		F23CB7FEDED011D152F41398 /* SocialModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SocialModel.swift; sourceTree = "<group>"; };
 		F3CC12600F76759EE19525D7 /* AppShellTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellTests.swift; sourceTree = "<group>"; };
 		F6E2BAD595F1BCBA485E91CB /* SequoiaWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SequoiaWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA6355E3E4C27EA2C9B1B356 /* PlantingCeremonyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlantingCeremonyView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -398,6 +404,7 @@
 		4846E2501BE5BF4057DB39AF /* Today */ = {
 			isa = PBXGroup;
 			children = (
+				FA6355E3E4C27EA2C9B1B356 /* PlantingCeremonyView.swift */,
 				5D367B1017ADA8B148A6BEE2 /* TodayView.swift */,
 				A8AE27BB50917F4B8644C304 /* TodayViewModel.swift */,
 			);
@@ -545,6 +552,7 @@
 		FDB8EF34A9CF307DC2CE9020 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				D5DF1A160CA93DEA18A2DC46 /* ForestAtmosphere+Store.swift */,
 				B6D9738ECBFCEDD69E70405F /* NotificationService.swift */,
 				EDAB8E33B5583AEFD5927CFD /* PronunciationPlayer.swift */,
 				AC8076A34C4AD0C9216C69FC /* ShareRenderer.swift */,
@@ -559,6 +567,7 @@
 			children = (
 				BC7016AC5EFD371847128B29 /* ForestView.swift */,
 				2F6E0A3AF4591E3BB7C075E7 /* ForestViewModel.swift */,
+				97DBC66FFD2B33B4D643919C /* PlantedTreesView.swift */,
 			);
 			path = Forest;
 			sourceTree = "<group>";
@@ -857,6 +866,7 @@
 				59756EDD9D17AB3B70F874EE /* DevModeBadge.swift in Sources */,
 				5BD51D8A1203ACB3D6E39C07 /* DevModeController.swift in Sources */,
 				091FB2CCC51F39A634318C49 /* DeveloperPanelView.swift in Sources */,
+				F458AAAF880C83C86D715FCE /* ForestAtmosphere+Store.swift in Sources */,
 				6FAE13DCBADA1144DF87B1A0 /* ForestView.swift in Sources */,
 				50F591777AA9B749C0D0B2C8 /* ForestViewModel.swift in Sources */,
 				6F1622242B8A9B0385D406A2 /* LaunchTiming.swift in Sources */,
@@ -865,6 +875,8 @@
 				DD337A486BF2F948B413551B /* MockSocialBackend.swift in Sources */,
 				47D708D0A9A9AC41D71DE06B /* NotificationService.swift in Sources */,
 				455427CE11A7F139E4772286 /* OnboardingView.swift in Sources */,
+				803400AC63E495793FF8950B /* PlantedTreesView.swift in Sources */,
+				F8A2F3EB9FB546CFAF98E9EF /* PlantingCeremonyView.swift in Sources */,
 				D9EA9A9A615EBD5A371A4AC4 /* PracticeView.swift in Sources */,
 				12FCEB71EA833EAA69318E66 /* PracticeViewModel.swift in Sources */,
 				E4D397AC68B26A6E5EFA0B81 /* Previews.swift in Sources */,

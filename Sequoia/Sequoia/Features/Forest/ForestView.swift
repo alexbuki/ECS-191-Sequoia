@@ -16,11 +16,43 @@ struct ForestView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: Theme.Spacing.xl) {
-                    GroveView(planted: model.plantedTrees.count, stage: model.stage, treeDays: model.growth.treeDays,
-                              daysToFullGrowth: model.daysToFullGrowth)
+                    VStack(spacing: Theme.Spacing.s) {
+                        // A link to the trees once there are some; never disabled, which would dim it.
+                        Group {
+                            if model.plantedCount > 0 {
+                                NavigationLink(value: ForestRoute.trees) { grove }
+                                    .buttonStyle(.plain)
+                            } else {
+                                grove
+                            }
+                        }
                         .accessibilityElement(children: .ignore)
                         .accessibilityLabel(model.accessibilityDescription)
                         .accessibilityIdentifier("grove")
+                        if model.plantedCount > 0 {
+                            NavigationLink(value: ForestRoute.trees) {
+                                HStack {
+                                    Label(model.plantedCount == 1 ? String(localized: "Your tree")
+                                                                   : String(localized: "Your \(model.plantedCount) trees"),
+                                          systemImage: "tree")
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(Typography.caption)
+                                        .foregroundStyle(Theme.Palette.soilSecondary)
+                                        .accessibilityHidden(true)
+                                }
+                                .font(Typography.headline)
+                                .padding(Theme.Spacing.m)
+                                .frame(minHeight: Theme.Size.minTapTarget)
+                                .background(Theme.Palette.surface,
+                                            in: RoundedRectangle(cornerRadius: Theme.Radius.medium, style: .continuous))
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityHint("Shows each tree and the words that grew it")
+                            .accessibilityIdentifier("yourTrees")
+                        }
+                    }
                     stats
                     StreakCalendar(model: model)
                     FriendsSection()
@@ -46,11 +78,27 @@ struct ForestView: View {
                     }
                 }
             }
+            .navigationDestination(for: ForestRoute.self) { route in
+                switch route {
+                case .trees: PlantedTreesView(store: model.store)
+                case .tree(let index): PlantedTreeDetailView(store: model.store, index: index)
+                case .word(let id):
+                    if let word = model.store.provider.word(id: id) {
+                        WordDetailView(store: model.store, word: word)
+                    }
+                }
+            }
             .sheet(isPresented: $showsSettings) {
                 SettingsView()
             }
             .task(id: model.store.revision) { renderSnapshot() }
         }
+    }
+
+    private var grove: some View {
+        GroveView(planted: model.plantedTrees.count, stage: model.stage,
+                  treeDays: model.growth.treeDays, daysToFullGrowth: model.daysToFullGrowth,
+                  light: model.store.forestLight, undergrowth: model.store.undergrowth)
     }
 
     private var stats: some View {
@@ -67,43 +115,25 @@ struct ForestView: View {
     private func renderSnapshot() {
         let view = ForestSnapshotView(planted: model.plantedCount, stage: model.stage, treeDays: model.growth.treeDays,
                                       streak: model.growth.currentStreak, rings: model.growth.totalRings,
-                                      daysToFullGrowth: model.daysToFullGrowth)
+                                      daysToFullGrowth: model.daysToFullGrowth, undergrowth: model.store.undergrowth)
         snapshot = ShareRenderer.render(view).map(Image.init(uiImage:))
     }
 }
 
-/// A calm grove: every planted tree, with the in-progress tree in front.
+/// The forest scene with the in-progress tree's status beneath it.
 struct GroveView: View {
     let planted: Int
     let stage: TreeStage
     let treeDays: Int
     let daysToFullGrowth: Int
-    var maxVisibleTrees: Int = .max
+    var light: ForestLight = .midday
+    var undergrowth: Undergrowth = .none
 
     var body: some View {
-        VStack(spacing: 0) {
-            if planted > 0 {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 34, maximum: 46), spacing: 0)], spacing: -18) {
-                    ForEach(0..<min(planted, maxVisibleTrees), id: \.self) { index in
-                        let scale = 0.78 + CGFloat((index * 37) % 23) / 100
-                        TreeView(stage: .grownSequoia, showsGround: false, variant: index)
-                            .frame(height: 76 * scale)
-                            .frame(height: 76, alignment: .bottom)
-                            .offset(y: CGFloat((index * 13) % 7) - 3)
-                    }
-                }
-                .padding(.horizontal, Theme.Spacing.s)
-                .padding(.top, Theme.Spacing.m)
-                if planted > maxVisibleTrees {
-                    Text("+\(planted - maxVisibleTrees) more")
-                        .font(Typography.caption)
-                        .foregroundStyle(Theme.Palette.soilSecondary)
-                }
-            }
-
-            HStack(alignment: .bottom, spacing: Theme.Spacing.m) {
-                TreeView(stage: stage)
-                    .frame(height: planted > 0 ? 130 : 170)
+        VStack(alignment: .leading, spacing: 0) {
+            ForestScene(planted: planted, currentStage: stage, light: light, undergrowth: undergrowth)
+                .frame(height: 260)
+            HStack(alignment: .center, spacing: Theme.Spacing.m) {
                 VStack(alignment: .leading, spacing: Theme.Spacing.xxs) {
                     Text(treeDays == 0 ? String(localized: "A new seed") : stage.title)
                         .font(Typography.headline)
@@ -112,28 +142,26 @@ struct GroveView: View {
                          : String(localized: "Day \(treeDays) of \(daysToFullGrowth)"))
                         .font(Typography.callout)
                         .foregroundStyle(Theme.Palette.soilSecondary)
-                    ProgressView(value: Double(treeDays), total: Double(daysToFullGrowth))
-                        .tint(Theme.Palette.canopy)
-                        .frame(maxWidth: 160)
                     if planted == 0 {
                         Text("Grown trees are planted here, forever.")
                             .font(Typography.caption)
                             .foregroundStyle(Theme.Palette.soilSecondary)
+                    } else if planted > ForestLayout.maxVisibleTrees {
+                        Text("+\(planted - ForestLayout.maxVisibleTrees) more beyond the hills")
+                            .font(Typography.caption)
+                            .foregroundStyle(Theme.Palette.soilSecondary)
                     }
                 }
-                .padding(.bottom, Theme.Spacing.m)
                 Spacer(minLength: 0)
+                ProgressView(value: Double(treeDays), total: Double(daysToFullGrowth))
+                    .tint(Theme.Palette.canopy)
+                    .frame(maxWidth: 120)
             }
-            .padding(.horizontal, Theme.Spacing.l)
-            .padding(.top, Theme.Spacing.s)
+            .padding(Theme.Spacing.m)
         }
         .frame(maxWidth: .infinity)
-        .background(alignment: .bottom) {
-            Theme.Palette.moss.opacity(0.55)
-                .frame(height: 56)
-                .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: Theme.Radius.card, bottomTrailingRadius: Theme.Radius.card))
-        }
-        .background(Theme.Palette.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
+        .background(Theme.Palette.surface)
+        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
     }
 }
 
@@ -145,12 +173,15 @@ struct ForestSnapshotView: View {
     let streak: Int
     let rings: Int
     let daysToFullGrowth: Int
+    var undergrowth: Undergrowth = .none
 
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.m) {
             Text("My forest")
                 .font(Typography.wordTitle)
-            GroveView(planted: planted, stage: stage, treeDays: treeDays, daysToFullGrowth: daysToFullGrowth, maxVisibleTrees: 40)
+            // Shared images always show the forest at midday.
+            GroveView(planted: planted, stage: stage, treeDays: treeDays, daysToFullGrowth: daysToFullGrowth,
+                      undergrowth: undergrowth)
             HStack {
                 Text("\(planted) trees · \(streak)-day streak · \(rings) rings")
                     .font(Typography.callout)
@@ -172,15 +203,22 @@ struct ForestSnapshotView: View {
 struct StreakCalendar: View {
     let model: ForestViewModel
 
+    /// A month arrow with a full-size tap target.
+    private func monthArrow(_ systemImage: String) -> some View {
+        Image(systemName: systemImage)
+            .frame(minWidth: Theme.Size.minTapTarget, minHeight: Theme.Size.minTapTarget)
+            .contentShape(Rectangle())
+    }
+
     var body: some View {
         let completed = model.completedDays
         VStack(alignment: .leading, spacing: Theme.Spacing.s) {
             HStack {
                 Text(model.monthTitle).font(Typography.headline)
                 Spacer()
-                Button { model.showPreviousMonth() } label: { Image(systemName: "chevron.left") }
+                Button { model.showPreviousMonth() } label: { monthArrow("chevron.left") }
                     .accessibilityLabel("Previous month")
-                Button { model.showNextMonth() } label: { Image(systemName: "chevron.right") }
+                Button { model.showNextMonth() } label: { monthArrow("chevron.right") }
                     .disabled(!model.canShowNextMonth)
                     .accessibilityLabel("Next month")
             }
@@ -230,9 +268,13 @@ struct FriendsSection: View {
                 Text("Friends").font(Typography.headline)
                 Spacer()
                 if social.isSignedIn {
-                    Button("All leaderboards") { social.showLeaderboards() }
-                        .font(Typography.callout)
-                        .foregroundStyle(Theme.Palette.bark)
+                    Button { social.showLeaderboards() } label: {
+                        Text("All leaderboards")
+                            .frame(minHeight: Theme.Size.minTapTarget)
+                            .contentShape(Rectangle())
+                    }
+                    .font(Typography.callout)
+                    .foregroundStyle(Theme.Palette.bark)
                 }
             }
             content

@@ -16,6 +16,8 @@ final class TodayViewModel {
     /// Incremented when a tree is planted, to trigger the richer haptic.
     private(set) var plantedCount = 0
     private(set) var shareImage: Image?
+    /// The tree just planted, while its ceremony is showing.
+    var plantedMoment: PlantedTreeMoment?
 
     init(store: SequoiaStore) {
         self.store = store
@@ -26,6 +28,8 @@ final class TodayViewModel {
     var stage: TreeStage { store.stage }
     var streak: Int { store.growth.currentStreak }
     var today: DayStamp { store.today }
+    /// Trees in the forest, for the scene behind the word.
+    var forestSize: Int { store.growth.plantedTrees }
 
     var isFavorite: Bool {
         _ = store.revision
@@ -70,7 +74,10 @@ final class TodayViewModel {
         guard case .checkedIn(let outcome) = store.checkIn(knewIt: knewIt) else { return }
         lastOutcome = outcome
         checkInCount += 1
-        if outcome.plantedTree { plantedCount += 1 }
+        if outcome.plantedTree {
+            plantedCount += 1
+            plantedMoment = PlantedTreeMoment.latest(in: store)
+        }
         prepareShareImage()
     }
 }

@@ -14,6 +14,7 @@ struct DeveloperPanelView: View {
     @State private var exactDate = Date.now
     @State private var pending: [(id: String, title: String, date: Date?)] = []
     @State private var socialScenario = MockSocialBackend.Scenario.current
+    @State private var ceremony: PlantedTreeMoment?
 
     var body: some View {
         List {
@@ -103,6 +104,7 @@ struct DeveloperPanelView: View {
                     }
                     Stepper("Trees to plant: \(forestCount)", value: $forestCount, in: 1...200)
                     Button("Fill forest with \(forestCount) trees") { app.store.devFillForest(adding: forestCount) }
+                    Button("Preview planting ceremony") { ceremony = .preview(in: app.store) }
                     LabeledContent("Streak", value: "\(app.store.growth.currentStreak)")
                     LabeledContent("Stage", value: app.store.stage.title)
                     LabeledContent("Rings", value: "\(app.store.growth.totalRings)")
@@ -114,6 +116,7 @@ struct DeveloperPanelView: View {
         .sequoiaScreen()
         .navigationTitle("Developer")
         .task { await refreshPending() }
+        .presentsCeremony($ceremony) {}
     }
 
     private func refreshPending() async {

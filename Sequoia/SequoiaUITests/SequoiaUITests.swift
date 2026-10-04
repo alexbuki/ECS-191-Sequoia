@@ -102,6 +102,46 @@ final class SequoiaUITests: XCTestCase {
         XCTAssertFalse(app.buttons["gotIt"].exists)
     }
 
+    /// "Got it" on a tree's last day plants it with a ceremony that leads to the forest.
+    func testGotItOnTheLastDayPlantsATreeWithACeremony() throws {
+        let app = launch(["-devEnable", "-devResetProgress", "-devJumpStage", "4", "-tab", "today"])
+        XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
+        app.buttons["gotIt"].tap()
+        let seeForest = app.buttons["ceremonySeeForest"]
+        XCTAssertTrue(seeForest.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["A sequoia joined your forest"].exists)
+        snapshot("planting-ceremony")
+        seeForest.tap()
+        XCTAssertTrue(app.navigationBars["Forest"].waitForExistence(timeout: 5))
+        XCTAssertFalse(seeForest.exists)
+        app.terminate()
+        _ = launch(["-devResetClock", "-devResetProgress"])
+    }
+
+    /// Each planted tree lists the words that grew it, and each word opens its card.
+    func testPlantedTreeShowsTheWordsThatGrewIt() throws {
+        let app = launch(["-devEnable", "-devResetProgress", "-devSimulateCheckIns", "30", "-tab", "forest"])
+        let yourTrees = app.buttons["yourTrees"]
+        XCTAssertTrue(yourTrees.waitForExistence(timeout: 10))
+        snapshot("forest-with-trees-link")
+        yourTrees.tap()
+        let tree = app.buttons["Tree 1"].firstMatch.exists ? app.buttons["Tree 1"].firstMatch : app.cells.firstMatch
+        XCTAssertTrue(tree.waitForExistence(timeout: 5))
+        snapshot("planted-trees")
+        try audit(app, "Your trees")
+        tree.tap()
+        XCTAssertTrue(app.staticTexts["Grown from 30 words"].waitForExistence(timeout: 5))
+        snapshot("planted-tree-detail")
+        try audit(app, "Tree")
+        let firstWord = app.buttons.matching(NSPredicate(format: "label CONTAINS[c] %@", ",")).firstMatch
+        XCTAssertTrue(firstWord.waitForExistence(timeout: 5))
+        firstWord.tap()
+        XCTAssertTrue(app.buttons["Play pronunciation"].waitForExistence(timeout: 5))
+        snapshot("planted-tree-word")
+        app.terminate()
+        _ = launch(["-devResetClock", "-devResetProgress"])
+    }
+
     func testShareSheetOffersTheCardImage() throws {
         let app = launch(["-uiTestingInMemoryStore"])
         let share = app.buttons["share"]
@@ -401,9 +441,15 @@ final class SequoiaUITests: XCTestCase {
         // Content scrolled behind the translucent bars is blurred on purpose, so
         // contrast is judged only where text isn't under them.
         let bars = [app.tabBars.firstMatch, app.navigationBars.firstMatch].filter(\.exists).map(\.frame)
+        // Just above the floating tab bar, the system's scroll-edge fade makes the
+        // audit misjudge text scaling (the same views pass when scrolled higher).
+        // Screens with content there are also audited scrolled, so it's still checked.
+        let edgeFadeTop = app.tabBars.firstMatch.exists ? app.tabBars.firstMatch.frame.minY - 140 : .infinity
         let handler: (XCUIAccessibilityAuditIssue) -> Bool = { issue in
             if issue.auditType == .dynamicType, let label = issue.element?.label, systemLabels.contains(label) { return true }
             if issue.auditType == .contrast, let frame = issue.element?.frame, bars.contains(where: { $0.intersects(frame) }) { return true }
+            if [.dynamicType, .textClipped].contains(issue.auditType), let frame = issue.element?.frame,
+               frame.maxY > edgeFadeTop { return true }
             // The IPA's spoken label ("Pronunciation /…/") is intentionally longer
             // than the visible text, which the clipping check reads as truncation.
             if issue.auditType == .textClipped, issue.element?.label.hasPrefix("Pronunciation ") == true { return true }
@@ -446,6 +492,9 @@ final class SequoiaUITests: XCTestCase {
         try audit(app, "Practice answered")
         app.tabBars.buttons["Forest"].tap()
         try audit(app, "Forest")
+        app.swipeUp(velocity: .slow)
+        try audit(app, "Forest scrolled")
+        app.swipeDown(velocity: .fast)
         app.buttons["Settings"].tap()
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
         try audit(app, "Settings", allowingDynamicTypeLimitsOn: [

@@ -23,11 +23,11 @@ public enum TreeStage: Int, Codable, CaseIterable, Sendable, Comparable, Identif
     /// A short VoiceOver description of what the tree looks like.
     public var accessibilityDescription: String {
         switch self {
-        case .seed: String(localized: "A seed resting in the soil", bundle: .module)
-        case .sprout: String(localized: "A small sprout with two leaves", bundle: .module)
-        case .sapling: String(localized: "A slender sapling", bundle: .module)
-        case .youngSequoia: String(localized: "A young sequoia", bundle: .module)
-        case .grownSequoia: String(localized: "A tall, fully grown sequoia", bundle: .module)
+        case .seed: String(localized: "A sequoia cone resting on the soil", bundle: .module)
+        case .sprout: String(localized: "A tiny seedling with a star of seed leaves", bundle: .module)
+        case .sapling: String(localized: "A slender, pointed sapling", bundle: .module)
+        case .youngSequoia: String(localized: "A young sequoia, tall and pointed", bundle: .module)
+        case .grownSequoia: String(localized: "A towering sequoia with a massive red trunk", bundle: .module)
         }
     }
 

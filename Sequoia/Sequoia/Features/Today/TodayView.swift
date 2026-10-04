@@ -5,6 +5,7 @@ import SequoiaCore
 /// The home screen. It exists to show today's word.
 struct TodayView: View {
     @State private var model: TodayViewModel
+    @Environment(AppModel.self) private var app
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -31,15 +32,24 @@ struct TodayView: View {
                 .padding(.bottom, Theme.Spacing.l)
             }
             .scrollIndicators(.hidden)
-            .safeAreaInset(edge: .bottom) { bottomPanel }
+            // Inside the bottom inset, so the forest floor meets the top of "Got it".
+            .background {
+                TodayForest(planted: model.forestSize, stage: model.stage,
+                            light: model.store.forestLight, undergrowth: model.store.undergrowth)
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) { bottomPanel }
             .sequoiaScreen()
             .toolbar(.hidden, for: .navigationBar)
         }
         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: model.checkInCount)
         .sensoryFeedback(.success, trigger: model.plantedCount)
         .task(id: model.word.id) { model.prepareShareImage() }
+        .presentsCeremony($model.plantedMoment) { app.selectedTab = .forest }
         #if SEQUOIA_DEV
-        .onAppear { LaunchTiming.wordDidAppear() }
+        .onAppear {
+            LaunchTiming.wordDidAppear()
+            if DevLaunchActions.showsCeremony { model.plantedMoment = .preview(in: model.store) }
+        }
         #endif
     }
 
@@ -117,15 +127,47 @@ struct TodayView: View {
         .padding(.horizontal, Theme.Spacing.m)
         .padding(.top, Theme.Spacing.s)
         .padding(.bottom, Theme.Spacing.xs)
-        .background(Theme.Palette.fog)
-        // A soft edge, so content scrolled behind the panel reads as more to scroll.
-        .background(alignment: .top) {
-            LinearGradient(colors: [Theme.Palette.fog.opacity(0), Theme.Palette.fog], startPoint: .top, endPoint: .bottom)
-                .frame(height: Theme.Spacing.l)
-                .offset(y: -Theme.Spacing.l)
-                .allowsHitTesting(false)
-                .accessibilityHidden(true)
+        // The panel stands on the forest floor, which also hides content scrolled beneath it.
+        .background { TodayForest.floor(model.store.forestLight) }
+    }
+}
+
+/// The user's forest filling the lower half of Today, behind the word card.
+/// Its sky is the page's fog, so it rises out of the background seamlessly;
+/// an extra veil keeps it quieter than on the Forest tab.
+struct TodayForest: View {
+    let planted: Int
+    let stage: TreeStage
+    var light: ForestLight = .midday
+    var undergrowth: Undergrowth = .none
+
+    private static let veil = Theme.Palette.fog.opacity(0.3)
+
+    static func floor(_ light: ForestLight) -> some View {
+        ZStack {
+            ForestScene.floorColor(light)
+            veil
         }
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Spacer(minLength: 0)
+            ForestScene(planted: planted, currentStage: stage, light: light, undergrowth: undergrowth)
+                .containerRelativeFrame(.vertical) { height, _ in height * 0.6 }
+                .overlay(Self.veil)
+                // The sky fades into the page, so a dark night sky has no hard edge.
+                .mask {
+                    LinearGradient(stops: [.init(color: .clear, location: 0), .init(color: .black, location: 0.35)],
+                                   startPoint: .top, endPoint: .bottom)
+                }
+            // The forest floor continues under the button and the tab bar.
+            Self.floor(light)
+                .frame(height: 0)
+            .ignoresSafeArea(edges: .bottom)
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 }
 
@@ -181,11 +223,11 @@ struct GrowthPanel: View {
 }
 
 #Preview("Today") {
-    TodayView(store: .preview)
+    TodayView(store: .preview).environment(AppModel.preview)
 }
 
 #Preview("Today – dark") {
-    TodayView(store: .preview).preferredColorScheme(.dark)
+    TodayView(store: .preview).environment(AppModel.preview).preferredColorScheme(.dark)
 }
 
 #Preview("Growth panel") {

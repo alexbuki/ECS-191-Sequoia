@@ -20,16 +20,16 @@ To run on your own iPhone:
 3. The first time, trust the developer certificate on the phone: **Settings → General → VPN & Device Management**.
 
 ## Testing the app
-- **Developer mode** (Debug builds only): **Settings → Developer** lets you simulate days passing, jump tree stages, fill the forest, fire a notification now, reload widgets and use mock Game Center friends. A yellow **DEV** badge turns on while active
+- **Developer mode** (Debug builds only): **Settings → Developer** lets you simulate days passing, jump tree stages, fill the forest, preview the tree-planting moment, fire a notification now, reload widgets and use mock Game Center friends. A yellow **DEV** badge turns on while active
 - **Tests:** press ⌘U with the Sequoia scheme to run the unit tests, UI tests and package tests. The watch tests use the **SequoiaWatch** scheme.
 
 ## Using the app
 
 - **Today:** today's word with its pronunciation (tap the speaker to hear it), definition, examples and origin. Tap **Got it** to complete the day, or **I already knew this**. The heart saves the word to favorites; the share button makes an image card.
-- **Your tree:** each day you complete grows the tree: Seed, Sprout, Sapling, Young sequoia, then Grown sequoia at day 30, when it's planted in your forest. Missing a day starts a new seed; your forest and rings are never lost.
+- **Your tree:** each day you complete grows the tree: Seed, Sprout, Sapling, Young sequoia, then Grown sequoia at day 30, when it's planted in your forest with a short celebration. Your forest grows behind today's word. Missing a day starts a new seed; your forest and rings are never lost.
 - **Library:** every word you've seen, newest first. Search by word or definition, or switch to **Favorites**. Tap a word for its full card.
 - **Practice:** once you've seen four words, play short rounds of **Definition Match** or **Fill the Blank** to earn extra rings.
-- **Forest:** your planted trees, current and longest streak, words learned, rings and a calendar of completed days. **Friends** (optional) compares streaks, trees and rings with Game Center friends.
+- **Forest:** your planted trees in a misty grove that follows the time of day, with ferns for practice rounds and wildflowers for favorite words. **Your trees** lists every tree and the 30 words that grew it. Also your current and longest streak, words learned, rings and a calendar of completed days. **Friends** (optional) compares streaks, trees and rings with Game Center friends.
 - **Settings** (gear icon in Forest): word difficulty, a daily reminder time and an evening streak nudge. Notifications are teasers that keep the word a surprise; tap one to open Today and see the word.
 - **Widgets:** add Sequoia to the Home Screen (word and streak widgets) or Lock Screen. The medium widget has a **Got it** button.
 - **Apple Watch:** shows today's word with a **Got it** button, plus watch-face complications. It stays in sync with the iPhone.

@@ -205,6 +205,20 @@ public final class SequoiaStore {
         return (try? context.fetch(descriptor)) ?? []
     }
 
+    /// The words of the days that grew a planted tree, oldest first. A tree
+    /// grows on the consecutive completed days that end the day it's planted.
+    /// Trees with no recorded days (from developer tools) have no words.
+    public func words(grownInto tree: PlantedTreeRecord) -> [Word] {
+        let last = tree.plantedDay
+        let first = last - engine.config.daysToFullGrowth + 1
+        let descriptor = FetchDescriptor<DayRecord>(
+            predicate: #Predicate { $0.dayNumber >= first && $0.dayNumber <= last && $0.completedAt != nil },
+            sortBy: [SortDescriptor(\.dayNumber)]
+        )
+        let records = (try? context.fetch(descriptor)) ?? []
+        return records.compactMap { provider.word(id: $0.wordID) }
+    }
+
     public var practiceRounds: Int { fetchProgress().practiceRounds }
 
     // MARK: - Settings

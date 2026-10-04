@@ -52,6 +52,22 @@ struct SequoiaStoreTests {
         #expect(store.completedDays() == [clock.clock.today()])
     }
 
+    @Test func aPlantedTreeRemembersTheWordsThatGrewIt() throws {
+        let store = try makeStore()
+        // A missed day first, so only the final unbroken run grows the tree.
+        store.checkIn()
+        clock.advance(days: 2)
+        var expected: [String] = []
+        for day in 0..<store.engine.config.daysToFullGrowth {
+            if day > 0 { clock.advance(days: 1) }
+            store.refresh()
+            expected.append(store.todayWord.id)
+            store.checkIn()
+        }
+        let tree = try #require(store.plantedTrees().first)
+        #expect(store.words(grownInto: tree).map(\.id) == expected)
+    }
+
     @Test func checkInPersistsAcrossRelaunch() throws {
         let url = URL.temporaryDirectory.appending(path: "store-\(UUID().uuidString).store")
         let config = ModelConfiguration(schema: Persistence.schema, url: url)

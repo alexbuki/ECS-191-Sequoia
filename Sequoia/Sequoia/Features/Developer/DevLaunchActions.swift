@@ -4,7 +4,8 @@ import SequoiaCore
 
 /// Launch arguments that drive developer tools from scripts and UI tests:
 /// `-devEnable`, `-devAdvanceDays N`, `-devJumpStage N`, `-devFillForest N`,
-/// `-devResetProgress`, `-devResetClock`, `-devReminderInMinutes N`. Compiled only in `SEQUOIA_DEV` builds.
+/// `-devResetProgress`, `-devResetClock`, `-devReminderInMinutes N`, `-devCeremony`.
+/// Compiled only in `SEQUOIA_DEV` builds.
 enum DevLaunchActions {
     /// Applied before the store opens (affects which store and clock are used).
     static func applyBeforeLaunch() {
@@ -48,6 +49,9 @@ enum DevLaunchActions {
             $0.reminderMinute = parts.minute ?? 0
         }
     }
+
+    /// Whether `-devCeremony` asked to show the planting ceremony on launch.
+    static var showsCeremony: Bool { ProcessInfo.processInfo.arguments.contains("-devCeremony") }
 
     /// The tab requested with `-tab today|library|practice|forest`.
     static var initialTab: AppTab? {
