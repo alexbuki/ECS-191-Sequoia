@@ -1,6 +1,7 @@
 import Foundation
 
-/// The four top-level destinations.
+/// The three top-level destinations. Practice lives inside Library: it
+/// reviews the words you've learned.
 enum AppTab: String, Hashable, CaseIterable {
-    case today, library, practice, forest
+    case today, library, forest
 }

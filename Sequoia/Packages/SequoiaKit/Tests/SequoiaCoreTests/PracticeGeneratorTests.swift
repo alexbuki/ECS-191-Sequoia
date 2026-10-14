@@ -100,6 +100,45 @@ struct PracticeGeneratorTests {
         #expect(try round(.definitionMatch, seen: 20, seed: 42) == round(.definitionMatch, seen: 20, seed: 42))
     }
 
+    @Test(arguments: PracticeGame.allCases)
+    func missedWordsComeFirst(game: PracticeGame) throws {
+        let seen = Array(library.prefix(60))
+        let missed = Set(seen.suffix(5).map(\.id))
+        for seed in UInt64(1)...20 {
+            var rng = SeededGenerator(seed: seed)
+            let round = try generator.round(game, from: seen, revisiting: missed, using: &rng).get()
+            let answers = round.questions.map(\.word.id)
+            let revisited = answers.filter(missed.contains)
+            #expect(revisited.count >= min(PracticeGenerator.maxRevisitsPerRound, missed.count) - (game == .fillTheBlank ? 2 : 0))
+            #expect(revisited.count <= PracticeGenerator.maxRevisitsPerRound, "most of the round stays fresh")
+            #expect(Array(answers.prefix(revisited.count)) == revisited, "missed words are asked first")
+        }
+    }
+
+    @MainActor
+    @Test func missesBringAWordBackUntilItsAnsweredRight() throws {
+        let store = SequoiaStore(container: try Persistence.makeContainer(.inMemory))
+        let word = store.todayWord.id
+        store.recordAnswer(wordID: word, correct: false)
+        store.recordAnswer(wordID: word, correct: false)
+        #expect(store.wordsToRevisit() == [word])
+        store.recordAnswer(wordID: word, correct: true)
+        #expect(store.wordsToRevisit() == [word], "one right answer per miss")
+        store.recordAnswer(wordID: word, correct: true)
+        #expect(store.wordsToRevisit().isEmpty)
+    }
+
+    @MainActor
+    @Test func eachGameKeepsItsBestScore() throws {
+        let store = SequoiaStore(container: try Persistence.makeContainer(.inMemory))
+        store.recordPractice(.definitionMatch, correctAnswers: 3)
+        store.recordPractice(.definitionMatch, correctAnswers: 2)
+        store.recordPractice(.fillTheBlank, correctAnswers: 5)
+        #expect(store.bestScore(for: .definitionMatch) == 3)
+        #expect(store.bestScore(for: .fillTheBlank) == 5)
+        #expect(store.practiceRounds == 3)
+    }
+
     @MainActor
     @Test func aCompletedRoundAwardsBonusRings() throws {
         let store = SequoiaStore(container: try Persistence.makeContainer(.inMemory))

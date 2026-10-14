@@ -50,8 +50,25 @@ final class PracticeViewModel {
 
     var isLastQuestion: Bool { questionIndex == questionCount - 1 }
 
+    /// Seen words missed in practice; rounds ask these first.
+    var revisitCount: Int {
+        _ = store.revision
+        return store.wordsToRevisit().count
+    }
+
+    var practiceRounds: Int {
+        _ = store.revision
+        return store.practiceRounds
+    }
+
+    func bestScore(for game: PracticeGame) -> Int {
+        _ = store.revision
+        return store.bestScore(for: game)
+    }
+
     func start(_ game: PracticeGame) {
-        guard case .success(let round) = generator.round(game, from: store.seenWords().map(\.word)) else { return }
+        let round = generator.round(game, from: store.seenWords().map(\.word), revisiting: store.wordsToRevisit())
+        guard case .success(let round) = round else { return }
         questionIndex = 0
         selectedIndex = nil
         correctCount = 0
@@ -63,12 +80,14 @@ final class PracticeViewModel {
         selectedIndex = index
         answerCount += 1
         if index == question.correctIndex { correctCount += 1 }
+        store.recordAnswer(wordID: question.word.id, correct: index == question.correctIndex)
     }
 
     func next() {
         guard selectedIndex != nil else { return }
         if isLastQuestion {
-            let rings = store.recordPractice(correctAnswers: correctCount)
+            let game: PracticeGame? = if case .playing(let round) = phase { round.game } else { nil }
+            let rings = store.recordPractice(game, correctAnswers: correctCount)
             phase = .finished(correct: correctCount, total: questionCount, rings: rings)
         } else {
             questionIndex += 1

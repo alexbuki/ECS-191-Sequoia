@@ -2,7 +2,8 @@ import SwiftUI
 import SequoiaCore
 
 /// Review sheet for the tree art: every stage at full, widget and complication
-/// sizes, at relative scale, and a row of grown variants.
+/// sizes, at relative scale, the grown varieties and a
+/// row of grown variants.
 struct TreeArtSheet: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -19,9 +20,15 @@ struct TreeArtSheet: View {
                     TreeView(stage: stage).frame(height: 380 * ForestSceneRenderer.relativeHeight(of: stage))
                 }
             }
-            label("Grown variants")
+            label("Grown varieties: classic · snag top · twin crown · broad · slender")
             HStack(alignment: .bottom, spacing: 4) {
-                ForEach(0..<8) { TreeView(stage: .grownSequoia, variant: $0).frame(height: 160) }
+                ForEach(TreeArt.Variety.allCases, id: \.self) { variety in
+                    TreeView(stage: .grownSequoia, variant: variety.sampleVariant).frame(height: 220)
+                }
+            }
+            label("Grown variants 0–9")
+            HStack(alignment: .bottom, spacing: 4) {
+                ForEach(0..<10) { TreeView(stage: .grownSequoia, variant: $0).frame(height: 130) }
             }
         }
         .padding(24)
@@ -59,6 +66,36 @@ struct ForestSceneSheet: View {
         .padding(24)
         .frame(width: 720)
         .background(Theme.Palette.fog)
+    }
+}
+
+/// Review sheet for the shared word card at midday, golden hour and night.
+struct ShareCardSheet: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top, spacing: 16) {
+                ForEach([12.75, 18.4], id: \.self) { hour in
+                    WordShareCard(word: .sample, stage: .sapling, streak: 9, planted: 12, light: ForestLight(hour: hour))
+                }
+            }
+        }
+        .padding(24)
+        .background(Color.gray.opacity(0.3))
+    }
+}
+
+/// Review sheet for the ring-count art, small and large.
+struct RingsSheet: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(spacing: 16) {
+                ForEach([0, 120, 475, 2000], id: \.self) { TreeRingsView(rings: $0).frame(width: 90) }
+            }
+            TreeRingsView(rings: 2000).frame(width: 240)
+            RingsTile(rings: 475).frame(width: 390)
+        }
+        .padding(24)
+        .sequoiaScreen()
     }
 }
 

@@ -7,20 +7,23 @@ public struct TreeView: View {
     private let stage: TreeStage
     private let showsGround: Bool
     private let variant: Int
+    private let simplified: Bool
 
     /// - Parameters:
     ///   - stage: the growth stage to draw.
     ///   - showsGround: whether to draw a small patch of ground.
     ///   - variant: a seed for subtle, deterministic shape variation in the forest.
-    public init(stage: TreeStage, showsGround: Bool = true, variant: Int = 0) {
+    ///   - simplified: draws the bold small-size silhouette at any size (for the app icon).
+    public init(stage: TreeStage, showsGround: Bool = true, variant: Int = 0, simplified: Bool = false) {
         self.stage = stage
         self.showsGround = showsGround
         self.variant = variant
+        self.simplified = simplified
     }
 
     public var body: some View {
         Canvas { context, size in
-            TreeArt(stage: stage, showsGround: showsGround, variant: variant)
+            TreeArt(stage: stage, showsGround: showsGround, variant: variant, simplified: simplified)
                 .draw(in: &context, size: size)
         }
         .aspectRatio(TreeArt.aspectRatio, contentMode: .fit)

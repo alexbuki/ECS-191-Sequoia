@@ -22,11 +22,20 @@ struct ContrastTests {
 
     struct RGB { let r, g, b: Double }
 
-    static func color(_ name: String, dark: Bool) throws -> RGB {
+    static func color(_ name: String, dark: Bool, highContrast: Bool = false) throws -> RGB {
         let url = catalog.appending(path: "\(name).colorset/Contents.json")
         let json = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any]
         let colors = try #require(json?["colors"] as? [[String: Any]])
-        let entry = try #require(colors.first { ($0["appearances"] != nil) == dark })
+        func values(_ entry: [String: Any]) -> Set<String> {
+            Set(((entry["appearances"] as? [[String: String]]) ?? []).compactMap { $0["value"] })
+        }
+        var wanted = Set<String>()
+        if dark { wanted.insert("dark") }
+        if highContrast { wanted.insert("high") }
+        let universal = colors.filter { ($0["idiom"] as? String) == "universal" }
+        // A high-contrast variant falls back to the standard one when a color has none.
+        let entry = try #require(universal.first { values($0) == wanted }
+            ?? universal.first { values($0) == wanted.subtracting(["high"]) })
         let components = try #require((entry["color"] as? [String: Any])?["components"] as? [String: String])
         func value(_ key: String) throws -> Double {
             let raw = try #require(components[key])
@@ -51,6 +60,16 @@ struct ContrastTests {
         for (fg, bg) in Self.textPairings {
             let ratio = Self.contrast(try Self.color(fg, dark: dark), try Self.color(bg, dark: dark))
             #expect(ratio >= 4.5, "\(fg) on \(bg) (\(dark ? "dark" : "light")) is \(ratio)")
+        }
+    }
+
+    /// With Increase Contrast on, secondary text reaches AAA (7:1) on every surface.
+    @Test(arguments: [false, true])
+    func increasedContrastStrengthensSecondaryText(dark: Bool) throws {
+        for bg in ["fog", "surface", "moss"] {
+            let ratio = Self.contrast(try Self.color("soilSecondary", dark: dark, highContrast: true),
+                                      try Self.color(bg, dark: dark, highContrast: true))
+            #expect(ratio >= 7, "soilSecondary on \(bg) (\(dark ? "dark" : "light"), high contrast) is \(ratio)")
         }
     }
 

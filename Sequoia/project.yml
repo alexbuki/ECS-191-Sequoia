@@ -43,9 +43,7 @@ targets:
       - target: SequoiaGameCenter
         link: false
       - target: SequoiaWidgets
-      # Temporarily not embedded: the watch App ID can't be registered until the
-      # free account's 10-per-week App ID limit resets (about 2026-10-08).
-      # - target: SequoiaWatch
+      - target: SequoiaWatch
     entitlements:
       path: Sequoia/Sequoia.entitlements
       properties:
@@ -61,6 +59,8 @@ targets:
         UILaunchScreen:
           UIColorName: LaunchBackground
         ITSAppUsesNonExemptEncryption: false
+        # Without it the share sheet hides "Save Image".
+        NSPhotoLibraryAddUsageDescription: Sequoia saves the word cards and forest pictures you share to your photo library.
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.sequoia.Sequoia

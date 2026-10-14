@@ -16,8 +16,6 @@ final class TodayViewModel {
     /// Incremented when a tree is planted, to trigger the richer haptic.
     private(set) var plantedCount = 0
     private(set) var shareImage: Image?
-    /// The tree just planted, while its ceremony is showing.
-    var plantedMoment: PlantedTreeMoment?
 
     init(store: SequoiaStore) {
         self.store = store
@@ -30,6 +28,28 @@ final class TodayViewModel {
     var today: DayStamp { store.today }
     /// Trees in the forest, for the scene behind the word.
     var forestSize: Int { store.growth.plantedTrees }
+    var treeDays: Int { store.growth.treeDays }
+    var daysToFullGrowth: Int { store.engine.config.daysToFullGrowth }
+
+    /// Before the very first "Got it": the word's level can still be changed
+    /// right here, in place of an onboarding question.
+    var isFirstWord: Bool { !isCompleted && store.growth.totalCheckIns == 0 }
+
+    var difficulty: Difficulty {
+        get { store.settings.difficulty }
+        set { store.updateSettings { $0.difficulty = newValue } }
+    }
+
+    /// Right after the first "Got it", the daily reminder is offered (it isn't
+    /// asked during onboarding, before the app has shown what it does).
+    var offersReminder: Bool {
+        isCompleted && store.growth.totalCheckIns == 1 && !store.settings.notificationsEnabled
+            && !store.settings.hasRequestedNotificationPermission
+    }
+
+    var reminderTime: DateComponents {
+        DateComponents(hour: store.settings.reminderHour, minute: store.settings.reminderMinute)
+    }
 
     var isFavorite: Bool {
         _ = store.revision
@@ -41,10 +61,17 @@ final class TodayViewModel {
         !isCompleted && streak == 0 && store.growth.longestStreak > 0
     }
 
+    /// A gentle note when rain days covered missed days, until today is done.
+    var rainNote: String? {
+        guard !isCompleted, store.growth.lastRainDay == today, streak > 0 else { return nil }
+        return String(localized: "A rain day kept your \(stage.title.lowercased()) growing.")
+    }
+
     /// The stage to draw in the growth panel: a planted tree is shown fully
-    /// grown before the new seed appears.
+    /// grown before the new seed appears. (The welcome tree is celebrated by
+    /// the ceremony; the panel shows the sprout that keeps growing.)
     var displayedStage: TreeStage {
-        if let lastOutcome, lastOutcome.plantedTree { return .grownSequoia }
+        if let lastOutcome, lastOutcome.plantedTree, !lastOutcome.plantedWelcomeTree { return .grownSequoia }
         return stage
     }
 
@@ -53,9 +80,7 @@ final class TodayViewModel {
             .formatted(.dateTime.weekday(.wide).month(.wide).day())
     }
 
-    func gotIt() { checkIn(knewIt: false) }
-
-    func alreadyKnewIt() { checkIn(knewIt: true) }
+    func gotIt() { checkIn() }
 
     func toggleFavorite() {
         store.toggleFavorite(word.id)
@@ -67,16 +92,15 @@ final class TodayViewModel {
 
     /// Renders the share card for the current word and streak.
     func prepareShareImage() {
-        shareImage = ShareRenderer.wordCard(word: word, stage: stage, streak: streak).map(Image.init(uiImage:))
+        shareImage = ShareRenderer.wordCard(word: word, store: store).map(Image.init(uiImage:))
     }
 
-    private func checkIn(knewIt: Bool) {
-        guard case .checkedIn(let outcome) = store.checkIn(knewIt: knewIt) else { return }
+    private func checkIn() {
+        guard case .checkedIn(let outcome) = store.checkIn() else { return }
         lastOutcome = outcome
         checkInCount += 1
         if outcome.plantedTree {
             plantedCount += 1
-            plantedMoment = PlantedTreeMoment.latest(in: store)
         }
         prepareShareImage()
     }

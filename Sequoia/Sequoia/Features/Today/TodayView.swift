@@ -6,6 +6,7 @@ import SequoiaCore
 struct TodayView: View {
     @State private var model: TodayViewModel
     @Environment(AppModel.self) private var app
+    @AppStorage(AppModel.reminderOfferDismissedKey) private var reminderOfferDismissed = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -25,7 +26,24 @@ struct TodayView: View {
                         .buttonStyle(IconButtonStyle())
                         .accessibilityLabel("Play pronunciation")
                     }
-                    secondaryActions
+                    if model.isFirstWord {
+                        wordLevelMenu
+                    }
+                    // Favorite and share come after the word is learned, so before
+                    // "Got it" the screen holds just the word and the button.
+                    if model.isCompleted {
+                        secondaryActions
+                    }
+                    // In the scrolling content, not the fixed bottom panel, so large
+                    // text never squeezes the growth panel.
+                    if model.offersReminder && !reminderOfferDismissed {
+                        ReminderOffer(time: model.reminderTime) { time in
+                            Task { await app.enableReminder(at: time) }
+                        } dismiss: {
+                            withAnimation(Theme.Motion.growth(reduceMotion: reduceMotion)) { reminderOfferDismissed = true }
+                        }
+                        .transition(.opacity)
+                    }
                 }
                 .padding(.horizontal, Theme.Spacing.m)
                 .padding(.top, Theme.Spacing.s)
@@ -44,12 +62,8 @@ struct TodayView: View {
         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: model.checkInCount)
         .sensoryFeedback(.success, trigger: model.plantedCount)
         .task(id: model.word.id) { model.prepareShareImage() }
-        .presentsCeremony($model.plantedMoment) { app.selectedTab = .forest }
         #if SEQUOIA_DEV
-        .onAppear {
-            LaunchTiming.wordDidAppear()
-            if DevLaunchActions.showsCeremony { model.plantedMoment = .preview(in: model.store) }
-        }
+        .onAppear { LaunchTiming.wordDidAppear() }
         #endif
     }
 
@@ -67,6 +81,27 @@ struct TodayView: View {
             StreakChip(stage: model.stage, day: model.streak)
                 .animation(Theme.Motion.growth(reduceMotion: reduceMotion), value: model.streak)
         }
+    }
+
+    /// On the first word only: change its level in place, instead of being
+    /// asked during onboarding before seeing a single word.
+    private var wordLevelMenu: some View {
+        Menu {
+            Picker("Word level", selection: $model.difficulty) {
+                ForEach(Difficulty.allCases) { Text($0.title).tag($0) }
+            }
+        } label: {
+            Label("Word level: \(model.difficulty.title)", systemImage: "slider.horizontal.3")
+                .font(Typography.callout.weight(.semibold))
+                .foregroundStyle(Theme.Palette.bark)
+                .padding(.horizontal, Theme.Spacing.m)
+                .frame(minHeight: Theme.Size.minTapTarget)
+                // On a surface, since the forest stands behind this part of the screen.
+                .background(Theme.Palette.surface, in: Capsule())
+                .contentShape(Capsule())
+        }
+        .accessibilityHint("Swaps today's word for an easier or harder one")
+        .accessibilityIdentifier("wordLevel")
     }
 
     private var secondaryActions: some View {
@@ -87,16 +122,7 @@ struct TodayView: View {
                 .accessibilityIdentifier("share")
             }
 
-            Spacer(minLength: Theme.Spacing.xs)
-
-            if !model.isCompleted {
-                Button("I already knew this", action: model.alreadyKnewIt)
-                    .buttonStyle(.sequoiaSecondary)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .layoutPriority(1)
-                    .accessibilityHint("Completes today and marks the word as already known")
-            }
+            Spacer(minLength: 0)
         }
     }
 
@@ -106,14 +132,24 @@ struct TodayView: View {
                 GrowthPanel(
                     stage: model.displayedStage,
                     streak: model.streak,
-                    outcome: model.lastOutcome
+                    outcome: model.lastOutcome,
+                    treeDays: model.treeDays,
+                    daysToFullGrowth: model.daysToFullGrowth
                 )
                 .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
             } else {
+                if let rainNote = model.rainNote {
+                    // Text on the forest floor uses `soil`: `soilSecondary` dims too far at night.
+                    Label(rainNote, systemImage: "cloud.rain")
+                        .font(Typography.callout)
+                        .foregroundStyle(Theme.Palette.soil)
+                        .multilineTextAlignment(.center)
+                        .accessibilityIdentifier("rainNote")
+                }
                 if model.showsFreshStartMessage {
                     Text("Plant a new seed today. Your forest is safe.")
                         .font(Typography.callout)
-                        .foregroundStyle(Theme.Palette.soilSecondary)
+                        .foregroundStyle(Theme.Palette.soil)
                         .multilineTextAlignment(.center)
                 }
                 Button("Got it") {
@@ -171,18 +207,25 @@ struct TodayForest: View {
     }
 }
 
-/// Shown once today is complete: the tree, the streak, and what was earned.
+/// Shown once today is complete: the tree, what changed, and how far it is
+/// to the next grown sequoia.
 struct GrowthPanel: View {
     let stage: TreeStage
     let streak: Int
     let outcome: CheckInOutcome?
+    var treeDays = 0
+    var daysToFullGrowth = 30
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    /// The stage before this check-in, drawn for a moment when the tree just
+    /// grew, so the growth itself is seen.
+    @State private var previousStage: TreeStage?
 
     var body: some View {
         HStack(spacing: Theme.Spacing.m) {
-            TreeView(stage: stage)
+            let shown = previousStage ?? stage
+            TreeView(stage: shown)
                 .frame(height: 76)
-                .id(stage)
+                .id(shown)
                 .transition(reduceMotion
                     ? .opacity
                     : .scale(scale: 0.4, anchor: .bottom).combined(with: .opacity))
@@ -190,17 +233,13 @@ struct GrowthPanel: View {
                 Text(title)
                     .font(Typography.headline)
                     .foregroundStyle(Theme.Palette.soil)
-                Text(subtitle)
+                subtitle
                     .font(Typography.callout)
                     .foregroundStyle(Theme.Palette.soilSecondary)
-                if let outcome {
-                    Text("+\(outcome.ringsEarned) rings")
-                        .font(Typography.label)
-                        .foregroundStyle(outcome.plantedTree ? Theme.Palette.onSunlight : Theme.Palette.canopy)
-                        .padding(.horizontal, outcome.plantedTree ? Theme.Spacing.xs : 0)
-                        .padding(.vertical, outcome.plantedTree ? 2 : 0)
-                        .background(outcome.plantedTree ? Theme.Palette.sunlight : .clear, in: Capsule())
-                }
+                ProgressView(value: Double(progressDays), total: Double(daysToFullGrowth))
+                    .tint(Theme.Palette.canopy)
+                    .padding(.top, Theme.Spacing.xxs)
+                    .accessibilityHidden(true)
             }
             Spacer(minLength: 0)
         }
@@ -208,17 +247,85 @@ struct GrowthPanel: View {
         .background(Theme.Palette.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.large, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("growthPanel")
+        .task(id: outcome?.streak) { await showGrowth() }
     }
 
+    /// Plays the stage change: the old stage, then the new one grows in.
+    private func showGrowth() async {
+        guard let outcome, outcome.stageChanged, !isPlanting, !reduceMotion else { return }
+        previousStage = outcome.previousStage
+        try? await Task.sleep(for: .milliseconds(700))
+        withAnimation(Theme.Motion.growth(reduceMotion: reduceMotion)) { previousStage = nil }
+    }
+
+    /// A grown tree was planted this check-in (not the welcome tree).
+    private var isPlanting: Bool { outcome?.plantedTree == true && outcome?.plantedWelcomeTree != true }
+
+    private var progressDays: Int { isPlanting ? daysToFullGrowth : treeDays }
+
+    private var wordsToGo: Int { max(0, daysToFullGrowth - treeDays) }
+
     private var title: String {
-        if outcome?.plantedTree == true { return String(localized: "A sequoia joined your forest") }
+        if outcome?.plantedWelcomeTree == true { return String(localized: "Your first sequoia is planted") }
+        if isPlanting { return String(localized: "A sequoia joined your forest") }
         if let outcome, outcome.stageChanged { return String(localized: "Your tree is now a \(outcome.reachedStage.title.lowercased())") }
         return String(localized: "Day \(streak) complete")
     }
 
-    private var subtitle: String {
-        if outcome?.plantedTree == true { return String(localized: "A new seed is planted. See you tomorrow.") }
-        return String(localized: "Come back tomorrow to keep it growing.")
+    private var subtitle: Text {
+        if outcome?.plantedWelcomeTree == true {
+            return Text("Your next one has sprouted. ^[\(wordsToGo) more word](inflect: true) to grow it.")
+        }
+        if isPlanting { return Text("A new seed is planted. See you tomorrow.") }
+        return Text("^[\(wordsToGo) more word](inflect: true) to a grown sequoia.")
+    }
+}
+
+/// Offered once, right after the first "Got it": a daily reminder for the
+/// next word, at a time the user picks.
+struct ReminderOffer: View {
+    let accept: (DateComponents) -> Void
+    let dismiss: () -> Void
+    @State private var time: Date
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    init(time: DateComponents, accept: @escaping (DateComponents) -> Void, dismiss: @escaping () -> Void) {
+        self.accept = accept
+        self.dismiss = dismiss
+        _time = State(initialValue: Calendar.current.date(from: time) ?? .now)
+    }
+
+    var body: some View {
+        // Side by side normally; stacked at accessibility text sizes so nothing clips.
+        let controls = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Theme.Spacing.s))
+            : AnyLayout(HStackLayout(spacing: Theme.Spacing.s))
+        VStack(alignment: .leading, spacing: Theme.Spacing.s) {
+            Text("Want tomorrow's word on time?")
+                .font(Typography.headline)
+                .foregroundStyle(Theme.Palette.soil)
+                .fixedSize(horizontal: false, vertical: true)
+            controls {
+                DatePicker("Reminder time", selection: $time, displayedComponents: .hourAndMinute)
+                    .labelsHidden()
+                if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 0) }
+                Button("Not now", action: dismiss)
+                    .font(Typography.callout)
+                    .foregroundStyle(Theme.Palette.bark)
+                    .frame(minHeight: Theme.Size.minTapTarget)
+                    .contentShape(Rectangle())
+                    .accessibilityIdentifier("reminderOfferDismiss")
+                Button("Remind me") {
+                    accept(Calendar.current.dateComponents([.hour, .minute], from: time))
+                }
+                .buttonStyle(.sequoiaSecondary)
+                .accessibilityIdentifier("reminderOfferAccept")
+            }
+        }
+        .padding(Theme.Spacing.m)
+        .background(Theme.Palette.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.large, style: .continuous))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("reminderOffer")
     }
 }
 
@@ -231,5 +338,5 @@ struct GrowthPanel: View {
 }
 
 #Preview("Growth panel") {
-    GrowthPanel(stage: .sapling, streak: 7, outcome: nil).padding().sequoiaScreen()
+    GrowthPanel(stage: .sapling, streak: 7, outcome: nil, treeDays: 7).padding().sequoiaScreen()
 }

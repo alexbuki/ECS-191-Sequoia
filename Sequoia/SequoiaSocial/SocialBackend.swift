@@ -8,7 +8,7 @@ import Foundation
 /// The three leaderboards. Their IDs must match the leaderboards configured in
 /// App Store Connect for the app.
 public enum LeaderboardKind: String, CaseIterable, Identifiable, Sendable {
-    case streak, trees, rings
+    case streak, trees
 
     public var id: String { rawValue }
     public var leaderboardID: String { "app.sequoia.Sequoia.leaderboard.\(rawValue)" }

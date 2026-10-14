@@ -33,6 +33,26 @@ struct WidgetTimelineTests {
         #expect(plan.reloadDate > midnight.date, "reloads after midnight, never before")
     }
 
+    @Test func flagsThePlantingDaySoTheWidgetOpensTheApp() throws {
+        let store = try makeStore()
+        let days = store.engine.config.daysToFullGrowth
+        // The day before planting: tomorrow's entry is the planting day.
+        for day in 0..<(days - 1) {
+            if day > 0 { clock.advance(days: 1); store.refresh() }
+            store.checkIn()
+        }
+        var plan = store.widgetTimeline(realOffset: 0)
+        #expect(!plan.entries[0].plantsTree)
+        #expect(plan.entries[1].plantsTree, "the midnight entry already offers planting")
+        clock.advance(days: 1)
+        plan = store.widgetTimeline(realOffset: 0)
+        #expect(plan.entries[0].plantsTree)
+        store.checkIn()
+        plan = store.widgetTimeline(realOffset: 0)
+        #expect(!plan.entries[0].plantsTree)
+        #expect(!plan.entries[1].plantsTree)
+    }
+
     @Test func reflectsACheckInAndKeepsTheStreakOvernight() throws {
         let store = try makeStore()
         store.checkIn()

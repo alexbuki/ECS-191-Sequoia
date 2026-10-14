@@ -37,7 +37,15 @@ struct WordLibraryTests {
     @Test func everyDifficultyHasWords() {
         let selector = DailyWordSelector(provider: provider)
         for level in Difficulty.allCases {
-            #expect(selector.pool(for: level).count >= 100, "\(level)")
+            // Five years of words at each level (with a leap day), so a daily
+            // user at one level doesn't see a repeat for five years.
+            #expect(selector.pool(for: level).count >= 5 * 365 + 1, "\(level)")
+        }
+    }
+
+    @Test func everyWordCanBeAFillTheBlank() {
+        for word in provider.words {
+            #expect(PracticeGenerator.blanked(word) != nil, "\(word.id) needs an example with the word on its own")
         }
     }
 

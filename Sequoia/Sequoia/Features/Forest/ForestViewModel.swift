@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 import SequoiaCore
+import DesignSystem
 
 @MainActor
 @Observable
@@ -33,17 +34,36 @@ final class ForestViewModel {
 
     /// The VoiceOver summary, e.g. "Your forest: 4 grown sequoias and a sapling on day 9."
     var accessibilityDescription: String {
-        Self.describe(planted: plantedCount, stage: stage, treeDays: growth.treeDays)
+        let forest = Self.describe(planted: plantedCount, stage: stage, treeDays: growth.treeDays,
+                                   phase: store.forestLight.phase, undergrowth: store.undergrowth)
+        switch growth.rainDays {
+        case 0: return forest
+        case 1: return forest + " " + String(localized: "1 rain day saved to cover a missed day.")
+        default: return forest + " " + String(localized: "\(growth.rainDays) rain days saved to cover missed days.")
+        }
     }
 
-    nonisolated static func describe(planted: Int, stage: TreeStage, treeDays: Int) -> String {
+    nonisolated static func describe(planted: Int, stage: TreeStage, treeDays: Int,
+                                     phase: ForestLight.Phase = .day, undergrowth: Undergrowth = .none) -> String {
         let trees = planted == 0
             ? String(localized: "no grown sequoias yet")
             : planted == 1 ? String(localized: "1 grown sequoia") : String(localized: "\(planted) grown sequoias")
         let current = treeDays == 0
             ? String(localized: "a seed waiting to be planted")
             : String(localized: "a \(stage.title.lowercased()) on day \(treeDays)")
-        return String(localized: "Your forest: \(trees) and \(current).")
+        let scene: String = switch phase {
+        case .day: String(localized: "Your forest: \(trees) and \(current).")
+        case .dawn: String(localized: "Your forest at dawn: \(trees) and \(current).")
+        case .goldenHour: String(localized: "Your forest at sunset: \(trees) and \(current).")
+        case .night: String(localized: "Your forest at night: \(trees) and \(current).")
+        }
+        let floor: String? = switch (undergrowth.ferns > 0, undergrowth.flowers > 0) {
+        case (true, true): String(localized: "Ferns and wildflowers grow below.")
+        case (true, false): String(localized: "Ferns grow below.")
+        case (false, true): String(localized: "Wildflowers grow below.")
+        case (false, false): nil
+        }
+        return [scene, floor].compactMap { $0 }.joined(separator: " ")
     }
 
     // MARK: - Calendar
@@ -67,9 +87,16 @@ final class ForestViewModel {
     }
 
     var weekdaySymbols: [String] {
-        let calendar = store.currentClock.calendar
-        let symbols = calendar.veryShortStandaloneWeekdaySymbols
-        let start = calendar.firstWeekday - 1
+        rotatedToFirstWeekday(store.currentClock.calendar.veryShortStandaloneWeekdaySymbols)
+    }
+
+    /// Full weekday names in the same order, for VoiceOver.
+    var weekdayNames: [String] {
+        rotatedToFirstWeekday(store.currentClock.calendar.standaloneWeekdaySymbols)
+    }
+
+    private func rotatedToFirstWeekday(_ symbols: [String]) -> [String] {
+        let start = store.currentClock.calendar.firstWeekday - 1
         return Array(symbols[start...] + symbols[..<start])
     }
 

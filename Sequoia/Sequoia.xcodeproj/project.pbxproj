@@ -29,6 +29,7 @@
 		5B30F249FACD0F74EEFE2CDA /* WatchSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE9660DEAA5BC7CF8232A31 /* WatchSyncService.swift */; };
 		5BD51D8A1203ACB3D6E39C07 /* DevModeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7944AC85C1E89DA5C586EC5 /* DevModeController.swift */; };
 		65677DD8E6391EFCA4B777B7 /* SocialModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23CB7FEDED011D152F41398 /* SocialModel.swift */; };
+		6637DF6B592FEA3BB70C1B56 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DEA6C71C5896CED9E49BC7C2 /* PrivacyInfo.xcprivacy */; };
 		6643DDE359A8B7C5AEDF7391 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C9D23232F64B23E39193EA /* LibraryView.swift */; };
 		6AEC4F16F870849814F96234 /* SequoiaCore in Frameworks */ = {isa = PBXBuildFile; productRef = E16679957C9006655E99F204 /* SequoiaCore */; };
 		6ED68CE1F7AB28349C0DD836 /* TodayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8AE27BB50917F4B8644C304 /* TodayViewModel.swift */; };
@@ -59,8 +60,11 @@
 		B09EA1F94A23A7102BFCB20B /* SequoiaWatchWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60AB6E96F104BDC3BA927E20 /* SequoiaWatchWidgets.swift */; };
 		B2D15A692B96D2052E6EE263 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40551EAD3108A101B4EBE10E /* SettingsView.swift */; };
 		B37297AABC8F492E524A2E9F /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D367B1017ADA8B148A6BEE2 /* TodayView.swift */; };
+		B54731BAA24A6B6A5FAC1372 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D8A03A60D0E3FC7C38951A0D /* PrivacyInfo.xcprivacy */; };
 		B85AE3AB3713E495697E7521 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4C1DEDB4F8F8EB500BD4488 /* WidgetKit.framework */; };
+		BEDA40345BA85463EEC72FD9 /* SequoiaWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E441C02BD3D2FF20CB48A349 /* SequoiaWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		D1BE122BFBFBC1CDFD2B0C87 /* WordTimelineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E299AB3E1AC946276BB6D0F /* WordTimelineProvider.swift */; };
+		D2ED48DAF3264A4E0CFC2ED4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E00022954444F63A934D2ADD /* PrivacyInfo.xcprivacy */; };
 		D5A49B913EAD0F4738176E76 /* SequoiaWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE9B468F30728F01468EC35 /* SequoiaWidgetsBundle.swift */; };
 		D8A7CC66D49E8AD19584511F /* SequoiaWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C152BC619DD15327009997 /* SequoiaWatchApp.swift */; };
 		D8FBD9481296BC574FAE63F8 /* SequoiaCore in Frameworks */ = {isa = PBXBuildFile; productRef = E68014313CEC9D991EBA7D08 /* SequoiaCore */; };
@@ -73,6 +77,7 @@
 		EE536B36FBF8B3D75FBD2D7D /* WatchTodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4520194AC9A1B8ABC4A478 /* WatchTodayView.swift */; };
 		F19F9E3D16F8203712612497 /* AppShellTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3CC12600F76759EE19525D7 /* AppShellTests.swift */; };
 		F1B2BB61E6443C2EBC73C94D /* SequoiaSocial.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9154838A3CF5F4B14A20A0A5 /* SequoiaSocial.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		F2C5C71350FBC63BA8ECF227 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0590760E752EF6117EA7AC8E /* PrivacyInfo.xcprivacy */; };
 		F458AAAF880C83C86D715FCE /* ForestAtmosphere+Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5DF1A160CA93DEA18A2DC46 /* ForestAtmosphere+Store.swift */; };
 		F8A2F3EB9FB546CFAF98E9EF /* PlantingCeremonyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA6355E3E4C27EA2C9B1B356 /* PlantingCeremonyView.swift */; };
 		FB635E8C700863788C1FA978 /* GameCenterBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F18D986C6320DC9878FF1A /* GameCenterBackend.swift */; };
@@ -100,6 +105,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 7DD0CF0754C7A1C8A295FCFB;
 			remoteInfo = Sequoia;
+		};
+		8DA8BA520655DC2CBC74F129 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1632991557C7D18E445D5917 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D3C829C26264DB7A521C370;
+			remoteInfo = SequoiaWatch;
 		};
 		A7003BE6BEC5EB2296C1B7EB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -150,6 +162,17 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		747C8A915F09FC9F977B4E33 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				BEDA40345BA85463EEC72FD9 /* SequoiaWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		955CF2CD91F956068B8BB65F /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -177,6 +200,7 @@
 
 /* Begin PBXFileReference section */
 		00E453AD0E1337BDC3ADE2C3 /* SequoiaWatchWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SequoiaWatchWidgets.entitlements; sourceTree = "<group>"; };
+		0590760E752EF6117EA7AC8E /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		0BADD2D87693C29D82913959 /* SequoiaWatchWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SequoiaWatchWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		0DE9660DEAA5BC7CF8232A31 /* WatchSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSyncService.swift; sourceTree = "<group>"; };
 		0E13A10658D17CA74C4E0091 /* SequoiaWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SequoiaWidgets.entitlements; sourceTree = "<group>"; };
@@ -231,7 +255,10 @@
 		CBFB75F02D94E3AD2C833467 /* WordWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordWidget.swift; sourceTree = "<group>"; };
 		CDD366CFC9F7E6179E913FEA /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
 		D5DF1A160CA93DEA18A2DC46 /* ForestAtmosphere+Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ForestAtmosphere+Store.swift"; sourceTree = "<group>"; };
+		D8A03A60D0E3FC7C38951A0D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		D98BBE25B175C6AB85A69B4B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		DEA6C71C5896CED9E49BC7C2 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		E00022954444F63A934D2ADD /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E21A6C1DC502472974310D87 /* DeferredGameCenterBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeferredGameCenterBackend.swift; sourceTree = "<group>"; };
 		E41904716FCDA57918A572A8 /* Previews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Previews.swift; sourceTree = "<group>"; };
 		E441C02BD3D2FF20CB48A349 /* SequoiaWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SequoiaWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -326,6 +353,7 @@
 			children = (
 				79235F7D6BE9EB002558984E /* Assets.xcassets */,
 				A4347A8ACBC9C03E2D10688A /* Localizable.xcstrings */,
+				E00022954444F63A934D2ADD /* PrivacyInfo.xcprivacy */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -364,6 +392,7 @@
 			isa = PBXGroup;
 			children = (
 				EF604E0C33F1A1E3F421A485 /* Info.plist */,
+				DEA6C71C5896CED9E49BC7C2 /* PrivacyInfo.xcprivacy */,
 				00E453AD0E1337BDC3ADE2C3 /* SequoiaWatchWidgets.entitlements */,
 				60AB6E96F104BDC3BA927E20 /* SequoiaWatchWidgets.swift */,
 			);
@@ -498,6 +527,7 @@
 			children = (
 				69C33C22EFF12936BBFABAE4 /* GotItIntent.swift */,
 				CB2DE0B278A610D439BB5FF3 /* Info.plist */,
+				D8A03A60D0E3FC7C38951A0D /* PrivacyInfo.xcprivacy */,
 				0E13A10658D17CA74C4E0091 /* SequoiaWidgets.entitlements */,
 				EAE9B468F30728F01468EC35 /* SequoiaWidgetsBundle.swift */,
 				3996D2A404464A9540AD818C /* StreakWidget.swift */,
@@ -541,6 +571,7 @@
 			isa = PBXGroup;
 			children = (
 				3B989520859D90B26C11E406 /* Assets.xcassets */,
+				0590760E752EF6117EA7AC8E /* PrivacyInfo.xcprivacy */,
 				30FC1C435DD601D3DCBCC59E /* SequoiaWatch.entitlements */,
 				49C152BC619DD15327009997 /* SequoiaWatchApp.swift */,
 				81F5045BD99FD07B0FED2A59 /* WatchModel.swift */,
@@ -580,6 +611,7 @@
 			buildConfigurationList = 379CD7C0600BC722C8B02DD6 /* Build configuration list for PBXNativeTarget "SequoiaWatchWidgets" */;
 			buildPhases = (
 				B5334A9415FD862E535F1B80 /* Sources */,
+				6B647AC893E3A646B1C41F71 /* Resources */,
 				22747283861594410B365955 /* Frameworks */,
 			);
 			buildRules = (
@@ -619,6 +651,7 @@
 			buildConfigurationList = F84E44C0E26BC6E833D4160B /* Build configuration list for PBXNativeTarget "SequoiaWidgets" */;
 			buildPhases = (
 				6861887FAC7128772E229087 /* Sources */,
+				8FD45DDA9D3EB5829D66D06A /* Resources */,
 				1F0E66EECF77E25FF79109D5 /* Frameworks */,
 			);
 			buildRules = (
@@ -678,6 +711,7 @@
 				0F415675E3959726A9534FD3 /* Frameworks */,
 				955CF2CD91F956068B8BB65F /* Embed Foundation Extensions */,
 				E73B77BA7ADC68E65B3CD641 /* Embed Frameworks */,
+				747C8A915F09FC9F977B4E33 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
@@ -685,6 +719,7 @@
 				A9E9545E442E7921D32840D0 /* PBXTargetDependency */,
 				65C4458DF8BF75C424E0BA44 /* PBXTargetDependency */,
 				9D8F9BCA6DCE7338DDC54D70 /* PBXTargetDependency */,
+				80DD19DA4A471938A9B519A1 /* PBXTargetDependency */,
 			);
 			name = Sequoia;
 			packageProductDependencies = (
@@ -839,6 +874,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				37066A3C28A94348796604EB /* Assets.xcassets in Resources */,
+				F2C5C71350FBC63BA8ECF227 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -848,6 +884,23 @@
 			files = (
 				889C9DEF6B51703A2AE3B218 /* Assets.xcassets in Resources */,
 				70CA432870E2BBBBB2C0E76E /* Localizable.xcstrings in Resources */,
+				D2ED48DAF3264A4E0CFC2ED4 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6B647AC893E3A646B1C41F71 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6637DF6B592FEA3BB70C1B56 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8FD45DDA9D3EB5829D66D06A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B54731BAA24A6B6A5FAC1372 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -977,6 +1030,11 @@
 			isa = PBXTargetDependency;
 			target = 39D215BC6252B220E6C786C7 /* SequoiaGameCenter */;
 			targetProxy = 625E7BB828021DFDCF631BE3 /* PBXContainerItemProxy */;
+		};
+		80DD19DA4A471938A9B519A1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D3C829C26264DB7A521C370 /* SequoiaWatch */;
+			targetProxy = 8DA8BA520655DC2CBC74F129 /* PBXContainerItemProxy */;
 		};
 		8E252F318A51FE2978C0C78A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

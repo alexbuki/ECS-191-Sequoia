@@ -163,6 +163,32 @@ final class WidgetUITests: XCTestCase {
         _ = launch(["-devResetClock"])
     }
 
+    /// On the day the tree would be planted, the widget hands off to the app,
+    /// so the planting and its ceremony are seen there.
+    func testThePlantingDayWidgetOpensTheApp() throws {
+        var app = launch(["-devResetClock", "-devResetProgress", "-devJumpStage", "4"])
+        XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
+        removeExistingWidgets()
+        addWidget(page: 0)
+        addWidget(page: 1)
+        showWidgetsPage()
+        let plant = springboard.buttons["Plant your sequoia"]
+        XCTAssertTrue(plant.waitForExistence(timeout: 15), "the medium widget offers planting in the app")
+        XCTAssertFalse(springboard.buttons["Got it"].exists)
+        snapshot("widgets-planting-day")
+
+        plant.tap()
+        app = XCUIApplication()
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 10))
+        let gotIt = app.buttons["gotIt"]
+        XCTAssertTrue(gotIt.waitForExistence(timeout: 5), "opens Today, still to be completed")
+        gotIt.tap()
+        XCTAssertTrue(app.buttons["ceremonyDone"].waitForExistence(timeout: 5))
+        app.buttons["ceremonyDone"].tap()
+        app.terminate()
+        _ = launch(["-devResetClock", "-devResetProgress"])
+    }
+
     /// Captures the widgets page as it is (run after the test above, in light and dark).
     func testCaptureWidgetsPage() throws {
         let name = try XCTUnwrap(ProcessInfo.processInfo.environment["SEQUOIA_CAPTURE_NAME"])

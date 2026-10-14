@@ -96,7 +96,9 @@ struct DeveloperPanelView: View {
                     Button("Check in for the next \(customDays) days") {
                         DevLaunchActions.simulateCheckIns(days: customDays, store: app.store)
                     }
-                    Button("Simulate a missed day") { dev.advance(days: 2); app.store.refresh() }
+                    Button("Simulate a missed day") { DevLaunchActions.missOneDay(store: app.store) }
+                    Button("Grant a rain day") { app.store.devGrantRainDay() }
+                    Button("Miss 3 words in practice") { DevLaunchActions.missWords(3, store: app.store); app.store.refresh() }
                     Menu("Jump to tree stage") {
                         ForEach(TreeStage.allCases) { stage in
                             Button(stage.title) { app.store.devJump(to: stage) }
@@ -108,6 +110,8 @@ struct DeveloperPanelView: View {
                     LabeledContent("Streak", value: "\(app.store.growth.currentStreak)")
                     LabeledContent("Stage", value: app.store.stage.title)
                     LabeledContent("Rings", value: "\(app.store.growth.totalRings)")
+                    LabeledContent("Rain days", value: "\(app.store.growth.rainDays) saved, \(app.store.growth.rainDaysUsed) used")
+                        .accessibilityIdentifier("devRainDays")
                     Button("Reset all progress", role: .destructive) { app.store.resetProgress() }
                 }
             }

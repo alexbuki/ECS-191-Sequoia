@@ -79,6 +79,19 @@ struct WordWidgetView: View {
                     Label("Done for today", systemImage: "checkmark")
                         .font(Typography.label)
                         .foregroundStyle(Theme.Palette.canopy)
+                } else if snapshot.plantsTree, let url = Self.todayURL {
+                    // The planting is the app's moment: open it rather than plant here.
+                    Link(destination: url) {
+                        Text("Plant your sequoia")
+                            .font(Typography.label)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .padding(.horizontal, Theme.Spacing.s)
+                            .padding(.vertical, Theme.Spacing.xxs)
+                    }
+                    .foregroundStyle(Theme.Palette.onSunlight)
+                    .background(Theme.Palette.sunlight, in: Capsule())
+                    .accessibilityHint("Opens Sequoia to plant your fully grown tree")
                 } else {
                     Button(intent: GotItIntent()) {
                         Text("Got it")
@@ -103,6 +116,8 @@ struct WordWidgetView: View {
         }
     }
 
+    private static let todayURL = URL(string: "sequoia://today")
+
     private var partOfSpeech: some View {
         Text(snapshot.word.partOfSpeech.title.uppercased())
             .font(Typography.caption.weight(.semibold))
@@ -111,11 +126,17 @@ struct WordWidgetView: View {
     }
 
     private var streakLabel: some View {
-        Text(snapshot.streak == 0 ? String(localized: "Plant a seed") : String(localized: "Day \(snapshot.streak)"))
+        Text(streakText)
             .font(Typography.label)
             .foregroundStyle(Theme.Palette.soilSecondary)
-            .lineLimit(1)
+            .lineLimit(2)
+            .multilineTextAlignment(.center)
             .minimumScaleFactor(0.8)
+    }
+
+    private var streakText: String {
+        if snapshot.plantsTree { return String(localized: "Ready to plant") }
+        return snapshot.streak == 0 ? String(localized: "Plant a seed") : String(localized: "Day \(snapshot.streak)")
     }
 
     // MARK: Lock Screen
@@ -141,7 +162,8 @@ struct WordWidgetView: View {
     // MARK: Accessibility
 
     private var treeSummary: String {
-        snapshot.streak == 0
+        if snapshot.plantsTree { return String(localized: "Your sequoia is fully grown and ready to plant in the app.") }
+        return snapshot.streak == 0
             ? String(localized: "No streak yet. \(snapshot.stage.accessibilityDescription).")
             : String(localized: "\(snapshot.stage.title), day \(snapshot.streak) of your streak")
     }

@@ -8,7 +8,6 @@ extension LeaderboardKind {
         switch self {
         case .streak: String(localized: "Streak")
         case .trees: String(localized: "Trees")
-        case .rings: String(localized: "Rings")
         }
     }
 
@@ -18,7 +17,6 @@ extension LeaderboardKind {
         switch self {
         case .streak: growth.currentStreak
         case .trees: growth.plantedTrees
-        case .rings: growth.totalRings
         }
     }
 }

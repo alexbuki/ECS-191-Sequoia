@@ -16,7 +16,10 @@ struct TreeArtRenderer {
             let suffix = scheme == .light ? "light" : "dark"
             try write(TreeArtSheet().environment(\.colorScheme, scheme), to: dir.appending(path: "trees-\(suffix).png"))
             try write(ForestSceneSheet().environment(\.colorScheme, scheme), to: dir.appending(path: "forest-\(suffix).png"))
+            try write(RingsSheet().environment(\.colorScheme, scheme), to: dir.appending(path: "rings-\(suffix).png"))
         }
+        // Shared images are always rendered light.
+        try write(ShareCardSheet().environment(\.colorScheme, .light), to: dir.appending(path: "share.png"))
     }
 
     private func write(_ view: some View, to url: URL) throws {

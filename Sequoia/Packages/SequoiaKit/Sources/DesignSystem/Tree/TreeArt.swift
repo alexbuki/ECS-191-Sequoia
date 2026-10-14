@@ -5,9 +5,12 @@ import SequoiaCore
 /// real giant sequoia changes with age:
 /// - seed: an egg-shaped sequoia cone resting on the soil
 /// - sprout: a red-stemmed seedling with a starburst of needle-like seed leaves
-/// - sapling and young sequoia: a narrow, pointed spire with foliage to the ground
+/// - sapling: a broad, sharply pointed cone of clumpy foliage down to the ground
+/// - young sequoia: the same youthful cone, carried on a straight bare trunk once
+///   its shaded lower limbs have dropped
 /// - grown sequoia: a massive buttressed trunk, bare low down, with stout crooked
-///   limbs holding flat-bottomed clouds of foliage and a rounded crown
+///   limbs holding clumps of foliage, in one of several varieties
+///   (rounded, snag-topped, twin-crowned, broad or slender)
 ///
 /// Unit coordinate space (x: 0...1 of the width, y: 0...1 of the height, y grows down).
 struct TreeArt {
@@ -17,6 +20,8 @@ struct TreeArt {
     let stage: TreeStage
     let showsGround: Bool
     let variant: Int
+    /// Draws the compact silhouette at any size (the app icon), not only small ones.
+    var simplified = false
 
     // Shading overlays. They darken or warm whatever palette color sits beneath,
     // so they work on both the light and dark variants of `bark` and `canopy`.
@@ -39,7 +44,7 @@ struct TreeArt {
     func draw(in context: inout GraphicsContext, size: CGSize) {
         let s = Space(w: size.width, h: size.height)
         var rng = SeededRandom(seed: UInt64(truncatingIfNeeded: variant) &* 0x9E37_79B9 &+ 17)
-        let compact = size.height < Self.compactHeight
+        let compact = simplified || size.height < Self.compactHeight
 
         switch stage {
         case .seed:
@@ -50,15 +55,15 @@ struct TreeArt {
             drawSeedling(&context, s)
         case .sapling:
             if showsGround { drawGround(&context, s, halfWidth: 0.34) }
-            drawSpire(&context, s, top: 0.36, base: 0.87, halfWidth: 0.2, tiers: compact ? 4 : 6,
-                      trunkHalf: 0.022, compact: compact, rng: &rng)
+            drawYoungCone(&context, s, top: 0.34, base: 0.93, halfWidth: 0.3, rows: 11, trunkHalf: 0.018,
+                          compact: compact, rng: &rng)
         case .youngSequoia:
             if showsGround { drawGround(&context, s, halfWidth: 0.42) }
-            drawSpire(&context, s, top: 0.08, base: 0.8, halfWidth: 0.3, tiers: compact ? 5 : 10,
-                      trunkHalf: 0.05, compact: compact, rng: &rng)
+            drawYoungCone(&context, s, top: 0.06, base: 0.68, halfWidth: 0.27, rows: 13, trunkHalf: 0.045,
+                          compact: compact, rng: &rng)
         case .grownSequoia:
             if showsGround { drawGround(&context, s, halfWidth: 0.48) }
-            drawGiant(&context, s, compact: compact, rng: &rng)
+            drawGiant(&context, s, form: Self.giantForm(.of(variant: variant), &rng), compact: compact, rng: &rng)
         }
     }
 
@@ -146,131 +151,264 @@ struct TreeArt {
         leaf.fill(path, with: .color(Theme.Palette.canopy))
     }
 
-    // MARK: Sapling and young sequoia: a pointed spire
+    // MARK: Sapling and young sequoia: the youthful cone
 
-    private func drawSpire(_ c: inout GraphicsContext, _ s: Space, top: CGFloat, base: CGFloat,
-                           halfWidth: CGFloat, tiers: Int, trunkHalf: CGFloat, compact: Bool,
-                           rng: inout SeededRandom) {
-        let cx: CGFloat = 0.5
+    /// A young sequoia is an evenly tapered, sharply pointed cone of dense,
+    /// clumpy foliage. A sapling keeps that foliage to the ground; as the tree
+    /// grows, its shaded lower limbs die and drop, until the cone rides on a
+    /// straight, bare, red trunk.
+    private func drawYoungCone(_ c: inout GraphicsContext, _ s: Space, top: CGFloat, base: CGFloat,
+                               halfWidth: CGFloat, rows: Int, trunkHalf: CGFloat, compact: Bool,
+                               rng: inout SeededRandom) {
         let ground = Self.groundY
+        let cx: CGFloat = 0.5 + rng.range(-0.006, 0.006)
+        /// Cone half-width at height y, with a softly rounded base.
+        func envelope(_ y: CGFloat) -> CGFloat {
+            let t = max(0, min(1, (y - top) / (base - top)))
+            let round = 1 - pow(max(0, (t - 0.86) / 0.14), 2) * 0.14
+            return halfWidth * (0.05 + 0.95 * pow(t, 0.95)) * round
+        }
 
-        // Trunk, visible only below the foliage, with a slight flare.
+        // A straight trunk with a slight flare at the ground.
         var trunk = Path()
-        trunk.move(to: s.p(cx - trunkHalf * 0.6, base - 0.1))
-        trunk.addLine(to: s.p(cx + trunkHalf * 0.6, base - 0.1))
-        trunk.addQuadCurve(to: s.p(cx + trunkHalf * 1.5, ground), control: s.p(cx + trunkHalf, ground - 0.03))
-        trunk.addLine(to: s.p(cx - trunkHalf * 1.5, ground))
-        trunk.addQuadCurve(to: s.p(cx - trunkHalf * 0.6, base - 0.1), control: s.p(cx - trunkHalf, ground - 0.03))
+        let trunkTop = top + (base - top) * 0.3
+        trunk.move(to: s.p(cx - trunkHalf * 0.35, trunkTop))
+        trunk.addLine(to: s.p(cx + trunkHalf * 0.35, trunkTop))
+        trunk.addLine(to: s.p(cx + trunkHalf, ground - 0.05))
+        trunk.addQuadCurve(to: s.p(cx + trunkHalf * 1.8, ground), control: s.p(cx + trunkHalf * 1.05, ground - 0.012))
+        trunk.addLine(to: s.p(cx - trunkHalf * 1.8, ground))
+        trunk.addQuadCurve(to: s.p(cx - trunkHalf, ground - 0.05), control: s.p(cx - trunkHalf * 1.05, ground - 0.012))
         trunk.closeSubpath()
         c.fill(trunk, with: .color(Theme.Palette.bark))
+        var bark = c
+        bark.clip(to: trunk)
+        bark.fill(Path(s.rect(cx - trunkHalf * 2, top, trunkHalf * 1.5, 1)), with: .color(Self.light))
+        bark.fill(Path(s.rect(cx + trunkHalf * 0.35, top, trunkHalf * 2, 1)), with: .color(Self.shade))
 
-        // Foliage: a narrow cone whose edges are rows of drooping sprays. Rows
-        // vary in spacing, and each side varies on its own, so no two rows match.
-        let weights = (0..<tiers).map { _ in rng.range(0.75, 1.3) }
-        let total = weights.reduce(0, +)
-        var ys: [CGFloat] = []
-        var y = top
-        for weight in weights {
-            y += (base - top) * weight / total
-            ys.append(y)
-        }
-        typealias Segment = (point: CGPoint, control: CGPoint)
-        /// One side's outline, as offsets from the centre line (x > 0).
-        func side() -> [Segment] {
-            var segments: [Segment] = []
-            var previousY = top
-            for (i, y) in ys.enumerated() {
-                let step = y - previousY
-                let t = (y - top) / (base - top)
-                let half = halfWidth * pow(t, 0.8) * (1 + rng.range(-0.13, 0.13))
-                let droop = rng.range(0.6, 0.9)
-                segments.append((CGPoint(x: half, y: y), CGPoint(x: half * 0.92, y: y - step * droop)))
-                if i < ys.count - 1 {
-                    let nextStep = ys[i + 1] - y
-                    segments.append((CGPoint(x: half * rng.range(0.55, 0.7), y: y - nextStep * 0.12),
-                                     CGPoint(x: half * 0.86, y: y + step * 0.08)))
-                }
-                previousY = y
-            }
-            return segments
-        }
-        let right = side()
-        let left = side()
-        let lastStep = (ys.last ?? base) - (ys.count > 1 ? ys[ys.count - 2] : top)
-
-        var foliage = Path()
-        foliage.move(to: s.p(cx, top))
-        for segment in right {
-            foliage.addQuadCurve(to: s.p(cx + segment.point.x, segment.point.y), to: s,
-                                 control: CGPoint(x: cx + segment.control.x, y: segment.control.y))
-        }
-        let bottomY = ys.last ?? base
-        foliage.addQuadCurve(to: s.p(cx - (left.last?.point.x ?? 0), bottomY), control: s.p(cx, bottomY + lastStep * 0.7))
-        // Back up the left side: each curve runs from point k + 1 to point k
-        // using segment k + 1's control, so it matches the shape going down.
-        for k in stride(from: left.count - 2, through: 0, by: -1) {
-            let control = left[k + 1].control
-            foliage.addQuadCurve(to: s.p(cx - left[k].point.x, left[k].point.y), to: s,
-                                 control: CGPoint(x: cx - control.x, y: control.y))
-        }
-        if let first = left.first {
-            foliage.addQuadCurve(to: s.p(cx, top), to: s, control: CGPoint(x: cx - first.control.x, y: first.control.y))
-        }
-        foliage.closeSubpath()
-        c.fill(foliage, with: .color(Theme.Palette.canopy))
-
-        var lit = c
-        lit.clip(to: foliage)
-        // Light catches the top of each spray on the left; the right side and
-        // the underside of each spray fall into shade.
-        if !compact {
-            var previousY = top
-            for (i, y) in ys.enumerated() {
-                let step = y - previousY
-                let half = left[i * 2].point.x
-                lightFoliage(&lit, Path(ellipseIn: s.rect(cx - half * 1.1, y - step * 0.95, half * 1.0, step * 0.35)))
-                lit.fill(Path(ellipseIn: s.rect(cx - half * 1.2, y - step * 0.18, half * 2.4, step * 0.36)),
-                         with: .color(Self.shade.opacity(0.7)))
-                previousY = y
+        // Dead, self-pruned twigs on the bare stretch of trunk.
+        if !compact && ground - base > 0.1 {
+            for (k, side) in [CGFloat(-1), 1, -1].enumerated() {
+                let y = base + 0.035 + CGFloat(k) * (ground - base - 0.09) / 3
+                var twig = Path()
+                twig.move(to: s.p(cx + side * trunkHalf * 0.6, y))
+                twig.addLine(to: s.p(cx + side * (trunkHalf + 0.05), y + 0.012))
+                c.stroke(twig, with: .color(Theme.Palette.bark),
+                         style: StrokeStyle(lineWidth: max(0.8, trunkHalf * 0.35 * s.w), lineCap: .round))
             }
         }
-        var shadeSide = Path()
-        shadeSide.move(to: s.p(cx + halfWidth * 0.15, top))
-        shadeSide.addLine(to: s.p(cx + halfWidth * 1.4, base + 0.1))
-        shadeSide.addLine(to: s.p(cx + halfWidth * 0.45, base + 0.1))
-        shadeSide.closeSubpath()
-        lit.fill(shadeSide, with: .color(Self.shade))
+
+        // A dark inner body, so the cone stays solid between the tufts.
+        var body = Path()
+        body.move(to: s.p(cx, top + 0.02))
+        for y in stride(from: top + 0.02, through: base, by: 0.01) { body.addLine(to: s.p(cx + envelope(y) * 0.85, y)) }
+        for y in stride(from: base, through: top + 0.02, by: -0.01) { body.addLine(to: s.p(cx - envelope(y) * 0.85, y)) }
+        body.closeSubpath()
+        c.fill(body, with: .color(Theme.Palette.canopy))
+        c.fill(body, with: .color(Self.deepShade))
+
+        // The sharp leader.
+        var leader = Path()
+        let leaderHalf = halfWidth * 0.06
+        leader.move(to: s.p(cx - leaderHalf, top + 0.05))
+        leader.addQuadCurve(to: s.p(cx, top - 0.03), control: s.p(cx - leaderHalf * 0.4, top))
+        leader.addQuadCurve(to: s.p(cx + leaderHalf, top + 0.05), control: s.p(cx + leaderHalf * 0.4, top))
+        leader.closeSubpath()
+        c.fill(leader, with: .color(Theme.Palette.canopy))
+
+        // Rows of tufts across the cone, top to bottom so each row's sunlit tops
+        // sit against the shaded undersides of the row above.
+        let rowCount = compact ? max(5, rows / 2) : rows
+        let step = (base - top) / CGFloat(rowCount)
+        for row in 0..<rowCount {
+            let y = top + step * (CGFloat(row) + 0.7)
+            let e = envelope(y)
+            // `step * 2` converts a height to width units (the art is half as wide as tall).
+            let rx = max(0.022, min(e * 0.8, step * 2 * (compact ? 1.45 : 1.1)))
+            let count = max(1, Int((2 * e / (rx * 1.3)).rounded(.up)))
+            let reach = max(0, e - rx * 0.75)
+            // Centre tufts first, then outwards, so the edge tufts bulge over them.
+            let order = (0..<count).sorted { abs(CGFloat($0) - CGFloat(count - 1) / 2) < abs(CGFloat($1) - CGFloat(count - 1) / 2) }
+            for k in order {
+                let f = count == 1 ? 0 : CGFloat(k) / CGFloat(count - 1) * 2 - 1
+                // Edge tufts droop a little, like the young tree's swooping limbs.
+                let droop = abs(f) * step * 0.3 + rng.range(-0.004, 0.004)
+                let size = rng.range(0.88, 1.12)
+                drawTuft(&c, s, x: cx + f * reach + rng.range(-0.008, 0.008), y: y + droop,
+                         rx: rx * size, ry: rx * size * 0.62, shaded: f > 0.25 ? 0.07 : 0,
+                         detailed: !compact, rng: &rng)
+            }
+        }
     }
 
     // MARK: Grown sequoia: the giant
 
-    private func drawGiant(_ c: inout GraphicsContext, _ s: Space, compact: Bool, rng: inout SeededRandom) {
+    /// The proportions of one grown giant.
+    private struct GiantForm {
+        enum Top { case dome, flat, twin }
+
+        var top: Top = .dome
+        var crownTop: CGFloat
+        var crownBase: CGFloat
+        var crownWidth: CGFloat
+        /// How far the top of the crown drifts sideways from the trunk base.
+        var lean: CGFloat = 0
+        var trunkBody: CGFloat = 0.08
+        var flare: CGFloat = 0.15
+        var limbs = 7
+        var reach: CGFloat = 1
+        var tuftScale: CGFloat = 1
+        var stubs = 2
+        /// A dead, silvered spike above the crown where the leader broke off.
+        var snag = false
+        /// A charred cavity at the base from an old fire.
+        var fireScar = false
+    }
+
+    /// Named kinds of grown giant, so the trees of a forest differ in character
+    /// and not only in detail.
+    enum Variety: CaseIterable {
+        /// A dense, rounded crown on a straight column.
+        case classic
+        /// A flattened crown below the dead spike of a lightning-struck leader.
+        case snagTop
+        /// The trunk forks high up into two rounded tops, like the Clothespin Tree.
+        case twinCrown
+        /// Long, heavy limbs in a wide crown on a massive, leaning trunk.
+        case broad
+        /// A tall, narrow crown high on a long bare trunk.
+        case slender
+
+        var title: String {
+            switch self {
+            case .classic: "Classic"
+            case .snagTop: "Snag top"
+            case .twinCrown: "Twin crown"
+            case .broad: "Broad"
+            case .slender: "Slender"
+            }
+        }
+
+        /// The variety for a tree, stable for its variant. Variant 0, the tree
+        /// shown on its own, is always the classic giant.
+        static func of(variant: Int) -> Variety {
+            guard variant != 0 else { return .classic }
+            var rng = SeededRandom(seed: UInt64(truncatingIfNeeded: variant) &* 0xD1B5_4A32_D192_ED03 &+ 5)
+            switch rng.unit() {
+            case ..<0.28: return .classic
+            case ..<0.46: return .snagTop
+            case ..<0.64: return .twinCrown
+            case ..<0.82: return .broad
+            default: return .slender
+            }
+        }
+
+        /// The first variant that draws as this variety, for galleries.
+        var sampleVariant: Int {
+            (0...).first { Variety.of(variant: $0) == self } ?? 0
+        }
+    }
+
+    private static func giantForm(_ variety: Variety, _ rng: inout SeededRandom) -> GiantForm {
+        var form = GiantForm(crownTop: 0.04 + rng.range(0, 0.03), crownBase: 0.53 + rng.range(-0.03, 0.03),
+                             crownWidth: 0.28 + rng.range(-0.02, 0.02), lean: rng.range(-0.02, 0.02))
+        switch variety {
+        case .classic:
+            form.fireScar = rng.unit() < 0.2
+        case .snagTop:
+            form.top = .flat
+            form.crownTop = 0.16 + rng.range(0, 0.02)
+            form.crownBase = 0.56 + rng.range(-0.02, 0.02)
+            form.crownWidth += 0.02
+            form.limbs = 6
+            form.snag = true
+            form.fireScar = rng.unit() < 0.5
+        case .twinCrown:
+            form.top = .twin
+            form.crownTop = 0.06 + rng.range(0, 0.02)
+            form.crownWidth = 0.3 + rng.range(-0.02, 0.02)
+            form.fireScar = rng.unit() < 0.25
+        case .broad:
+            form.crownTop = 0.1 + rng.range(0, 0.03)
+            form.crownBase = 0.5 + rng.range(-0.02, 0.02)
+            form.crownWidth = 0.31 + rng.range(-0.01, 0.01)
+            form.lean = (rng.unit() < 0.5 ? -1 : 1) * rng.range(0.03, 0.045)
+            form.trunkBody = 0.09
+            form.flare = 0.17
+            form.reach = 1.08
+            form.tuftScale = 1.08
+            form.stubs = 3
+        case .slender:
+            form.crownTop = 0.03 + rng.range(0, 0.02)
+            form.crownBase = 0.44 + rng.range(-0.02, 0.02)
+            form.crownWidth = 0.19 + rng.range(-0.015, 0.015)
+            form.trunkBody = 0.07
+            form.flare = 0.12
+            form.reach = 0.9
+            form.tuftScale = 0.85
+            form.fireScar = rng.unit() < 0.5
+        }
+        return form
+    }
+
+    /// A grown giant: a massive buttressed trunk, bare low down, holding a crown
+    /// of a few huge, crooked limbs that bend upwards and end in dense clumps of
+    /// foliage.
+    private func drawGiant(_ c: inout GraphicsContext, _ s: Space, form: GiantForm, compact: Bool,
+                           rng: inout SeededRandom) {
         let ground = Self.groundY
         let cx = 0.5 + rng.range(-0.012, 0.012)
-        let crownBase: CGFloat = 0.56 + rng.range(-0.03, 0.03)
-        let crownTop: CGFloat = 0.05 + rng.range(0, 0.03)
-        let crownWidth: CGFloat = 0.25 + rng.range(-0.03, 0.03)
-        // Old giants often lose their leader and grow a broad, flattened top.
-        let flatTop = rng.unit() < 0.35
-        // The trunk ends inside the crown's cap so it never pokes through.
-        let trunkTop = crownTop + 0.05
+        let crownTop = form.crownTop, crownBase = form.crownBase, crownWidth = form.crownWidth
+        let isTwin = form.top == .twin
+        // The trunk ends inside the crown so it never pokes through; a twin's
+        // ends lower, where it forks.
+        let trunkTop = crownTop + (isTwin ? 0.24 : 0.08)
 
-        /// Trunk half-width at height y: a gentle taper, then a strong buttress flare.
+        /// The trunk's centre at height y: straight below the crown, then
+        /// drifting with the lean towards the top.
+        func center(_ y: CGFloat) -> CGFloat {
+            let t = max(0, min(1, (crownBase - y) / (crownBase - crownTop)))
+            return cx + form.lean * pow(t, 1.5)
+        }
+        /// Trunk half-width at height y: a gentle taper, then the buttress flare.
         func half(_ y: CGFloat) -> CGFloat {
-            let taper = 0.018 + max(0, min(1, (y - 0.04) / 0.76)) * 0.062
-            let flare = pow(max(0, (y - 0.76) / (ground - 0.76)), 2.4) * 0.15
+            let topHalf = form.trunkBody * 0.42
+            let taper = topHalf + max(0, min(1, (y - crownTop) / (0.8 - crownTop))) * (form.trunkBody - topHalf)
+            let flare = pow(max(0, (y - 0.76) / (ground - 0.76)), 2.4) * form.flare
             return taper + flare
+        }
+        /// Crown half-width at height y: a rounded top easing into a column.
+        func envelope(_ y: CGFloat) -> CGFloat {
+            let t = max(0, min(1, (y - crownTop) / (crownBase - crownTop)))
+            let dome = sqrt(min(1, t / (form.top == .dome ? 0.32 : 0.18)))
+            let skirt = 1 - pow(max(0, (t - 0.8) / 0.2), 2) * 0.3
+            return crownWidth * dome * skirt
+        }
+
+        struct Tuft { var x: CGFloat; var y: CGFloat; var rx: CGFloat }
+        var tufts: [Tuft] = []
+        let tuftScale = form.tuftScale * (compact ? 1.3 : 1)
+
+        // A shaded mass of foliage behind the trunk keeps the crown dense.
+        var y = crownTop + 0.05
+        var backSide: CGFloat = 1
+        while y < crownBase - 0.03 {
+            let e = envelope(y)
+            let split = isTwin && y < trunkTop ? backSide * crownWidth * 0.55 : 0
+            drawTuft(&c, s, x: center(y) + split + rng.range(-0.04, 0.04), y: y, rx: e * (isTwin ? 0.5 : 0.6), ry: e * 0.4,
+                     back: true, detailed: !compact, rng: &rng)
+            backSide = -backSide
+            y += compact ? 0.09 : 0.07
         }
 
         // Trunk.
         var trunk = Path()
         let samples = stride(from: trunkTop, through: ground, by: 0.01).map { CGFloat($0) }
-        trunk.move(to: s.p(cx, trunkTop))
+        trunk.move(to: s.p(center(trunkTop), trunkTop))
         for y in samples {
-            trunk.addLine(to: s.p(cx + half(y) + sin(y * 31) * 0.003, y))
+            trunk.addLine(to: s.p(center(y) + half(y) + sin(y * 31) * 0.003, y))
         }
         for y in samples.reversed() {
-            trunk.addLine(to: s.p(cx - half(y) + sin(y * 27 + 1) * 0.003, y))
+            trunk.addLine(to: s.p(center(y) - half(y) + sin(y * 27 + 1) * 0.003, y))
         }
         trunk.closeSubpath()
         c.fill(trunk, with: .color(Theme.Palette.bark))
@@ -280,125 +418,187 @@ struct TreeArt {
         bark.clip(to: trunk)
         func band(from a: CGFloat, to b: CGFloat) -> Path {
             var path = Path()
-            path.move(to: s.p(cx + a * half(trunkTop), trunkTop))
-            for y in samples { path.addLine(to: s.p(cx + a * half(y), y)) }
-            for y in samples.reversed() { path.addLine(to: s.p(cx + b * half(y), y)) }
+            path.move(to: s.p(center(trunkTop) + a * half(trunkTop), trunkTop))
+            for y in samples { path.addLine(to: s.p(center(y) + a * half(y), y)) }
+            for y in samples.reversed() { path.addLine(to: s.p(center(y) + b * half(y), y)) }
             path.closeSubpath()
             return path
         }
         bark.fill(band(from: -1.1, to: -0.45), with: .color(Self.light))
         bark.fill(band(from: 0.4, to: 1.1), with: .color(Self.shade))
+        // The crown casts the upper trunk into shade.
+        bark.fill(Path(s.rect(0, 0, 1, crownBase - 0.04)), with: .color(Self.shade))
+        bark.fill(Path(s.rect(0, crownBase - 0.04, 1, 0.04)), with: .color(Self.shade.opacity(0.5)))
         let furrowCount = compact ? 0 : 7
         for k in 0..<furrowCount {
             let f = (CGFloat(k) + 0.5) / CGFloat(furrowCount) * 2 - 1
             var furrow = Path()
             let start = crownBase - 0.08 + rng.range(-0.04, 0.04)
-            furrow.move(to: s.p(cx + f * half(start) * 0.92, start))
+            furrow.move(to: s.p(center(start) + f * half(start) * 0.92, start))
             for y in stride(from: start, through: ground, by: 0.01) {
                 let wobble = sin(y * 55 + CGFloat(k) * 1.7) * 0.0035
-                furrow.addLine(to: s.p(cx + f * half(y) * 0.92 + wobble, y))
+                furrow.addLine(to: s.p(center(y) + f * half(y) * 0.92 + wobble, y))
             }
             bark.stroke(furrow, with: .color(Self.deepShade), style: StrokeStyle(lineWidth: max(0.5, 0.0075 * s.w), lineCap: .round))
         }
 
-        // A couple of broken branch stubs on the bare lower trunk.
-        for (side, y) in compact ? [] : [(CGFloat(1), crownBase + 0.07), (-1, crownBase + 0.13)] {
+        // A charred cavity at the foot of the trunk, where a fire once burned
+        // through the bark. Giants survive these for centuries.
+        if form.fireScar && !compact {
+            let x = cx + rng.range(-0.04, 0.03)
+            let height = rng.range(0.08, 0.13), width = rng.range(0.03, 0.045)
+            var scar = Path()
+            scar.move(to: s.p(x - width, ground + 0.01))
+            scar.addQuadCurve(to: s.p(x + rng.range(-0.01, 0.01), ground - height), control: s.p(x - width * 0.8, ground - height * 0.45))
+            scar.addQuadCurve(to: s.p(x + width, ground + 0.01), control: s.p(x + width * 0.7, ground - height * 0.4))
+            scar.closeSubpath()
+            bark.fill(scar, with: .color(Self.deepShade))
+            bark.fill(scar, with: .color(Self.shade))
+            bark.stroke(scar, with: .color(Self.light), lineWidth: max(0.5, 0.008 * s.w))
+        }
+
+        // A few broken branch stubs on the bare lower trunk.
+        for k in 0..<(compact ? 0 : form.stubs) {
+            let side: CGFloat = k % 2 == 0 ? 1 : -1
+            let y = crownBase + 0.06 + CGFloat(k) * 0.06
             var stub = Path()
-            let start = s.p(cx + side * half(y) * 0.8, y)
-            stub.move(to: start)
-            stub.addLine(to: s.p(cx + side * (half(y) + 0.035), y - 0.015))
-            c.stroke(stub, with: .color(Theme.Palette.bark), style: StrokeStyle(lineWidth: max(1, 0.018 * s.w), lineCap: .round))
+            stub.move(to: s.p(center(y) + side * half(y) * 0.8, y))
+            stub.addLine(to: s.p(center(y) + side * (half(y) + 0.035), y - 0.015))
+            c.stroke(stub, with: .color(Theme.Palette.bark),
+                     style: StrokeStyle(lineWidth: max(1, half(y) * 0.4 * s.w), lineCap: .round))
         }
 
-        // The crown: a dense, rounded column of overlapping foliage clouds. Most
-        // of the upper trunk hides behind them; a few gaps show stout limbs.
-        /// Crown half-width at height y: a rounded dome easing into a column.
-        func envelope(_ y: CGFloat) -> CGFloat {
-            let t = max(0, min(1, (y - crownTop) / (crownBase - crownTop)))
-            let dome = sqrt(min(1, t / 0.35))
-            let skirt = 1 - pow(max(0, (t - 0.85) / 0.15), 2) * 0.25
-            return crownWidth * dome * skirt
-        }
-
-        struct Cloud { var x: CGFloat; var y: CGFloat; var r: CGFloat; var stretch: CGFloat = 1; var depth: Int }
-        var clouds: [Cloud] = []
-        // Fewer, larger pads at small sizes keep the silhouette readable.
-        let rows = compact ? 4 : 8
-        let padScale: CGFloat = compact ? 1.5 : 1
-        let rowStep = (crownBase - crownTop - 0.06) / CGFloat(rows - 1)
-        var side: CGFloat = rng.unit() < 0.5 ? -1 : 1
-        for row in 0..<rows {
-            let t = CGFloat(row) / CGFloat(rows - 1)
-            let y = crownTop + 0.03 + t * (crownBase - crownTop - 0.06)
-            let e = envelope(y + 0.02)
-            // Wide, shaded clouds behind every other row fill the crown's middle.
-            if compact || row % 2 == 1 {
-                clouds.append(Cloud(x: cx + rng.range(-0.03, 0.03), y: y + rowStep * 0.4, r: 0.04 + e * 0.6, depth: 0))
-            }
-            // Pads alternate sides, half a row apart, so the crown never mirrors.
-            for pass in 0..<2 {
-                // Leave an occasional gap so a limb and the trunk show through.
-                if !compact, row > 1, rng.unit() < 0.25 { side = -side; continue }
-                let padY = y + CGFloat(pass) * rowStep * 0.5 + rng.range(-0.01, 0.01)
-                let padE = envelope(padY + 0.02)
-                let x = cx + side * max(0.02, padE - (compact ? 0.09 : 0.06)) * (1 + rng.range(-0.15, 0.1))
-                // Pads vary in size and breadth: some big and spreading, some small and tight.
-                let r = (0.05 + padE * 0.34) * rng.range(0.75, 1.22) * padScale
-                clouds.append(Cloud(x: x, y: padY, r: r, stretch: rng.range(0.85, 1.2), depth: 1))
-                side = -side
-            }
-        }
-        // A rounded cap over the top of the crown.
-        clouds.append(Cloud(x: cx + rng.range(-0.01, 0.01), y: crownTop + (flatTop ? 0.025 : 0.015),
-                            r: crownWidth * (flatTop ? 0.66 : 0.5), depth: 1))
-
-        // Limbs reaching out to the side clouds.
-        for cloud in clouds where cloud.depth == 1 && !compact {
-            let side: CGFloat = cloud.x < cx ? -1 : 1
+        // The dead spike of a broken leader, bleached silver by the weather.
+        if form.snag {
+            let x = center(crownTop)
+            var spike = Path()
+            spike.move(to: s.p(x - 0.028, crownTop + 0.08))
+            spike.addLine(to: s.p(x - 0.012, crownTop - 0.09))
+            spike.addLine(to: s.p(x - 0.004, crownTop - 0.15))
+            spike.addLine(to: s.p(x + 0.004, crownTop - 0.1))
+            spike.addLine(to: s.p(x + 0.012, crownTop - 0.118))
+            spike.addLine(to: s.p(x + 0.026, crownTop + 0.08))
+            spike.closeSubpath()
             var limb = Path()
-            limb.move(to: s.p(cx, cloud.y + 0.04))
-            limb.addQuadCurve(to: s.p(cloud.x - side * cloud.r * 0.2, cloud.y + 0.005),
-                              control: s.p(cx + side * abs(cloud.x - cx) * 0.6, cloud.y + 0.045))
-            c.stroke(limb, with: .color(Theme.Palette.bark),
-                     style: StrokeStyle(lineWidth: max(1, half(cloud.y) * 0.8 * s.w), lineCap: .round))
+            limb.move(to: s.p(x + 0.006, crownTop - 0.04))
+            limb.addLine(to: s.p(x + 0.07, crownTop - 0.08))
+            let silver = Color.white.opacity(0.4)
+            for path in [spike, limb.strokedPath(StrokeStyle(lineWidth: max(1, 0.016 * s.w), lineCap: .round))] {
+                c.fill(path, with: .color(Theme.Palette.bark))
+                c.fill(path, with: .color(silver))
+            }
+            var shaded = c
+            shaded.clip(to: spike)
+            shaded.fill(Path(s.rect(x, crownTop - 0.16, 0.03, 0.26)), with: .color(Self.shade))
         }
 
-        for cloud in clouds.sorted(by: { ($0.depth, $0.y) < ($1.depth, $1.y) }) {
-            drawFoliageCloud(&c, s, x: cloud.x, y: cloud.y, r: cloud.r, stretch: cloud.stretch,
-                             back: cloud.depth == 0, lit: !compact, rng: &rng)
+        /// A crooked limb: out from the trunk, bending at an elbow, then up.
+        func drawLimb(from start: CGPoint, elbow: CGPoint, end: CGPoint, width: CGFloat) {
+            var inner = Path()
+            inner.move(to: s.p(start.x, start.y))
+            inner.addQuadCurve(to: s.p(elbow.x, elbow.y), control: s.p((start.x + elbow.x) / 2, elbow.y + 0.012))
+            c.stroke(inner, with: .color(Theme.Palette.bark),
+                     style: StrokeStyle(lineWidth: max(1, width * s.w), lineCap: .round, lineJoin: .round))
+            var outer = Path()
+            outer.move(to: s.p(elbow.x, elbow.y))
+            outer.addQuadCurve(to: s.p(end.x, end.y), control: s.p(end.x, elbow.y))
+            c.stroke(outer, with: .color(Theme.Palette.bark),
+                     style: StrokeStyle(lineWidth: max(1, width * 0.6 * s.w), lineCap: .round, lineJoin: .round))
+        }
+
+        // A twin's two leaders, forking from the trunk, each with its own top.
+        var tops: [CGPoint] = []
+        if isTwin {
+            for side in [CGFloat(-1), 1] {
+                let top = CGPoint(x: center(crownTop) + side * crownWidth * 0.58, y: crownTop + 0.05 + rng.range(0, 0.03))
+                drawLimb(from: CGPoint(x: center(trunkTop + 0.03), y: trunkTop + 0.03),
+                         elbow: CGPoint(x: center(trunkTop) + side * crownWidth * 0.35, y: trunkTop - 0.07),
+                         end: top, width: half(trunkTop) * 1.1)
+                tops.append(top)
+            }
+        } else {
+            tops.append(CGPoint(x: center(crownTop), y: crownTop + (form.top == .flat ? 0.035 : 0.03)))
+        }
+
+        // The limbs, alternating sides with the odd repeat, each ending in a
+        // cluster of tufts.
+        let limbCount = compact ? 5 : form.limbs
+        var side: CGFloat = rng.unit() < 0.5 ? -1 : 1
+        let lowest = crownBase - 0.03, highest = crownTop + (isTwin ? 0.2 : 0.11)
+        for k in 0..<limbCount {
+            let t = CGFloat(k) / CGFloat(max(1, limbCount - 1))
+            let y0 = lowest - t * (lowest - highest) + rng.range(-0.012, 0.012)
+            let origin = CGPoint(x: center(y0), y: y0)
+            let room = (side > 0 ? 1 - origin.x : origin.x) - 0.14
+            let reach = min(0.36, room, envelope(y0 - 0.04) * rng.range(0.78, 1.05) * form.reach)
+            let elbow = CGPoint(x: origin.x + side * reach * rng.range(0.45, 0.6), y: y0 + rng.range(-0.005, 0.015))
+            let end = CGPoint(x: origin.x + side * reach, y: y0 - rng.range(0.035, 0.075))
+            if !compact {
+                drawLimb(from: origin, elbow: elbow, end: end, width: half(y0) * rng.range(0.7, 0.95))
+            }
+            let rx = (0.06 + reach * 0.32) * tuftScale * rng.range(0.9, 1.12)
+            tufts.append(Tuft(x: end.x, y: end.y, rx: rx))
+            tufts.append(Tuft(x: end.x - side * rx * 0.75, y: end.y - rx * 0.3, rx: rx * 0.72))
+            if rng.unit() < 0.35 {
+                tufts.append(Tuft(x: elbow.x, y: elbow.y - rx * 0.55, rx: rx * 0.6))
+            }
+            side = rng.unit() < 0.8 ? -side : side
+        }
+        // A few tufts in front of the trunk, so it disappears into the crown.
+        for k in 0..<(compact ? 1 : 3) {
+            let first = isTwin ? trunkTop : crownTop + 0.12
+            let fy = first + (CGFloat(k) + rng.range(0.1, 0.9)) * (crownBase - first - 0.03) / 3
+            tufts.append(Tuft(x: center(fy) + rng.range(-0.05, 0.05), y: fy, rx: rng.range(0.06, 0.09) * tuftScale))
+        }
+        // The top of the crown (or each of a twin's tops).
+        for top in tops {
+            let width = isTwin ? crownWidth * 0.3 : crownWidth * (form.top == .flat ? 0.52 : 0.4)
+            tufts.append(Tuft(x: top.x + rng.range(-0.01, 0.01), y: top.y, rx: width * tuftScale))
+            tufts.append(Tuft(x: top.x - width * 0.65, y: top.y + 0.035, rx: width * 0.8 * tuftScale))
+            tufts.append(Tuft(x: top.x + width * 0.65, y: top.y + 0.04, rx: width * 0.8 * tuftScale))
+        }
+
+        // Upper tufts first, so lower ones overlap their shaded undersides.
+        for tuft in tufts.sorted(by: { $0.y < $1.y }) {
+            // Keep the crown inside the frame (a tuft reaches about 1.15 rx out).
+            let x = min(max(tuft.x, tuft.rx * 1.15), 1 - tuft.rx * 1.15)
+            drawTuft(&c, s, x: x, y: tuft.y, rx: tuft.rx, ry: tuft.rx * 0.6,
+                     shaded: x > center(tuft.y) + crownWidth * 0.25 ? 0.06 : 0, detailed: !compact, rng: &rng)
         }
     }
 
-    /// A rounded, cauliflower-like cloud of foliage, lit from the upper left,
-    /// with a shaded flat underside.
-    private func drawFoliageCloud(_ c: inout GraphicsContext, _ s: Space, x: CGFloat, y: CGFloat, r: CGFloat,
-                                  stretch: CGFloat, back: Bool, lit hasRim: Bool, rng: inout SeededRandom) {
-        let center = s.p(x, y)
-        let radius = r * s.w
-        func ellipse(_ dx: CGFloat, _ dy: CGFloat, _ rw: CGFloat, _ rh: CGFloat) -> Path {
-            Path(ellipseIn: CGRect(x: center.x + (dx - rw) * stretch * radius, y: center.y + (dy - rh) * radius,
-                                   width: rw * 2 * stretch * radius, height: rh * 2 * radius))
-        }
-        var cloud = ellipse(0, 0.08, 1.0, 0.36)
-        cloud.addPath(ellipse(-0.42 + rng.range(-0.08, 0.08), -0.08, 0.5, 0.36))
-        cloud.addPath(ellipse(0.4 + rng.range(-0.08, 0.08), -0.06, 0.52, 0.34))
-        cloud.addPath(ellipse(rng.range(-0.15, 0.15), -0.24, 0.5, 0.34))
+    // MARK: Foliage
 
-        c.fill(cloud, with: .color(Theme.Palette.canopy))
-        var lit = c
-        lit.clip(to: cloud)
-        if back {
-            lit.fill(cloud, with: .color(Self.shade))
-        } else {
-            if hasRim {
-                // A thin sunlit rim along the top of the pad.
-                var rim = lit
-                rim.clip(to: ellipse(-0.05, -0.62, 1.05, 0.4))
-                lightFoliage(&rim, cloud)
+    /// A clump of sequoia foliage: a scalloped mass of small rounded tufts, lit
+    /// from the upper left, with a shaded underside. Sizes are in width units.
+    private func drawTuft(_ c: inout GraphicsContext, _ s: Space, x: CGFloat, y: CGFloat, rx: CGFloat, ry: CGFloat,
+                          back: Bool = false, shaded: Double = 0, detailed: Bool, rng: inout SeededRandom) {
+        let center = s.p(x, y)
+        let a = rx * s.w, b = ry * s.w
+        var outline = Path(ellipseIn: CGRect(x: center.x - a * 0.8, y: center.y - b * 0.7, width: a * 1.6, height: b * 1.45))
+        var lights = Path()
+        let bumps = detailed ? 8 : 5
+        for i in 0..<bumps {
+            // Bumps run around the sides and top; the underside stays flatter.
+            let angle = (160 + 220 * Double(i) / Double(bumps - 1)) * .pi / 180 + Double(rng.range(-0.12, 0.12))
+            let dx = CGFloat(cos(angle)) * a * 0.72, dy = CGFloat(sin(angle)) * b * 0.62
+            let r = b * rng.range(0.5, 0.68)
+            outline.addEllipse(in: CGRect(x: center.x + dx - r, y: center.y + dy - r, width: r * 2, height: r * 2))
+            if cos(angle) < 0.35 && sin(angle) < 0.1 {
+                let lr = r * 0.62
+                lights.addEllipse(in: CGRect(x: center.x + dx - r * 0.2 - lr, y: center.y + dy - r * 0.25 - lr,
+                                             width: lr * 2, height: lr * 1.6))
             }
-            lit.fill(Path(CGRect(x: center.x - radius * 1.2 * stretch, y: center.y + radius * 0.22,
-                                 width: radius * 2.4 * stretch, height: radius)), with: .color(Self.shade))
         }
+        c.fill(outline, with: .color(Theme.Palette.canopy))
+        if back {
+            c.fill(outline, with: .color(Self.deepShade))
+            return
+        }
+        c.fill(Path(ellipseIn: CGRect(x: center.x - a * 0.7, y: center.y + b * 0.08, width: a * 1.4, height: b * 0.62)),
+               with: .color(Self.shade))
+        if detailed { lightFoliage(&c, lights) }
+        if shaded > 0 { c.fill(outline, with: .color(.black.opacity(shaded))) }
     }
 }
 

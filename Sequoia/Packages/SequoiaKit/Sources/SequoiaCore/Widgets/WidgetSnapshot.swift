@@ -9,14 +9,18 @@ public struct WidgetSnapshot: Equatable, Sendable {
     public var stage: TreeStage
     public var streak: Int
     public var isCompleted: Bool
+    /// Completing this day plants the tree, which happens in the app.
+    public var plantsTree: Bool
 
-    public init(date: Date, day: DayStamp, word: Word, stage: TreeStage, streak: Int, isCompleted: Bool) {
+    public init(date: Date, day: DayStamp, word: Word, stage: TreeStage, streak: Int, isCompleted: Bool,
+                plantsTree: Bool = false) {
         self.date = date
         self.day = day
         self.word = word
         self.stage = stage
         self.streak = streak
         self.isCompleted = isCompleted
+        self.plantsTree = plantsTree
     }
 }
 
@@ -42,11 +46,13 @@ extension SequoiaStore {
 
         let current = WidgetSnapshot(
             date: now.addingTimeInterval(-realOffset), day: today, word: todayWord,
-            stage: stage, streak: growth.currentStreak, isCompleted: todayCompleted
+            stage: stage, streak: growth.currentStreak, isCompleted: todayCompleted,
+            plantsTree: todayPlantsTree
         )
         let next = WidgetSnapshot(
             date: midnight.addingTimeInterval(-realOffset), day: tomorrow, word: word(for: tomorrow),
-            stage: engine.stage(of: tomorrowGrowth), streak: tomorrowGrowth.currentStreak, isCompleted: false
+            stage: engine.stage(of: tomorrowGrowth), streak: tomorrowGrowth.currentStreak, isCompleted: false,
+            plantsTree: engine.checkInPlantsTree(tomorrowGrowth, on: tomorrow)
         )
         // Ask again just after midnight, so the following day is planned too.
         return WidgetTimelinePlan(entries: [current, next], reloadDate: next.date.addingTimeInterval(60))

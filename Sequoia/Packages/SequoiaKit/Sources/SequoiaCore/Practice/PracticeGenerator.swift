@@ -53,6 +53,8 @@ public enum PracticeUnavailable: Equatable, Sendable, Error {
 public struct PracticeGenerator: Sendable {
     public static let questionsPerRound = 5
     public static let optionsPerQuestion = 4
+    /// At most this many questions per round go to words missed before.
+    public static let maxRevisitsPerRound = 3
     /// The blank shown in Fill the Blank sentences.
     public static let blank = "_____"
 
@@ -61,9 +63,12 @@ public struct PracticeGenerator: Sendable {
     /// Words needed before practice opens: one per answer option.
     public static var minimumSeenWords: Int { optionsPerQuestion }
 
+    /// A round from the seen words. Words in `revisit` (missed before) are
+    /// asked first, up to `maxRevisitsPerRound`; the rest are random.
     public func round(
         _ game: PracticeGame,
         from seen: [Word],
+        revisiting revisit: Set<String> = [],
         using generator: inout some RandomNumberGenerator
     ) -> Result<PracticeRound, PracticeUnavailable> {
         // A word can only appear once per round, and options must be distinct text.
@@ -73,7 +78,10 @@ public struct PracticeGenerator: Sendable {
             return .failure(.tooFewWords(seen: unique.count, needed: max(1, Self.optionsPerQuestion - unique.count)))
         }
 
-        let answers = Array(eligible.shuffled(using: &generator).prefix(Self.questionsPerRound))
+        let shuffled = eligible.shuffled(using: &generator)
+        let missed = shuffled.filter { revisit.contains($0.id) }.prefix(Self.maxRevisitsPerRound)
+        let missedIDs = Set(missed.map(\.id))
+        let answers = Array((missed + shuffled.filter { !missedIDs.contains($0.id) }).prefix(Self.questionsPerRound))
         let questions = answers.enumerated().map { index, word in
             question(index, game: game, answer: word, pool: unique, using: &generator)
         }
@@ -81,9 +89,10 @@ public struct PracticeGenerator: Sendable {
     }
 
     /// Convenience using the system random source.
-    public func round(_ game: PracticeGame, from seen: [Word]) -> Result<PracticeRound, PracticeUnavailable> {
+    public func round(_ game: PracticeGame, from seen: [Word],
+                      revisiting revisit: Set<String> = []) -> Result<PracticeRound, PracticeUnavailable> {
         var generator = SystemRandomNumberGenerator()
-        return round(game, from: seen, using: &generator)
+        return round(game, from: seen, revisiting: revisit, using: &generator)
     }
 
     private func question(

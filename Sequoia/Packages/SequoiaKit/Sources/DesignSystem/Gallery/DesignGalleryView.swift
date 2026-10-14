@@ -19,6 +19,16 @@ public struct DesignGalleryView: View {
                         ForEach(TreeStage.allCases) { TreeView(stage: $0).frame(height: 180) }
                     }
                 }
+                section("Grown sequoia varieties") {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: Theme.Spacing.s)], spacing: Theme.Spacing.m) {
+                        ForEach(TreeArt.Variety.allCases, id: \.self) { variety in
+                            VStack(spacing: Theme.Spacing.xxs) {
+                                TreeView(stage: .grownSequoia, variant: variety.sampleVariant).frame(height: 190)
+                                Text(verbatim: variety.title).font(Typography.caption)
+                            }
+                        }
+                    }
+                }
                 section("Trees · widget size") {
                     HStack(alignment: .bottom, spacing: Theme.Spacing.m) {
                         ForEach(TreeStage.allCases) { TreeView(stage: $0).frame(height: 56) }

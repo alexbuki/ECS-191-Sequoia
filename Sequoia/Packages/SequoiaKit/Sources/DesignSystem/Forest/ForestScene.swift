@@ -6,6 +6,7 @@ import SequoiaCore
 /// the in-progress tree standing in a patch of sunlight.
 public struct ForestScene: View {
     private let layout: ForestLayout
+    private let planted: Int
     private let currentStage: TreeStage?
     private let light: ForestLight
     private let undergrowth: Undergrowth
@@ -17,6 +18,7 @@ public struct ForestScene: View {
     ///   - undergrowth: ferns and flowers on the forest floor.
     public init(planted: Int, currentStage: TreeStage?, light: ForestLight = .midday, undergrowth: Undergrowth = .none) {
         layout = ForestLayout(planted: planted)
+        self.planted = planted
         self.currentStage = currentStage
         self.light = light
         self.undergrowth = undergrowth
@@ -34,11 +36,89 @@ public struct ForestScene: View {
     }
 
     public var body: some View {
-        Canvas { context, size in
-            ForestSceneRenderer(layout: layout, currentStage: currentStage, light: light, undergrowth: undergrowth)
-                .draw(in: &context, size: size)
+        ZStack {
+            // The backdrop holds nearly all the drawing and only redraws when
+            // the forest, light or undergrowth change, not when today's tree grows.
+            ForestBackdrop(planted: planted, light: light, undergrowth: undergrowth)
+                .equatable()
+            Canvas { context, size in
+                if let currentStage {
+                    ForestSceneRenderer(layout: layout, currentStage: currentStage, light: light, undergrowth: undergrowth)
+                        .drawCurrentTree(currentStage, in: &context, size: size)
+                }
+            }
         }
         .clipped()
+    }
+}
+
+/// Everything in the scene but the in-progress tree, which is drawn above it.
+/// With a full forest this is most of the drawing, so it's rendered once per
+/// forest, light, size and appearance and then shown as an image: growing
+/// today's tree or re-laying out the screen never redraws it.
+struct ForestBackdrop: View, @MainActor Equatable {
+    let planted: Int
+    let light: ForestLight
+    let undergrowth: Undergrowth
+    @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.displayScale) private var displayScale
+
+    nonisolated static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.planted == rhs.planted && lhs.light == rhs.light && lhs.undergrowth == rhs.undergrowth
+    }
+
+    var body: some View {
+        GeometryReader { proxy in
+            let key = ForestBackdropCache.Key(planted: planted, light: light, undergrowth: undergrowth,
+                                              width: proxy.size.width, height: proxy.size.height,
+                                              dark: colorScheme == .dark, scale: displayScale)
+            if let image = ForestBackdropCache.image(for: key) {
+                Image(decorative: image, scale: displayScale)
+                    .resizable()
+            }
+        }
+    }
+}
+
+/// The last few rendered backdrops. Bounded, so memory stays flat as the
+/// light changes through the day.
+@MainActor
+enum ForestBackdropCache {
+    struct Key: Hashable {
+        let planted: Int
+        let light: ForestLight
+        let undergrowth: Undergrowth
+        let width: CGFloat
+        let height: CGFloat
+        let dark: Bool
+        let scale: CGFloat
+    }
+
+    static let capacity = 4
+    private static var images: [Key: CGImage] = [:]
+    private static var order: [Key] = []
+
+    static func image(for key: Key) -> CGImage? {
+        guard key.width > 0, key.height > 0 else { return nil }
+        if let cached = images[key] {
+            order.removeAll { $0 == key }
+            order.append(key)
+            return cached
+        }
+        let canvas = Canvas { context, size in
+            ForestSceneRenderer(layout: ForestLayout(planted: key.planted), currentStage: nil,
+                                light: key.light, undergrowth: key.undergrowth)
+                .draw(in: &context, size: size)
+        }
+        .frame(width: key.width, height: key.height)
+        .environment(\.colorScheme, key.dark ? .dark : .light)
+        let renderer = ImageRenderer(content: canvas)
+        renderer.scale = key.scale
+        guard let image = renderer.cgImage else { return nil }
+        images[key] = image
+        order.append(key)
+        while order.count > capacity { images[order.removeFirst()] = nil }
+        return image
     }
 }
 
@@ -158,7 +238,7 @@ struct ForestSceneRenderer {
             return CGPoint(x: x * size.width, y: y * size.height)
         }
         for _ in 0..<min(undergrowth.ferns, Undergrowth.maxFerns) {
-            drawFern(&context, at: spot(), height: size.height * rng.range(0.06, 0.1), lean: rng.range(-0.15, 0.15))
+            Self.drawFern(&context, at: spot(), height: size.height * rng.range(0.06, 0.1), lean: rng.range(-0.15, 0.15))
         }
         var flowers = Path(), stems = Path()
         var accents = Path()
@@ -178,7 +258,8 @@ struct ForestSceneRenderer {
     }
 
     /// A small fern: arching fronds fanning from one point.
-    private func drawFern(_ context: inout GraphicsContext, at base: CGPoint, height: CGFloat, lean: CGFloat) {
+    static func drawFern(_ context: inout GraphicsContext, at base: CGPoint, height: CGFloat, lean: CGFloat,
+                         color: Color = Theme.Palette.canopy) {
         var fronds = Path()
         for (angle, length) in [(-150.0, 0.8), (-120.0, 1.0), (-90.0, 1.05), (-60.0, 1.0), (-30.0, 0.8)] {
             let radians = (angle + Double(lean) * 60) * .pi / 180
@@ -189,7 +270,7 @@ struct ForestSceneRenderer {
             frond.addQuadCurve(to: tip, control: control)
             fronds.addPath(frond.strokedPath(StrokeStyle(lineWidth: max(1.2, height * 0.13), lineCap: .round)))
         }
-        context.fill(fronds, with: .color(Theme.Palette.canopy))
+        context.fill(fronds, with: .color(color))
     }
 
     /// Draws one layer: its hill and its trees.
@@ -207,13 +288,16 @@ struct ForestSceneRenderer {
 
         for placement in layout.placements where placement.layer == layer {
             let baseY = Self.ground(layer, at: placement.x) + placement.drop + 0.02
+            // Fog hides fine detail on distant trees, so they draw the simpler
+            // silhouette: most of the forest's trees are back there.
             Self.drawTree(&context, size: size, stage: .grownSequoia, variant: placement.index,
-                          x: placement.x, baseY: baseY, height: layer.treeHeight * placement.scale)
+                          x: placement.x, baseY: baseY, height: layer.treeHeight * placement.scale,
+                          simplified: layer <= .far)
         }
     }
 
     /// The in-progress tree in a patch of sunlight.
-    private func drawCurrentTree(_ stage: TreeStage, in context: inout GraphicsContext, size: CGSize) {
+    func drawCurrentTree(_ stage: TreeStage, in context: inout GraphicsContext, size: CGSize) {
         let x = ForestLayout.currentTreeX
         let baseY = Self.ground(.near, at: x) + 0.03
         let patch = CGRect(x: (x - 0.09) * size.width, y: (baseY - 0.025) * size.height,
@@ -246,13 +330,13 @@ struct ForestSceneRenderer {
 
     /// Draws one tree with its trunk base at (x, baseY), in fractions of `size`.
     private static func drawTree(_ context: inout GraphicsContext, size: CGSize, stage: TreeStage, variant: Int,
-                                 x: CGFloat, baseY: CGFloat, height: CGFloat) {
+                                 x: CGFloat, baseY: CGFloat, height: CGFloat, simplified: Bool = false) {
         let treeHeight = height * size.height
         let treeWidth = treeHeight * TreeArt.aspectRatio
         var tree = context
         // TreeArt's trunk base sits at `groundY` of its frame.
         tree.translateBy(x: x * size.width - treeWidth / 2, y: baseY * size.height - treeHeight * TreeArt.groundY)
-        TreeArt(stage: stage, showsGround: false, variant: variant)
+        TreeArt(stage: stage, showsGround: false, variant: variant, simplified: simplified)
             .draw(in: &tree, size: CGSize(width: treeWidth, height: treeHeight))
     }
 }

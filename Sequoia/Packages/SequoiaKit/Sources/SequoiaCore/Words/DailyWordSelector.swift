@@ -34,6 +34,35 @@ public struct DailyWordSelector: Sendable {
         }
         return .sample
     }
+
+    /// The word for `day`, skipping words already seen (by id) until every word
+    /// at that level has been seen, then starting over in the same order. The
+    /// same day, level and seen words always give the same word, so every
+    /// device that shares the seen words agrees.
+    public func word(for day: DayStamp, difficulty: Difficulty, excluding seen: Set<String>) -> Word {
+        let candidates = [difficulty] + Difficulty.allCases.filter { $0 != difficulty }
+        for level in candidates {
+            let pool = pool(for: level)
+            guard !pool.isEmpty else { continue }
+            let start = ((day.dayNumber % pool.count) + pool.count) % pool.count
+            for step in 0..<pool.count where !seen.contains(pool[(start + step) % pool.count].id) {
+                return pool[(start + step) % pool.count]
+            }
+            return pool[start]
+        }
+        return .sample
+    }
+
+    /// The words for `count` days starting at `day`, each day's word counting
+    /// as seen for the days after it.
+    public func words(from day: DayStamp, count: Int, difficulty: Difficulty, excluding seen: Set<String>) -> [Word] {
+        var seen = seen
+        return (0..<max(0, count)).map { offset in
+            let word = word(for: day.adding(days: offset), difficulty: difficulty, excluding: seen)
+            seen.insert(word.id)
+            return word
+        }
+    }
 }
 
 /// FNV-1a: unlike `hashValue`, it is identical across launches and processes.

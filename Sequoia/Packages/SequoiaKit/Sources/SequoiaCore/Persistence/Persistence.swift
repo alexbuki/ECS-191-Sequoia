@@ -62,10 +62,27 @@ public enum Persistence {
         return try ModelContainer(for: schema, configurations: configuration)
     }
 
+    /// Thrown by `-devStoreFailure`, to test what the app does when its store won't open.
+    public struct SimulatedFailure: Error {}
+
+    /// The store for `location`, or a throwaway in-memory one plus the error when
+    /// the disk store won't open, so the app can say its changes aren't being saved.
+    public static func openContainer(_ location: Location = currentLocation) -> (container: ModelContainer, error: (any Error)?) {
+        do {
+            #if SEQUOIA_DEV
+            if ProcessInfo.processInfo.arguments.contains("-devStoreFailure"), location != .inMemory { throw SimulatedFailure() }
+            #endif
+            return (try makeContainer(location), nil)
+        } catch {
+            guard let container = try? makeContainer(.inMemory) else {
+                preconditionFailure("SwiftData could not create even an in-memory store: \(error)")
+            }
+            return (container, error)
+        }
+    }
+
     /// A container that always succeeds, falling back to memory if the disk store fails.
     public static func makeContainerOrFallback(_ location: Location = currentLocation) -> ModelContainer {
-        if let container = try? makeContainer(location) { return container }
-        if let container = try? makeContainer(.inMemory) { return container }
-        preconditionFailure("SwiftData could not create even an in-memory store")
+        openContainer(location).container
     }
 }

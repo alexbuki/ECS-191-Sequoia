@@ -11,6 +11,9 @@ public final class WordRecord {
     /// True when the user said "I already knew this."
     public var knewIt: Bool
     public var isCompleted: Bool
+    /// Practice answers missed, less those answered right since. Above zero,
+    /// the word comes up first in practice.
+    public var practiceMisses: Int = 0
 
     public init(wordID: String, firstSeenDay: Int) {
         self.wordID = wordID
@@ -46,10 +49,14 @@ public final class DayRecord {
 public final class PlantedTreeRecord {
     @Attribute(.unique) public var index: Int
     public var plantedDay: Int
+    /// False until the app has played the planting ceremony for this tree, so a
+    /// tree planted elsewhere (the widget or the watch) is still celebrated.
+    public var ceremonyShown: Bool = true
 
-    public init(index: Int, plantedDay: Int) {
+    public init(index: Int, plantedDay: Int, ceremonyShown: Bool = true) {
         self.index = index
         self.plantedDay = plantedDay
+        self.ceremonyShown = ceremonyShown
     }
 }
 
@@ -64,6 +71,11 @@ public final class ProgressRecord {
     public var totalCheckIns: Int
     public var plantedTrees: Int
     public var practiceRounds: Int
+    public var bestDefinitionMatch: Int = 0
+    public var bestFillTheBlank: Int = 0
+    public var rainDays: Int = 0
+    public var rainDaysUsed: Int = 0
+    public var lastRainDay: Int?
 
     public init() {
         currentStreak = 0
@@ -85,7 +97,10 @@ public final class ProgressRecord {
                 lastCheckInDay: lastCheckInDay.map(DayStamp.init(dayNumber:)),
                 totalRings: totalRings,
                 totalCheckIns: totalCheckIns,
-                plantedTrees: plantedTrees
+                plantedTrees: plantedTrees,
+                rainDays: rainDays,
+                rainDaysUsed: rainDaysUsed,
+                lastRainDay: lastRainDay.map(DayStamp.init(dayNumber:))
             )
         }
         set {
@@ -96,6 +111,9 @@ public final class ProgressRecord {
             totalRings = newValue.totalRings
             totalCheckIns = newValue.totalCheckIns
             plantedTrees = newValue.plantedTrees
+            rainDays = newValue.rainDays
+            rainDaysUsed = newValue.rainDaysUsed
+            lastRainDay = newValue.lastRainDay?.dayNumber
         }
     }
 }

@@ -2,8 +2,15 @@ import SwiftUI
 import DesignSystem
 import SequoiaCore
 
+/// Navigation targets inside the Library tab, besides a word's card.
+enum LibraryRoute: Hashable {
+    case practice
+}
+
 struct LibraryView: View {
     @State private var model: LibraryViewModel
+    @State private var path = NavigationPath()
+    @Environment(AppModel.self) private var app
 
     init(store: SequoiaStore) {
         _model = State(initialValue: LibraryViewModel(store: store))
@@ -11,7 +18,7 @@ struct LibraryView: View {
 
     var body: some View {
         @Bindable var model = model
-        NavigationStack {
+        NavigationStack(path: $path) {
             Group {
                 if model.allWords.isEmpty {
                     emptyState
@@ -24,7 +31,48 @@ struct LibraryView: View {
             .navigationDestination(for: SeenWord.self) { entry in
                 WordDetailView(store: model.store, word: entry.word)
             }
+            .navigationDestination(for: LibraryRoute.self) { route in
+                switch route {
+                case .practice: PracticeView(store: model.store)
+                }
+            }
         }
+        .onChange(of: app.opensPractice, initial: true) { _, opens in
+            guard opens else { return }
+            app.opensPractice = false
+            path = NavigationPath([LibraryRoute.practice])
+        }
+    }
+
+    /// Practice appears once there are enough words to quiz; until then it
+    /// would only be a locked screen.
+    private var practiceUnlocked: Bool {
+        model.allWords.count >= PracticeGenerator.minimumSeenWords
+    }
+
+    private var practiceRow: some View {
+        NavigationLink(value: LibraryRoute.practice) {
+            HStack(spacing: Theme.Spacing.m) {
+                Image(systemName: "puzzlepiece")
+                    .font(Typography.iconSmall)
+                    .foregroundStyle(Theme.Palette.canopy)
+                    .frame(width: 44, height: 44)
+                    .background(Theme.Palette.moss, in: Circle())
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: Theme.Spacing.xxs) {
+                    Text("Practice")
+                        .font(Typography.headline)
+                        .foregroundStyle(Theme.Palette.soil)
+                    Text("A quick round with your words")
+                        .font(Typography.callout)
+                        .foregroundStyle(Theme.Palette.soilSecondary)
+                }
+            }
+            .padding(.vertical, Theme.Spacing.xxs)
+            .accessibilityElement(children: .combine)
+        }
+        .listRowBackground(Theme.Palette.surface)
+        .accessibilityIdentifier("practiceLink")
     }
 
     private var list: some View {
@@ -38,12 +86,22 @@ struct LibraryView: View {
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets())
                 // A plain row rather than a section footer, which doesn't scale with Dynamic Type.
-                Text("\(model.allWords.count) words learned so far")
-                    .font(Typography.caption)
-                    .foregroundStyle(Theme.Palette.soilSecondary)
+                // The tree these words are growing, beside their count.
+                HStack(spacing: Theme.Spacing.xs) {
+                    TreeView(stage: model.store.stage, showsGround: false)
+                        .frame(height: 22)
+                        .accessibilityHidden(true)
+                    Text("\(model.allWords.count) words learned so far")
+                        .font(Typography.caption)
+                        .foregroundStyle(Theme.Palette.soilSecondary)
+                }
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
                     .listRowInsets(EdgeInsets(top: Theme.Spacing.xs, leading: Theme.Spacing.xxs, bottom: 0, trailing: 0))
+            }
+
+            if practiceUnlocked && model.searchText.isEmpty {
+                Section { practiceRow }
             }
 
             if model.visibleWords.isEmpty {
@@ -110,7 +168,6 @@ struct LibraryRow: View {
                 Text(entry.word.definition)
                     .font(Typography.callout)
                     .foregroundStyle(Theme.Palette.soilSecondary)
-                    .lineLimit(2)
             }
             Spacer(minLength: 0)
             VStack(alignment: .trailing, spacing: Theme.Spacing.xxs) {
@@ -172,7 +229,7 @@ struct WordDetailView: View {
         .navigationTitle(word.word)
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            shareImage = ShareRenderer.wordCard(word: word, stage: store.stage, streak: store.growth.currentStreak)
+            shareImage = ShareRenderer.wordCard(word: word, store: store)
                 .map(Image.init(uiImage:))
         }
     }
@@ -183,6 +240,6 @@ struct WordDetailView: View {
     }
 }
 
-#Preview("Library") { LibraryView(store: .preview) }
-#Preview("Library – dark") { LibraryView(store: .preview).preferredColorScheme(.dark) }
+#Preview("Library") { LibraryView(store: .preview).environment(AppModel.preview) }
+#Preview("Library – dark") { LibraryView(store: .preview).environment(AppModel.preview).preferredColorScheme(.dark) }
 #Preview("Detail") { NavigationStack { WordDetailView(store: .preview, word: .sample) } }

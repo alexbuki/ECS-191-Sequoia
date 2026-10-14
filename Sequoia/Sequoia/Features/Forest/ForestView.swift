@@ -31,22 +31,9 @@ struct ForestView: View {
                         .accessibilityIdentifier("grove")
                         if model.plantedCount > 0 {
                             NavigationLink(value: ForestRoute.trees) {
-                                HStack {
-                                    Label(model.plantedCount == 1 ? String(localized: "Your tree")
-                                                                   : String(localized: "Your \(model.plantedCount) trees"),
-                                          systemImage: "tree")
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .font(Typography.caption)
-                                        .foregroundStyle(Theme.Palette.soilSecondary)
-                                        .accessibilityHidden(true)
-                                }
-                                .font(Typography.headline)
-                                .padding(Theme.Spacing.m)
-                                .frame(minHeight: Theme.Size.minTapTarget)
-                                .background(Theme.Palette.surface,
-                                            in: RoundedRectangle(cornerRadius: Theme.Radius.medium, style: .continuous))
-                                .contentShape(Rectangle())
+                                LinkRow(title: model.plantedCount == 1 ? String(localized: "Your tree")
+                                                                       : String(localized: "Your \(model.plantedCount) trees"),
+                                        systemImage: "tree")
                             }
                             .buttonStyle(.plain)
                             .accessibilityHint("Shows each tree and the words that grew it")
@@ -55,7 +42,13 @@ struct ForestView: View {
                     }
                     stats
                     StreakCalendar(model: model)
-                    FriendsSection()
+                    // Optional and off the main screen: most people never connect Game Center.
+                    NavigationLink(value: ForestRoute.friends) {
+                        LinkRow(title: String(localized: "Friends"), systemImage: "person.2")
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Compare streaks and trees with Game Center friends")
+                    .accessibilityIdentifier("friendsLink")
                 }
                 .padding(.horizontal, Theme.Spacing.m)
                 .padding(.bottom, Theme.Spacing.xl)
@@ -86,6 +79,7 @@ struct ForestView: View {
                     if let word = model.store.provider.word(id: id) {
                         WordDetailView(store: model.store, word: word)
                     }
+                case .friends: FriendsScreen()
                 }
             }
             .sheet(isPresented: $showsSettings) {
@@ -107,15 +101,15 @@ struct ForestView: View {
             StatTile(value: "\(model.growth.currentStreak)", label: "Current streak", systemImage: "flame")
             StatTile(value: "\(model.growth.longestStreak)", label: "Longest streak", systemImage: "trophy")
             StatTile(value: "\(model.wordsLearned)", label: "Words learned", systemImage: "text.book.closed")
-            StatTile(value: model.growth.totalRings.formatted(), label: "Rings", systemImage: "circle.circle")
             StatTile(value: "\(model.plantedCount)", label: "Trees planted", systemImage: "tree")
         }
     }
 
     private func renderSnapshot() {
         let view = ForestSnapshotView(planted: model.plantedCount, stage: model.stage, treeDays: model.growth.treeDays,
-                                      streak: model.growth.currentStreak, rings: model.growth.totalRings,
-                                      daysToFullGrowth: model.daysToFullGrowth, undergrowth: model.store.undergrowth)
+                                      streak: model.growth.currentStreak,
+                                      daysToFullGrowth: model.daysToFullGrowth, undergrowth: model.store.undergrowth,
+                                      light: ShareRenderer.light(for: model.store))
         snapshot = ShareRenderer.render(view).map(Image.init(uiImage:))
     }
 }
@@ -171,19 +165,18 @@ struct ForestSnapshotView: View {
     let stage: TreeStage
     let treeDays: Int
     let streak: Int
-    let rings: Int
     let daysToFullGrowth: Int
     var undergrowth: Undergrowth = .none
+    var light: ForestLight = .midday
 
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.m) {
             Text("My forest")
                 .font(Typography.wordTitle)
-            // Shared images always show the forest at midday.
             GroveView(planted: planted, stage: stage, treeDays: treeDays, daysToFullGrowth: daysToFullGrowth,
-                      undergrowth: undergrowth)
+                      light: light, undergrowth: undergrowth)
             HStack {
-                Text("\(planted) trees · \(streak)-day streak · \(rings) rings")
+                Text("\(planted) trees · \(streak)-day streak")
                     .font(Typography.callout)
                     .foregroundStyle(Theme.Palette.soilSecondary)
                 Spacer()
@@ -226,11 +219,13 @@ struct StreakCalendar: View {
 
             let columns = Array(repeating: GridItem(.flexible(), spacing: Theme.Spacing.xxs), count: 7)
             LazyVGrid(columns: columns, spacing: Theme.Spacing.xxs) {
-                ForEach(Array(model.weekdaySymbols.enumerated()), id: \.offset) { _, symbol in
+                ForEach(Array(model.weekdaySymbols.enumerated()), id: \.offset) { index, symbol in
+                    // Read as the full name ("Monday"), like a calendar's column header.
                     Text(symbol)
                         .font(Typography.caption)
                         .foregroundStyle(Theme.Palette.soilSecondary)
-                        .accessibilityHidden(true)
+                        .frame(maxWidth: .infinity)
+                        .accessibilityLabel(model.weekdayNames[index])
                 }
                 ForEach(Array(model.calendarCells.enumerated()), id: \.offset) { _, day in
                     if let day {
@@ -255,6 +250,43 @@ struct StreakCalendar: View {
     }
 }
 
+/// A full-width row that opens another Forest screen.
+private struct LinkRow: View {
+    let title: String
+    let systemImage: String
+
+    var body: some View {
+        HStack {
+            Label(title, systemImage: systemImage)
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(Typography.caption)
+                .foregroundStyle(Theme.Palette.soilSecondary)
+                .accessibilityHidden(true)
+        }
+        .font(Typography.headline)
+        .padding(Theme.Spacing.m)
+        .frame(minHeight: Theme.Size.minTapTarget)
+        .background(Theme.Palette.surface,
+                    in: RoundedRectangle(cornerRadius: Theme.Radius.medium, style: .continuous))
+        .contentShape(Rectangle())
+    }
+}
+
+/// Friends, pushed from the Forest tab.
+struct FriendsScreen: View {
+    var body: some View {
+        ScrollView {
+            FriendsSection()
+                .padding(.horizontal, Theme.Spacing.m)
+                .padding(.bottom, Theme.Spacing.xl)
+        }
+        .sequoiaScreen()
+        .navigationTitle("Friends")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
 /// Friends and leaderboards through Game Center. Entirely optional: signed-out
 /// players see a calm opt-in, and nothing else depends on it.
 struct FriendsSection: View {
@@ -265,7 +297,6 @@ struct FriendsSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.s) {
             HStack {
-                Text("Friends").font(Typography.headline)
                 Spacer()
                 if social.isSignedIn {
                     Button { social.showLeaderboards() } label: {
@@ -294,7 +325,7 @@ struct FriendsSection: View {
         case .signedOut:
             CalmEmptyState(
                 "Grow alongside friends",
-                message: "Connect Game Center to compare streaks, trees and rings with friends. It's optional; everything else works without it.",
+                message: "Connect Game Center to compare streaks and trees with friends. It's optional; everything else works without it.",
                 systemImage: "person.2"
             ) {
                 Button("Connect Game Center") { social.signIn() }

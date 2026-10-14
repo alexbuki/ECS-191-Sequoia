@@ -7,6 +7,7 @@ enum ForestRoute: Hashable {
     case trees
     case tree(index: Int)
     case word(id: String)
+    case friends
 }
 
 /// Every planted tree, newest first.
@@ -47,6 +48,9 @@ struct PlantedTreesView: View {
 
     private func plantedLabel(_ tree: PlantedTreeRecord) -> String {
         let date = DayStamp(dayNumber: tree.plantedDay).startDate(in: store.currentClock.calendar)
+        if store.isWelcomeTree(tree) {
+            return String(localized: "Welcome tree · Planted \(date.formatted(date: .abbreviated, time: .omitted))")
+        }
         return String(localized: "Planted \(date.formatted(date: .abbreviated, time: .omitted))")
     }
 }
@@ -59,6 +63,7 @@ struct PlantedTreeDetailView: View {
     var body: some View {
         let tree = store.plantedTrees().first { $0.index == index }
         let words = tree.map { store.words(grownInto: $0) } ?? []
+        let isWelcome = tree.map { store.isWelcomeTree($0) } ?? false
         List {
             Section {
                 VStack(spacing: Theme.Spacing.s) {
@@ -88,14 +93,15 @@ struct PlantedTreeDetailView: View {
                                 Text(word.definition)
                                     .font(Typography.callout)
                                     .foregroundStyle(Theme.Palette.soilSecondary)
-                                    .lineLimit(2)
                             }
                             .accessibilityElement(children: .combine)
                         }
                     }
                 }
             } header: {
-                Text(words.isEmpty ? String(localized: "Words") : String(localized: "Grown from \(words.count) words"))
+                Text(words.isEmpty ? String(localized: "Words")
+                     : isWelcome ? String(localized: "A welcome gift for your first word")
+                     : String(localized: "Grown from \(words.count) words"))
                     .font(Typography.label)
                     .foregroundStyle(Theme.Palette.soilSecondary)
             }

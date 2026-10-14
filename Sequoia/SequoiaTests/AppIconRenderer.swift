@@ -14,13 +14,23 @@ struct AppIconRenderer {
         let variant: Variant
 
         var body: some View {
-            ZStack {
+            ZStack(alignment: .bottom) {
                 background
-                tree
-                    .frame(height: 900)
-                    .offset(y: 20)
+                if variant != .tinted {
+                    // Late light behind the crown, and a quiet grove on the hills.
+                    Circle()
+                        .fill(Theme.Palette.sunlight.opacity(variant == .light ? 0.35 : 0.22))
+                        .frame(width: 620)
+                        .blur(radius: 70)
+                        .offset(x: 170, y: -560)
+                    hills
+                }
+                grove
+                tree(height: 960, variant: 2)
+                    .offset(y: 8)
             }
             .frame(width: 1024, height: 1024)
+            .clipped()
             .environment(\.colorScheme, variant == .light ? .light : .dark)
         }
 
@@ -32,12 +42,30 @@ struct AppIconRenderer {
             }
         }
 
-        @ViewBuilder private var tree: some View {
+        private var hills: some View {
+            Ellipse()
+                .fill(Theme.Palette.moss.opacity(variant == .light ? 0.7 : 0.35))
+                .frame(width: 1500, height: 520)
+                .offset(x: -120, y: 300)
+        }
+
+        /// Two smaller giants behind, faded into the fog, for depth.
+        private var grove: some View {
+            ZStack(alignment: .bottom) {
+                tree(height: 600, variant: 5).offset(x: -320, y: -60)
+                tree(height: 500, variant: 9).offset(x: 330, y: -85)
+            }
+            .opacity(variant == .tinted ? 0.4 : 0.45)
+        }
+
+        @ViewBuilder private func tree(height: CGFloat, variant seed: Int) -> some View {
+            let view = TreeView(stage: .grownSequoia, showsGround: false, variant: seed)
+                .frame(height: height)
             if variant == .tinted {
                 // Tinted icons are grayscale; the system applies the tint.
-                TreeView(stage: .grownSequoia, showsGround: true).grayscale(1).brightness(0.35)
+                view.grayscale(1).brightness(0.35)
             } else {
-                TreeView(stage: .grownSequoia, showsGround: true)
+                view
             }
         }
     }

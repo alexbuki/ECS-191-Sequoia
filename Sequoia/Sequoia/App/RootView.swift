@@ -18,6 +18,15 @@ struct RootView: View {
         .fullScreenCover(isPresented: Binding(get: { app.needsOnboarding }, set: { _ in })) {
             OnboardingView()
         }
+        .presentsCeremony(Binding(get: { app.ceremony }, set: { app.ceremony = $0 })) { app.selectedTab = .forest }
+        .alert("Sequoia couldn't open your progress", isPresented: Binding(get: { app.showsStoreError },
+                                                                             set: { if !$0 { app.storeErrorAcknowledged = true } })) {
+            // After the dismissal, so a retry that fails again shows the alert anew.
+            Button("Try Again") { Task { app.rebuildStore() } }
+            Button("Continue Without Saving", role: .cancel) {}
+        } message: {
+            Text("Your words, streak and trees are still on this iPhone, but anything you do now won't be saved. Sequoia tries again each time you open it.")
+        }
         #if SEQUOIA_DEV
         .sheet(isPresented: .constant(ProcessInfo.processInfo.arguments.contains("-showGallery"))) {
             DesignGalleryView()
@@ -34,9 +43,6 @@ struct RootView: View {
             LibraryView(store: app.store)
                 .tabItem { Label("Library", systemImage: "books.vertical") }
                 .tag(AppTab.library)
-            PracticeView(store: app.store)
-                .tabItem { Label("Practice", systemImage: "puzzlepiece") }
-                .tag(AppTab.practice)
             ForestView(store: app.store)
                 .tabItem { Label("Forest", systemImage: "tree") }
                 .tag(AppTab.forest)

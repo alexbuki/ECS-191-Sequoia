@@ -10,14 +10,26 @@ import SequoiaSocial
 final class AppModel {
     private(set) var store: SequoiaStore
     var selectedTab: AppTab = .today
+    /// Set to open Practice inside Library (a deep link or `-tab practice`);
+    /// Library clears it once shown.
+    var opensPractice = false
+    /// The planting ceremony on screen. Every planted tree gets one, wherever
+    /// it was planted, the next time the app is open.
+    var ceremony: PlantedTreeMoment?
     let notifications = NotificationService()
     let watchSync = WatchSyncService()
     private(set) var social: SocialModel
     private var rescheduleTask: Task<Void, Never>?
+    /// Set when the saved store wouldn't open and a throwaway one is in use,
+    /// so nothing done now is saved. Retried each time the app becomes active.
+    private(set) var storeError: (any Error)?
+    /// The user chose to carry on without saving; asked again on the next failed retry.
+    var storeErrorAcknowledged = false
+    var showsStoreError: Bool { storeError != nil && !storeErrorAcknowledged }
 
     /// Onboarding shows only until it is finished or skipped once.
     var needsOnboarding: Bool {
-        !store.settings.hasCompletedOnboarding && !ProcessInfo.processInfo.arguments.contains("-uiTestingSkipOnboarding")
+        storeError == nil && !store.settings.hasCompletedOnboarding && !ProcessInfo.processInfo.arguments.contains("-uiTestingSkipOnboarding")
     }
 
     init(store: SequoiaStore? = nil) {
@@ -25,25 +37,29 @@ final class AppModel {
         LaunchTiming.mark("appmodel-init")
         if store == nil { DevLaunchActions.applyBeforeLaunch() }
         #endif
-        let container = store == nil ? Persistence.makeContainerOrFallback() : nil
+        let opened = store == nil ? Persistence.openContainer() : nil
         #if SEQUOIA_DEV
         LaunchTiming.mark("container")
         #endif
-        self.store = store ?? SequoiaStore(container: container ?? Persistence.makeContainerOrFallback())
+        self.store = store ?? SequoiaStore(container: opened?.container ?? Persistence.makeContainerOrFallback())
         #if SEQUOIA_DEV
         LaunchTiming.mark("store")
         #endif
         social = SocialModel(backend: Self.makeSocialBackend())
+        storeError = opened?.error
         #if SEQUOIA_DEV
         LaunchTiming.mark("social")
         #endif
-        connectStore()
         #if SEQUOIA_DEV
         if store == nil {
             DevLaunchActions.apply(to: self.store)
+            if DevLaunchActions.showsCeremony { ceremony = .preview(in: self.store) }
             if let tab = DevLaunchActions.initialTab { selectedTab = tab }
+            if DevLaunchActions.opensPractice { selectedTab = .library; opensPractice = true }
         }
         #endif
+        // Connected after the launch tools run; `storeDidChange` below covers their changes.
+        connectStore()
         notifications.app = self
         notifications.configure()
         #if SEQUOIA_DEV
@@ -86,7 +102,10 @@ final class AppModel {
     /// Re-opens the store for the current location (used when dev mode toggles,
     /// which switches between the real and the simulated store).
     func rebuildStore() {
-        store = SequoiaStore(container: Persistence.makeContainerOrFallback())
+        let opened = Persistence.openContainer()
+        storeError = opened.error
+        storeErrorAcknowledged = false
+        store = SequoiaStore(container: opened.container)
         connectStore()
         storeDidChange()
     }
@@ -94,24 +113,40 @@ final class AppModel {
     /// Called when the app returns to the foreground: picks up changes from the
     /// widget, the watch or a notification action, and a new day if one began.
     func sceneDidBecomeActive() {
+        if storeError != nil { return rebuildStore() }
         store.reloadFromDisk()
         storeDidChange()
     }
 
-    /// Finishes onboarding with the chosen (or default) settings.
-    func completeOnboarding(difficulty: Difficulty?, reminder: DateComponents?, wantsReminder: Bool) async {
+    /// Shows the ceremony for any tree planted since the last one played.
+    func presentPendingCeremony() {
+        guard ceremony == nil, !needsOnboarding, let moment = PlantedTreeMoment.pending(in: store) else { return }
+        ceremony = moment
+        store.markCeremoniesShown()
+    }
+
+    /// Finishes the one-screen onboarding. Nothing is asked up front: the
+    /// default difficulty applies (changeable from the first word), and the
+    /// reminder is offered after the first "Got it", once the app has shown its value.
+    func completeOnboarding() {
+        UserDefaults.standard.removeObject(forKey: Self.reminderOfferDismissedKey)
         store.updateSettings { settings in
-            if let difficulty { settings.difficulty = difficulty }
-            if let hour = reminder?.hour, let minute = reminder?.minute {
-                settings.reminderHour = hour
-                settings.reminderMinute = minute
-            }
-            settings.notificationsEnabled = wantsReminder
+            settings.notificationsEnabled = false
             settings.hasCompletedOnboarding = true
         }
-        if wantsReminder {
-            await notifications.requestPermissionIfNeeded(store: store)
+    }
+
+    /// Set when the user answers "Not now" to the reminder offer.
+    static let reminderOfferDismissedKey = "reminderOfferDismissed"
+
+    /// Turns on the daily reminder at `time` and asks for permission if needed.
+    func enableReminder(at time: DateComponents) async {
+        store.updateSettings { settings in
+            settings.reminderHour = time.hour ?? settings.reminderHour
+            settings.reminderMinute = time.minute ?? settings.reminderMinute
+            settings.notificationsEnabled = true
         }
+        await notifications.requestPermissionIfNeeded(store: store)
     }
 
     /// Handles `sequoia://` deep links from widgets and notifications.
@@ -119,7 +154,7 @@ final class AppModel {
         guard url.scheme == "sequoia" else { return }
         switch url.host() {
         case "library": selectedTab = .library
-        case "practice": selectedTab = .practice
+        case "practice": selectedTab = .library; opensPractice = true
         case "forest": selectedTab = .forest
         default: selectedTab = .today
         }
@@ -131,12 +166,14 @@ final class AppModel {
 
     /// Side effects after any change to user state, coalesced.
     private func storeDidChange() {
+        presentPendingCeremony()
         rescheduleTask?.cancel()
         rescheduleTask = Task { [weak self] in
             try? await Task.sleep(for: .milliseconds(300))
             guard let self, !Task.isCancelled else { return }
             WidgetCenter.shared.reloadAllTimelines()
-            self.watchSync.send(self.store.watchSnapshot)
+            // A throwaway store would overwrite the watch's copy with empty progress.
+            if self.storeError == nil { self.watchSync.send(self.store.watchSnapshot) }
             await self.notifications.reschedule(store: self.store)
             await self.social.submitScores(from: self.store.growth)
         }

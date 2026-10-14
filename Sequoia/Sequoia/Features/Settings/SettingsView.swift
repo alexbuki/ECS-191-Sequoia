@@ -55,7 +55,7 @@ struct SettingsView: View {
                 Section {
                     Button("Reset progress", role: .destructive) { confirmsReset = true }
                 } footer: {
-                    Text("Erases your streak, rings, forest and word history. This can't be undone.")
+                    Text("Erases your streak, forest and word history. This can't be undone.")
                 }
 
                 #if SEQUOIA_DEV
@@ -80,7 +80,7 @@ struct SettingsView: View {
             .confirmationDialog("Reset all progress?", isPresented: $confirmsReset, titleVisibility: .visible) {
                 Button("Reset progress", role: .destructive) { store.resetProgress() }
             } message: {
-                Text("Your streak, rings, forest and word history will be erased.")
+                Text("Your streak, forest and word history will be erased.")
             }
             .task { await refreshAuthorization() }
         }

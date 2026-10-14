@@ -41,6 +41,13 @@ struct WatchTodayView: View {
                         .foregroundStyle(Theme.Palette.canopy)
                         .padding(.top, Theme.Spacing.xs)
                         .accessibilityIdentifier("watchDone")
+                } else if model.plantsTree {
+                    // The planting is the iPhone app's moment.
+                    Label("Your sequoia is ready. Open Sequoia on your iPhone to plant it.", systemImage: "iphone")
+                        .font(Typography.label)
+                        .foregroundStyle(Theme.Palette.canopy)
+                        .padding(.top, Theme.Spacing.xs)
+                        .accessibilityIdentifier("watchPlantOnPhone")
                 } else {
                     Button("Got it") {
                         withAnimation(Theme.Motion.growth(reduceMotion: reduceMotion)) { model.gotIt() }

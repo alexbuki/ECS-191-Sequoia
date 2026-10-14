@@ -3,7 +3,7 @@ import Foundation
 /// Every tunable number in the growth system lives here, so thresholds and
 /// rewards can be adjusted without touching code elsewhere.
 public struct GrowthConfig: Codable, Equatable, Sendable {
-    /// The tree day on which each stage begins. Must start with `.seed` at day 1.
+    /// The tree day on which each stage begins. Must start with `.seed`.
     public var stageThresholds: [StageThreshold]
     /// Rings for each daily check-in.
     public var ringsPerCheckIn: Int
@@ -13,9 +13,14 @@ public struct GrowthConfig: Codable, Equatable, Sendable {
     public var ringsPerCorrectAnswer: Int
     /// Bonus rings when a tree reaches a new stage.
     public var milestoneRings: [StageReward]
-    /// Missed days forgiven before a streak resets. Zero today; reserved for a
-    /// future earned "rain day" that protects a streak.
-    public var graceDays: Int
+    /// A rain day is earned every this many consecutive check-ins. Each one
+    /// covers a missed day, so the streak and tree survive. Zero turns them off.
+    public var rainDayEvery: Int
+    /// The most rain days a user can hold at once.
+    public var maxRainDays: Int
+    /// Whether the very first check-in also plants a grown "welcome" sequoia,
+    /// so a new user sees the whole loop (word → tree → forest) on day one.
+    public var plantsWelcomeTree: Bool
 
     public struct StageThreshold: Codable, Equatable, Sendable {
         public var stage: TreeStage
@@ -41,21 +46,27 @@ public struct GrowthConfig: Codable, Equatable, Sendable {
         ringsPerPracticeRound: Int,
         ringsPerCorrectAnswer: Int,
         milestoneRings: [StageReward],
-        graceDays: Int
+        rainDayEvery: Int,
+        maxRainDays: Int,
+        plantsWelcomeTree: Bool = false
     ) {
         self.stageThresholds = stageThresholds.sorted { $0.day < $1.day }
         self.ringsPerCheckIn = ringsPerCheckIn
         self.ringsPerPracticeRound = ringsPerPracticeRound
         self.ringsPerCorrectAnswer = ringsPerCorrectAnswer
         self.milestoneRings = milestoneRings
-        self.graceDays = graceDays
+        self.rainDayEvery = rainDayEvery
+        self.maxRainDays = maxRainDays
+        self.plantsWelcomeTree = plantsWelcomeTree
     }
 
-    /// The tuned defaults: seed day 1, sprout 3, sapling 7, young 14, grown 30.
+    /// The tuned defaults: a seed before the first word, sprout on day 1 (so the
+    /// first check-in visibly grows it), sapling 7, young 14, grown 30; a rain day
+    /// every 7 days, holding at most 2; the first check-in plants a welcome tree.
     public static let standard = GrowthConfig(
         stageThresholds: [
-            .init(.seed, day: 1),
-            .init(.sprout, day: 3),
+            .init(.seed, day: 0),
+            .init(.sprout, day: 1),
             .init(.sapling, day: 7),
             .init(.youngSequoia, day: 14),
             .init(.grownSequoia, day: 30),
@@ -69,7 +80,9 @@ public struct GrowthConfig: Codable, Equatable, Sendable {
             .init(.youngSequoia, rings: 20),
             .init(.grownSequoia, rings: 50),
         ],
-        graceDays: 0
+        rainDayEvery: 7,
+        maxRainDays: 2,
+        plantsWelcomeTree: true
     )
 
     /// The tree day on which a stage begins.

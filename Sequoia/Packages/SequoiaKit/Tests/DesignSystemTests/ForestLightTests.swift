@@ -2,6 +2,13 @@ import Testing
 @testable import DesignSystem
 
 struct ForestLightTests {
+    @Test func namesThePartOfTheDay() {
+        #expect(ForestLight(hour: 6.5).phase == .dawn)
+        #expect(ForestLight(hour: 12.75).phase == .day)
+        #expect(ForestLight(hour: 18.8).phase == .goldenHour)
+        #expect(ForestLight(hour: 23).phase == .night)
+    }
+
     @Test func middayIsBrightNeutralAndHigh() {
         let light = ForestLight(hour: 12.75)
         #expect(light.night == 0)

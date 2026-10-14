@@ -48,10 +48,10 @@ final class MockSocialBackend: SocialBackend {
     private(set) var submitted: [LeaderboardKind: Int] = [:]
 
     private static let friends: [(name: String, scores: [LeaderboardKind: Int])] = [
-        ("Maya", [.streak: 21, .trees: 3, .rings: 980]),
-        ("Jonah", [.streak: 6, .trees: 1, .rings: 310]),
-        ("Priya", [.streak: 44, .trees: 5, .rings: 1_720]),
-        ("Sam", [.streak: 2, .trees: 0, .rings: 90]),
+        ("Maya", [.streak: 21, .trees: 3]),
+        ("Jonah", [.streak: 6, .trees: 1]),
+        ("Priya", [.streak: 44, .trees: 5]),
+        ("Sam", [.streak: 2, .trees: 0]),
     ]
 
     init(scenario: Scenario) {

@@ -48,7 +48,7 @@ struct SequoiaStoreTests {
         #expect(store.todayCompleted)
         #expect(store.growth.currentStreak == 1)
         #expect(store.checkIn() == .alreadyCheckedIn)
-        #expect(store.growth.totalRings == 10)
+        #expect(store.growth.totalRings == 15, "10 for the check-in, 5 for sprouting")
         #expect(store.completedDays() == [clock.clock.today()])
     }
 
@@ -56,6 +56,7 @@ struct SequoiaStoreTests {
         let store = try makeStore()
         // A missed day first, so only the final unbroken run grows the tree.
         store.checkIn()
+        let firstWord = store.todayWord.id
         clock.advance(days: 2)
         var expected: [String] = []
         for day in 0..<store.engine.config.daysToFullGrowth {
@@ -64,8 +65,58 @@ struct SequoiaStoreTests {
             expected.append(store.todayWord.id)
             store.checkIn()
         }
-        let tree = try #require(store.plantedTrees().first)
+        let trees = store.plantedTrees()
+        #expect(trees.count == 2)
+        let welcome = try #require(trees.first)
+        #expect(store.isWelcomeTree(welcome))
+        #expect(store.words(grownInto: welcome).map(\.id) == [firstWord], "the first word planted the welcome tree")
+        let tree = try #require(trees.last)
+        #expect(!store.isWelcomeTree(tree))
         #expect(store.words(grownInto: tree).map(\.id) == expected)
+    }
+
+    @Test func everyPlantedTreeAwaitsItsCeremonyOnce() throws {
+        let store = try makeStore()
+        for day in 0..<store.engine.config.daysToFullGrowth {
+            if day > 0 { clock.advance(days: 1) }
+            store.refresh()
+            // The first day plants the welcome tree; the last plants the grown one.
+            #expect(store.todayPlantsTree == (day == 0 || day == store.engine.config.daysToFullGrowth - 1))
+            store.checkIn()
+        }
+        #expect(!store.todayPlantsTree)
+        #expect(store.treesAwaitingCeremony().map(\.index) == [0, 1])
+        store.markCeremoniesShown()
+        #expect(store.treesAwaitingCeremony().isEmpty)
+        #expect(store.plantedTrees().count == 2)
+    }
+
+    @Test func noWordRepeatsUntilTheWholeLevelHasBeenSeen() throws {
+        let store = try makeStore()
+        let poolSize = store.selector.pool(for: .elevated).count
+        var shown: [String] = []
+        for day in 0..<poolSize {
+            if day > 0 { clock.advance(days: 1) }
+            store.refresh()
+            // Switching levels back and forth doesn't bring back seen words either.
+            if day == poolSize / 3 { store.updateSettings { $0.difficulty = .erudite } }
+            if day == poolSize / 3 + 5 { store.updateSettings { $0.difficulty = .elevated } }
+            shown.append(store.todayWord.id)
+        }
+        #expect(Set(shown).count == shown.count)
+    }
+
+    @Test func tomorrowsWordIsKnownInAdvance() throws {
+        let store = try makeStore()
+        let predicted = store.upcomingWords(count: 3).map(\.id)
+        #expect(store.word(for: store.today.adding(days: 2)).id == predicted[1])
+        var actual: [String] = []
+        for _ in 0..<3 {
+            clock.advance(days: 1)
+            store.refresh()
+            actual.append(store.todayWord.id)
+        }
+        #expect(actual == predicted)
     }
 
     @Test func checkInPersistsAcrossRelaunch() throws {
@@ -105,20 +156,22 @@ struct SequoiaStoreTests {
             store.checkIn()
             clock.advance(days: 1)
         }
-        #expect(store.plantedTrees().count == 1)
+        #expect(store.plantedTrees().count == 2, "the welcome tree and the grown one")
         clock.advance(days: 5)
         store.refresh()
-        #expect(store.plantedTrees().count == 1)
-        #expect(store.growth.plantedTrees == 1)
+        #expect(store.plantedTrees().count == 2)
+        #expect(store.growth.plantedTrees == 2)
     }
 
     @Test func favorites() throws {
         let store = try makeStore()
         let id = store.todayWord.id
         #expect(!store.isFavorite(id))
+        #expect(store.favoriteCount == 0)
         store.toggleFavorite(id)
         #expect(store.isFavorite(id))
         #expect(store.seenWords().first?.isFavorite == true)
+        #expect(store.favoriteCount == 1)
     }
 
     @Test func changingDifficultySwapsAnUnfinishedWord() throws {

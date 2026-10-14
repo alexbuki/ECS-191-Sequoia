@@ -8,14 +8,21 @@ struct PlantedTreeMoment: Identifiable, Equatable {
     let index: Int
     /// The words of the days that grew it, oldest first.
     let words: [Word]
+    /// How many trees this ceremony celebrates: more than one when several were
+    /// planted while the app was closed. `index` is the newest of them.
+    var count = 1
+    /// The welcome tree, planted by the very first word.
+    var isWelcome = false
 
     var id: Int { index }
 
-    /// The most recently planted tree, if there is one.
+    /// The trees planted since the last ceremony, shown as one moment for the newest.
     @MainActor
-    static func latest(in store: SequoiaStore) -> PlantedTreeMoment? {
-        guard let tree = store.plantedTrees().last else { return nil }
-        return PlantedTreeMoment(index: tree.index, words: store.words(grownInto: tree))
+    static func pending(in store: SequoiaStore) -> PlantedTreeMoment? {
+        let trees = store.treesAwaitingCeremony()
+        guard let newest = trees.last else { return nil }
+        return PlantedTreeMoment(index: newest.index, words: store.words(grownInto: newest), count: trees.count,
+                                 isWelcome: trees.count == 1 && store.isWelcomeTree(newest))
     }
 
     #if SEQUOIA_DEV
@@ -23,10 +30,11 @@ struct PlantedTreeMoment: Identifiable, Equatable {
     /// words when it has none (trees planted by developer tools).
     @MainActor
     static func preview(in store: SequoiaStore) -> PlantedTreeMoment {
-        let latest = latest(in: store)
-        let words = latest?.words.isEmpty == false
-            ? latest?.words ?? []
-            : Array(store.seenWords().map(\.word).prefix(store.engine.config.daysToFullGrowth))
+        let latest = store.plantedTrees().last
+        let grown = latest.map { store.words(grownInto: $0) } ?? []
+        let words = grown.isEmpty
+            ? Array(store.seenWords().map(\.word).prefix(store.engine.config.daysToFullGrowth))
+            : grown
         return PlantedTreeMoment(index: latest?.index ?? 0, words: words)
     }
     #endif
@@ -94,13 +102,18 @@ struct PlantingCeremonyView: View {
     private var card: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Theme.Spacing.s) {
-                Text("A sequoia joined your forest")
+                Text(title)
                     .font(Typography.wordTitle)
                     .accessibilityAddTraits(.isHeader)
                 Text(subtitle)
                     .font(Typography.callout)
                     .foregroundStyle(Theme.Palette.soilSecondary)
-                if !moment.words.isEmpty {
+                if moment.isWelcome, let first = moment.words.first {
+                    Text("Planted with “\(first.word)”")
+                        .font(Typography.quote)
+                        .foregroundStyle(Theme.Palette.soil)
+                        .accessibilityIdentifier("ceremonyWords")
+                } else if !moment.words.isEmpty {
                     Text("Grown from \(wordList)")
                         .font(Typography.quote)
                         .foregroundStyle(Theme.Palette.soil)
@@ -123,8 +136,20 @@ struct PlantingCeremonyView: View {
         .background(Theme.Palette.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous))
     }
 
+    private var title: String {
+        if moment.isWelcome { return String(localized: "Your first sequoia") }
+        return moment.count > 1
+            ? String(localized: "\(moment.count) sequoias joined your forest")
+            : String(localized: "A sequoia joined your forest")
+    }
+
     private var subtitle: String {
-        String(localized: "Tree \(moment.index + 1) in your forest. It will stand there forever.")
+        if moment.isWelcome {
+            return String(localized: "A welcome gift for your first word. Every word from now on grows the next one, and it stands beside this one forever.")
+        }
+        return moment.count > 1
+            ? String(localized: "Trees \(moment.index + 2 - moment.count)–\(moment.index + 1) in your forest. They will stand there forever.")
+            : String(localized: "Tree \(moment.index + 1) in your forest. It will stand there forever.")
     }
 
     /// The first words in full, then a count, so the card stays compact.
@@ -155,16 +180,32 @@ struct PlantingCeremonyView: View {
 extension View {
     /// Shows the planting ceremony full screen, fading in rather than sliding up.
     func presentsCeremony(_ moment: Binding<PlantedTreeMoment?>, onSeeForest: @escaping () -> Void) -> some View {
-        fullScreenCover(item: moment) { current in
-            PlantingCeremonyView(moment: current) {
-                moment.wrappedValue = nil
-                onSeeForest()
-            } onDone: {
-                moment.wrappedValue = nil
+        modifier(CeremonyPresenter(moment: moment, onSeeForest: onSeeForest))
+    }
+}
+
+/// Presents the ceremony. "See your forest" acts once the cover has gone, since
+/// changing tabs while it is still dismissing is ignored.
+private struct CeremonyPresenter: ViewModifier {
+    @Binding var moment: PlantedTreeMoment?
+    let onSeeForest: () -> Void
+    @State private var seesForest = false
+
+    func body(content: Content) -> some View {
+        content
+            .fullScreenCover(item: $moment, onDismiss: {
+                if seesForest { onSeeForest() }
+                seesForest = false
+            }) { current in
+                PlantingCeremonyView(moment: current) {
+                    seesForest = true
+                    moment = nil
+                } onDone: {
+                    moment = nil
+                }
+                .presentationBackground(.clear)
             }
-            .presentationBackground(.clear)
-        }
-        .transaction(value: moment.wrappedValue) { $0.disablesAnimations = true }
+            .transaction(value: moment) { $0.disablesAnimations = true }
     }
 }
 

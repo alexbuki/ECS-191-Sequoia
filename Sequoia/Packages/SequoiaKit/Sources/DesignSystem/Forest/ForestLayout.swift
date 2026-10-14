@@ -84,8 +84,9 @@ public struct ForestLayout: Equatable, Sendable {
         let rows = layer == .horizon ? max(1, (indices.count + 39) / 40) : 1
         let slots: [CGFloat]
         if layer == .near {
-            // Fixed spots that leave room for the in-progress tree.
-            slots = [0.14, 0.42, 0.97].prefix(indices.count).map { $0 }
+            // Fixed spots that leave room for the in-progress tree. A lone tree
+            // (the welcome tree on day one) stands fully in view, not at the edge.
+            slots = indices.count == 1 ? [0.3] : [0.14, 0.42, 0.97].prefix(indices.count).map { $0 }
         } else {
             let perRow = Int((Double(indices.count) / Double(rows)).rounded(.up))
             slots = (0..<indices.count).map { k in

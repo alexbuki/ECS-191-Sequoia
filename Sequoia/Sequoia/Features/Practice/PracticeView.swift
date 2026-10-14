@@ -11,20 +11,19 @@ struct PracticeView: View {
         _model = State(initialValue: PracticeViewModel(store: store))
     }
 
+    /// Pushed from Library (no navigation stack of its own).
     var body: some View {
-        NavigationStack {
-            Group {
-                switch model.phase {
-                case .menu: menu
-                case .playing: playing
-                case .finished(let correct, let total, let rings): finished(correct: correct, total: total, rings: rings)
-                }
+        Group {
+            switch model.phase {
+            case .menu: menu
+            case .playing: playing
+            case .finished(let correct, let total, _): finished(correct: correct, total: total)
             }
-            .animation(reduceMotion ? Theme.Motion.fade : Theme.Motion.settle, value: model.phase)
-            .sequoiaScreen()
-            .navigationTitle("Practice")
-            .navigationBarTitleDisplayMode(.inline)
         }
+        .animation(reduceMotion ? Theme.Motion.fade : Theme.Motion.settle, value: model.phase)
+        .sequoiaScreen()
+        .navigationTitle("Practice")
+        .navigationBarTitleDisplayMode(.inline)
         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.5), trigger: model.answerCount)
     }
 
@@ -43,18 +42,50 @@ struct PracticeView: View {
         } else {
             ScrollView {
                 VStack(alignment: .leading, spacing: Theme.Spacing.m) {
+                    fernCard
                     Text("A quick round of \(PracticeGenerator.questionsPerRound) questions from the \(model.seenCount) words you've seen.")
                         .font(Typography.callout)
                         .foregroundStyle(Theme.Palette.soilSecondary)
                     ForEach(PracticeGame.allCases) { game in
-                        Button { model.start(game) } label: { GameCard(game: game) }
-                            .buttonStyle(.plain)
-                            .accessibilityIdentifier("practiceGame-\(game.rawValue)")
+                        Button { model.start(game) } label: {
+                            GameCard(game: game, best: model.practiceRounds > 0 ? model.bestScore(for: game) : nil)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("practiceGame-\(game.rawValue)")
+                    }
+                    if model.revisitCount > 0 {
+                        Label(model.revisitCount == 1
+                              ? String(localized: "Rounds start with a word you missed.")
+                              : String(localized: "Rounds start with \(min(model.revisitCount, PracticeGenerator.maxRevisitsPerRound)) of the \(model.revisitCount) words you missed."),
+                              systemImage: "arrow.uturn.backward")
+                            .font(Typography.callout)
+                            .foregroundStyle(Theme.Palette.soilSecondary)
+                            .accessibilityIdentifier("practiceRevisit")
                     }
                 }
                 .padding(Theme.Spacing.m)
             }
         }
+    }
+
+    /// Rounds played, shown as the ferns they grow in the forest.
+    private var fernCard: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+            FernBed(ferns: model.practiceRounds)
+                .frame(height: 64)
+            Text(model.practiceRounds == 0
+                 ? String(localized: "Each round you finish grows a fern in your forest.")
+                 : model.practiceRounds == 1
+                    ? String(localized: "1 round played. Its fern grows in your forest.")
+                    : String(localized: "\(model.practiceRounds) rounds played. Their ferns grow in your forest."))
+                .font(Typography.callout)
+                .foregroundStyle(Theme.Palette.soil)
+        }
+        .padding(Theme.Spacing.m)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.Palette.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.large, style: .continuous))
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("practiceFerns")
     }
 
     // MARK: Playing
@@ -137,22 +168,21 @@ struct PracticeView: View {
 
     // MARK: Finished
 
-    private func finished(correct: Int, total: Int, rings: Int) -> some View {
+    /// The reward is the fern this round grows in the forest.
+    private func finished(correct: Int, total: Int) -> some View {
         VStack(spacing: Theme.Spacing.l) {
             Spacer(minLength: 0)
-            Image(systemName: "circle.circle")
-                .font(Typography.icon)
-                .foregroundStyle(Theme.Palette.canopy)
+            FernBed(ferns: 1)
+                .frame(width: 96, height: 64)
                 .accessibilityHidden(true)
             Text("\(correct) of \(total) correct")
                 .font(Typography.title)
                 .foregroundStyle(Theme.Palette.soil)
-            Text("+\(rings) rings")
+            Text("A new fern grows in your forest")
                 .font(Typography.headline)
-                .foregroundStyle(Theme.Palette.onSunlight)
-                .padding(.horizontal, Theme.Spacing.s)
-                .padding(.vertical, Theme.Spacing.xxs)
-                .background(Theme.Palette.sunlight, in: Capsule())
+                .foregroundStyle(Theme.Palette.canopy)
+                .multilineTextAlignment(.center)
+                .accessibilityIdentifier("practiceFern")
             Text(correct == total ? "Every answer right. Your words are taking root." : "Each round helps the words take root.")
                 .font(Typography.callout)
                 .foregroundStyle(Theme.Palette.soilSecondary)
@@ -178,6 +208,8 @@ extension PracticeViewModel {
 /// A game choice on the Practice menu.
 private struct GameCard: View {
     let game: PracticeGame
+    /// The best score so far, once any round has been played.
+    let best: Int?
 
     var body: some View {
         HStack(spacing: Theme.Spacing.m) {
@@ -194,6 +226,11 @@ private struct GameCard: View {
                 Text(game.subtitle)
                     .font(Typography.callout)
                     .foregroundStyle(Theme.Palette.soilSecondary)
+                if let best, best > 0 {
+                    Text("Best: \(best) of \(PracticeGenerator.questionsPerRound)")
+                        .font(Typography.label)
+                        .foregroundStyle(Theme.Palette.canopy)
+                }
             }
             Spacer(minLength: 0)
             Image(systemName: "chevron.right")
@@ -271,5 +308,5 @@ private struct OptionButton: View {
     }
 }
 
-#Preview("Practice") { PracticeView(store: .preview) }
-#Preview("Practice – dark") { PracticeView(store: .preview).preferredColorScheme(.dark) }
+#Preview("Practice") { NavigationStack { PracticeView(store: .preview) } }
+#Preview("Practice – dark") { NavigationStack { PracticeView(store: .preview) }.preferredColorScheme(.dark) }

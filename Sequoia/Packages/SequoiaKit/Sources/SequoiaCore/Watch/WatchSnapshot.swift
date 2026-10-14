@@ -11,13 +11,21 @@ public struct WatchSnapshot: Codable, Equatable, Sendable {
     public var difficulty: Difficulty
     public var growth: GrowthState
     public var isCompleted: Bool
+    /// The phone's words for the days after `day`, in order. The phone skips
+    /// words already seen, which the watch can't know, so it sends them ahead.
+    public var upcomingWordIDs: [String]?
 
-    public init(day: DayStamp, wordID: String, difficulty: Difficulty, growth: GrowthState, isCompleted: Bool) {
+    /// Days of words sent ahead, so the watch agrees through a week without a sync.
+    public static let upcomingDays = 7
+
+    public init(day: DayStamp, wordID: String, difficulty: Difficulty, growth: GrowthState, isCompleted: Bool,
+                upcomingWordIDs: [String]? = nil) {
         self.day = day
         self.wordID = wordID
         self.difficulty = difficulty
         self.growth = growth
         self.isCompleted = isCompleted
+        self.upcomingWordIDs = upcomingWordIDs
     }
 
     /// Before the phone has synced: today's word at the default difficulty and a new seed.
@@ -27,18 +35,25 @@ public struct WatchSnapshot: Codable, Equatable, Sendable {
                              difficulty: difficulty, growth: .empty, isCompleted: false)
     }
 
-    /// The snapshot as of `today`: a new day brings its deterministic word and
-    /// applies any missed days, exactly as the phone will.
+    /// The snapshot as of `today`: a new day brings the word the phone sent
+    /// ahead for it (or the deterministic one past those) and applies any
+    /// missed days, exactly as the phone will.
     public func current(
         today: DayStamp, engine: GrowthEngine = GrowthEngine(), selector: DailyWordSelector = DailyWordSelector()
     ) -> WatchSnapshot {
         guard today > day else { return self }
+        let ahead = today.days(since: day)
+        let upcoming = upcomingWordIDs ?? []
+        let wordID = upcoming.indices.contains(ahead - 1)
+            ? upcoming[ahead - 1]
+            : selector.word(for: today, difficulty: difficulty).id
         return WatchSnapshot(
             day: today,
-            wordID: selector.word(for: today, difficulty: difficulty).id,
+            wordID: wordID,
             difficulty: difficulty,
             growth: engine.refreshed(growth, today: today),
-            isCompleted: engine.hasCheckedIn(growth, on: today)
+            isCompleted: engine.hasCheckedIn(growth, on: today),
+            upcomingWordIDs: Array(upcoming.dropFirst(ahead))
         )
     }
 
@@ -51,6 +66,12 @@ public struct WatchSnapshot: Codable, Equatable, Sendable {
         snapshot.growth = next
         snapshot.isCompleted = true
         return snapshot
+    }
+
+    /// Completing this day plants the tree. The watch leaves that to the
+    /// iPhone, so the planting is seen in the app.
+    public func plantsTree(engine: GrowthEngine = GrowthEngine()) -> Bool {
+        !isCompleted && engine.checkInPlantsTree(growth, on: day)
     }
 
     public func word(provider: any WordProvider = BundledWordProvider.shared, selector: DailyWordSelector = DailyWordSelector()) -> Word {
@@ -79,7 +100,8 @@ extension SequoiaStore {
     /// What the watch should show right now.
     public var watchSnapshot: WatchSnapshot {
         WatchSnapshot(day: today, wordID: todayWord.id, difficulty: settings.difficulty,
-                      growth: growth, isCompleted: todayCompleted)
+                      growth: growth, isCompleted: todayCompleted,
+                      upcomingWordIDs: upcomingWords(count: WatchSnapshot.upcomingDays).map(\.id))
     }
 }
 

@@ -97,31 +97,50 @@ public struct WordShareCard: View {
     private let word: Word
     private let stage: TreeStage
     private let streak: Int
+    private let planted: Int
+    private let light: ForestLight
 
-    public init(word: Word, stage: TreeStage, streak: Int) {
+    /// - Parameters:
+    ///   - planted: trees in the sharer's forest, which rises behind the card.
+    ///   - light: the forest's light when shared.
+    public init(word: Word, stage: TreeStage, streak: Int, planted: Int = 0, light: ForestLight = .midday) {
         self.word = word
         self.stage = stage
         self.streak = streak
+        self.planted = planted
+        self.light = light
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.l) {
+        VStack(alignment: .leading, spacing: 0) {
             WordCard(word: word, style: .compact)
-            HStack(alignment: .bottom) {
-                VStack(alignment: .leading, spacing: Theme.Spacing.xxs) {
-                    Text("Sequoia", bundle: .module)
-                        .font(Typography.headline)
-                        .foregroundStyle(Theme.Palette.soil)
-                    Text(streak > 0 ? String(localized: "Day \(streak) of my streak", bundle: .module) : String(localized: "Daily Vocab", bundle: .module))
-                        .font(Typography.caption)
-                        .foregroundStyle(Theme.Palette.soilSecondary)
-                }
+            // The forest shows through between the card and the footer.
+            Spacer(minLength: 150)
+            HStack(alignment: .firstTextBaseline) {
+                Text("Sequoia", bundle: .module)
+                    .font(Typography.headline)
                 Spacer()
-                TreeView(stage: stage).frame(height: 64)
+                Text(streak > 0 ? String(localized: "Day \(streak) of my streak", bundle: .module)
+                                : String(localized: "Daily Vocab", bundle: .module))
+                    .font(Typography.callout)
             }
+            .foregroundStyle(Theme.Palette.soil)
+            .padding(.top, Theme.Spacing.m)
         }
         .padding(Theme.Spacing.xl)
         .frame(width: 390)
+        .background(alignment: .bottom) {
+            VStack(spacing: 0) {
+                ForestScene(planted: planted, currentStage: stage, light: light)
+                    .frame(height: 300)
+                    .mask {
+                        LinearGradient(stops: [.init(color: .clear, location: 0), .init(color: .black, location: 0.4)],
+                                       startPoint: .top, endPoint: .bottom)
+                    }
+                ForestScene.floorColor(light)
+                    .frame(height: 64)
+            }
+        }
         .background(Theme.Palette.fog)
         .font(Typography.body)
     }
@@ -144,5 +163,5 @@ public struct WordShareCard: View {
 }
 
 #Preview("Share card") {
-    WordShareCard(word: .sample, stage: .sapling, streak: 9)
+    WordShareCard(word: .sample, stage: .sapling, streak: 9, planted: 12)
 }

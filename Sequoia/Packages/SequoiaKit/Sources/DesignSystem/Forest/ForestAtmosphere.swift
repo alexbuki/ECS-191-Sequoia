@@ -2,7 +2,7 @@ import CoreGraphics
 
 /// The forest's light at a time of day: where the sun (or moon) sits, and how
 /// warm or dark the scene is. Pure, so it can be tested.
-public struct ForestLight: Equatable, Sendable {
+public struct ForestLight: Hashable, Sendable {
     /// The sun's or moon's centre, in scene fractions.
     public var orbX: CGFloat
     public var orbY: CGFloat
@@ -43,11 +43,21 @@ public struct ForestLight: Equatable, Sendable {
     }
 
     public static let midday = ForestLight(hour: 12.75)
+
+    /// The part of the day the light shows, for VoiceOver.
+    public enum Phase: Equatable, Sendable { case dawn, day, goldenHour, night }
+
+    public var phase: Phase {
+        if night > 0.5 { return .night }
+        if mist > 0.3 { return .dawn }
+        if warmth > 0.5 { return .goldenHour }
+        return .day
+    }
 }
 
 /// Small growth on the forest floor, earned through other habits: ferns from
 /// practice rounds and wildflowers from favorite words.
-public struct Undergrowth: Equatable, Sendable {
+public struct Undergrowth: Hashable, Sendable {
     public var ferns: Int
     public var flowers: Int
 

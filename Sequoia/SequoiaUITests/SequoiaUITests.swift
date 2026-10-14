@@ -32,39 +32,93 @@ final class SequoiaUITests: XCTestCase {
         if allow.waitForExistence(timeout: 4) { allow.tap() }
     }
 
-    func testOnboardingAppearsOnceAndAppliesChoices() throws {
-        let start = Date()
+    /// Taps "Got it". On a fresh store the first one plants the welcome tree,
+    /// whose ceremony covers the screen; this closes it.
+    func tapGotIt(_ app: XCUIApplication) {
+        app.buttons["gotIt"].tap()
+        let done = app.buttons["ceremonyDone"]
+        if done.waitForExistence(timeout: 4) {
+            // Let the card finish rising; a tap mid-slide lands on the button below.
+            sleep(1)
+            done.tap()
+        }
+        XCTAssertTrue(app.otherElements["growthPanel"].waitForExistence(timeout: 5))
+    }
+
+    /// Time to magic: one tap from the welcome screen to the first word, and the
+    /// first "Got it" plants a tree with its ceremony.
+    func testFirstLaunchReachesTheFirstTreeFast() throws {
         var app = launch(["-uiTestingDiskStore", "-uiTestingResetStore"], skipOnboarding: false)
         XCTAssertTrue(app.buttons["onboardingBegin"].waitForExistence(timeout: 10))
+        // The user's time starts when the welcome screen appears, not while
+        // XCUITest sets up its automation session.
+        let start = Date()
         snapshot("onboarding-welcome")
         app.buttons["onboardingBegin"].tap()
-        XCTAssertTrue(app.buttons["difficulty-3"].waitForExistence(timeout: 5))
-        snapshot("onboarding-difficulty")
-        app.buttons["difficulty-3"].tap()
-        XCTAssertTrue(app.buttons["reminder-evening"].waitForExistence(timeout: 5))
-        snapshot("onboarding-reminder")
-        app.buttons["reminder-evening"].tap()
-        allowNotificationsIfAsked()
         let word = app.staticTexts["wordTitle"]
         XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.buttons["onboardingBegin"].waitForNonExistence(timeout: 10))
-        XCTAssertLessThan(Date().timeIntervalSince(start), 20, "onboarding finishes in under 20 seconds")
-        XCTAssertEqual(word.value as? String, "Erudite", "chosen difficulty drives today's word")
+        XCTAssertLessThan(Date().timeIntervalSince(start), 10, "the first word is on screen within 10 seconds")
+        XCTAssertFalse(app.buttons["onboardingBegin"].exists)
+        XCTAssertEqual(word.value as? String, "Elevated", "the default level, with no question asked")
+        XCTAssertFalse(springboard.alerts.firstMatch.exists, "no permission prompt before the first word")
+        snapshot("today-first-word")
+
+        // The first word's level can be changed in place.
+        app.buttons["wordLevel"].tap()
+        app.buttons["Erudite"].tap()
+        XCTAssertTrue(NSPredicate(format: "value == 'Erudite'").evaluate(with: word) ||
+                      XCTWaiter.wait(for: [expectation(for: NSPredicate(format: "value == 'Erudite'"), evaluatedWith: word)], timeout: 5) == .completed,
+                      "the chosen level swaps today's word")
+        snapshot("today-first-word-erudite")
+
+        app.buttons["gotIt"].tap()
+        XCTAssertTrue(app.staticTexts["Your first sequoia"].waitForExistence(timeout: 5), "the first word plants a welcome tree")
+        XCTAssertTrue(app.staticTexts["ceremonyWords"].label.hasPrefix("Planted with"))
+        sleep(1)
+        snapshot("welcome-ceremony")
+        app.buttons["ceremonyDone"].tap()
+        let panel = app.otherElements["growthPanel"]
+        XCTAssertTrue(panel.waitForExistence(timeout: 5))
+        XCTAssertTrue(panel.label.contains("Your first sequoia is planted"), panel.label)
+        XCTAssertTrue(panel.label.contains("29 more words"), panel.label)
+        XCTAssertTrue(app.buttons["favorite"].exists, "favorite and share appear once the word is learned")
+        let offer = app.otherElements["reminderOffer"]
+        XCTAssertTrue(offer.waitForExistence(timeout: 5), "the reminder is offered after the first Got it")
+        snapshot("today-first-done")
+        // The offer sits in the scrolling content, under the word.
+        if !app.buttons["reminderOfferDismiss"].isHittable { app.swipeUp(velocity: .slow) }
+        snapshot("today-first-done-reminder")
+        app.buttons["reminderOfferDismiss"].tap()
+        XCTAssertTrue(offer.waitForNonExistence(timeout: 5))
 
         app.terminate()
         app = launch(["-uiTestingDiskStore"], skipOnboarding: false)
-        XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.otherElements["growthPanel"].waitForExistence(timeout: 10))
         XCTAssertFalse(app.buttons["onboardingBegin"].exists, "onboarding shows only on first launch")
+        XCTAssertFalse(app.otherElements["reminderOffer"].exists, "Not now is remembered")
+        XCTAssertFalse(app.buttons["ceremonyDone"].exists, "the ceremony plays once")
+        app.tabBars.buttons["Forest"].tap()
+        XCTAssertTrue(app.buttons["yourTrees"].waitForExistence(timeout: 5), "the welcome tree is in the forest")
+        snapshot("forest-day-one")
     }
 
-    func testOnboardingCanBeSkipped() throws {
+    /// "Remind me" turns on the daily reminder at the chosen time.
+    func testReminderOfferTurnsOnTheReminder() throws {
         let app = launch(["-uiTestingInMemoryStore"], skipOnboarding: false)
-        XCTAssertTrue(app.buttons["onboardingSkip"].waitForExistence(timeout: 10))
-        app.buttons["onboardingSkip"].tap()
-        allowNotificationsIfAsked()
-        XCTAssertTrue(app.buttons["onboardingSkip"].waitForNonExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["onboardingBegin"].waitForExistence(timeout: 10))
+        app.buttons["onboardingBegin"].tap()
         XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
-        XCTAssertEqual(app.staticTexts["wordTitle"].value as? String, "Elevated", "defaults apply when skipped")
+        tapGotIt(app)
+        let accept = app.buttons["reminderOfferAccept"]
+        XCTAssertTrue(accept.waitForExistence(timeout: 5))
+        accept.tap()
+        allowNotificationsIfAsked()
+        XCTAssertTrue(app.otherElements["reminderOffer"].waitForNonExistence(timeout: 5))
+        app.tabBars.buttons["Forest"].tap()
+        app.buttons["Settings"].tap()
+        let toggle = app.switches["Daily reminder"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 5))
+        XCTAssertEqual(toggle.value as? String, "1")
     }
 
     func testSettingsChangesApplyImmediately() throws {
@@ -80,11 +134,13 @@ final class SequoiaUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["wordTitle"].value as? String, "Everyday")
     }
 
-    func testShowsFourTabs() throws {
+    func testShowsThreeTabs() throws {
         let app = launch(["-uiTestingInMemoryStore"])
-        for tab in ["Today", "Library", "Practice", "Forest"] {
+        for tab in ["Today", "Library", "Forest"] {
             XCTAssertTrue(app.tabBars.buttons[tab].waitForExistence(timeout: 10), "Missing tab \(tab)")
         }
+        XCTAssertFalse(app.tabBars.buttons["Practice"].exists, "Practice lives in Library")
+        XCTAssertEqual(app.tabBars.buttons.count, 3)
     }
 
     func testGotItPersistsAcrossRelaunch() throws {
@@ -92,8 +148,9 @@ final class SequoiaUITests: XCTestCase {
         let gotIt = app.buttons["gotIt"]
         XCTAssertTrue(gotIt.waitForExistence(timeout: 10), "Today opens directly to the word")
         snapshot("today-before")
-        gotIt.tap()
-        XCTAssertTrue(app.otherElements["growthPanel"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["I already knew this"].exists, "just the word and Got it")
+        XCTAssertFalse(app.buttons["share"].exists)
+        tapGotIt(app)
         snapshot("today-after")
 
         app.terminate()
@@ -110,10 +167,68 @@ final class SequoiaUITests: XCTestCase {
         let seeForest = app.buttons["ceremonySeeForest"]
         XCTAssertTrue(seeForest.waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["A sequoia joined your forest"].exists)
+        // Let the card finish rising; a tap mid-slide lands on the button below.
+        sleep(1)
         snapshot("planting-ceremony")
         seeForest.tap()
         XCTAssertTrue(app.navigationBars["Forest"].waitForExistence(timeout: 5))
         XCTAssertFalse(seeForest.exists)
+        app.terminate()
+        _ = launch(["-devResetClock", "-devResetProgress"])
+    }
+
+    /// A tree planted outside the app (the widget or the watch) gets its
+    /// ceremony the next time the app opens, on any tab, exactly once.
+    func testATreePlantedElsewhereGetsItsCeremonyOnce() throws {
+        var app = launch(["-devEnable", "-devResetProgress", "-devPlantedElsewhere", "-tab", "library"])
+        let done = app.buttons["ceremonyDone"]
+        XCTAssertTrue(done.waitForExistence(timeout: 10))
+        // From fresh progress, the first tree is planted on the first completed day: the welcome tree.
+        XCTAssertTrue(app.staticTexts["Your first sequoia"].exists)
+        snapshot("planted-elsewhere-ceremony")
+        done.tap()
+        XCTAssertFalse(done.waitForExistence(timeout: 2))
+        app.terminate()
+        app = launch(["-devEnable", "-tab", "library"])
+        XCTAssertTrue(app.navigationBars["Library"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["ceremonyDone"].waitForExistence(timeout: 3), "the ceremony plays only once")
+        app.terminate()
+        _ = launch(["-devResetClock", "-devResetProgress"])
+    }
+
+    /// Two weeks earn two rain days; a missed day spends one, Today says so
+    /// quietly, and the streak carries on.
+    func testARainDayCoversAMissedDay() throws {
+        var app = launch(["-devEnable", "-devResetClock", "-devResetProgress", "-devSimulateCheckIns", "14", "-tab", "forest"])
+        XCTAssertTrue(app.navigationBars["Forest"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts["2 rain days saved"].exists, "rain days aren't a counter; they show up when they help")
+        app.terminate()
+        app = launch(["-devEnable", "-devAdvanceDays", "2", "-tab", "today"])
+        let note = app.staticTexts["A rain day kept your young sequoia growing."]
+        XCTAssertTrue(note.waitForExistence(timeout: 10))
+        snapshot("rain-day-today")
+        try audit(app, "Today with a rain day")
+        app.buttons["gotIt"].tap()
+        XCTAssertTrue(app.otherElements["growthPanel"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.otherElements["growthPanel"].label.contains("Day 15 complete"), app.otherElements["growthPanel"].label)
+        app.terminate()
+        _ = launch(["-devResetClock", "-devResetProgress"])
+    }
+
+    /// The dev tool's missed day costs exactly one rain day, whether or not today is done.
+    /// Two weeks hold two rain days: two misses are covered, and a third lapses.
+    func testSimulatedMissedDayUsesOneRainDay() throws {
+        // Today done: tomorrow is missed, and covered.
+        var app = launch(["-devEnable", "-devResetClock", "-devResetProgress", "-devSimulateCheckIns", "14", "-devMissDay", "-tab", "today"])
+        XCTAssertTrue(app.staticTexts["A rain day kept your young sequoia growing."].waitForExistence(timeout: 10))
+        app.terminate()
+        // The rain day covered through yesterday, so today isn't done: today itself is missed.
+        app = launch(["-devEnable", "-devMissDay", "-tab", "today"])
+        XCTAssertTrue(app.staticTexts["A rain day kept your young sequoia growing."].waitForExistence(timeout: 10))
+        app.terminate()
+        // No rain days left: one more miss starts a new seed.
+        app = launch(["-devEnable", "-devMissDay", "-tab", "today"])
+        XCTAssertTrue(app.staticTexts["Plant a new seed today. Your forest is safe."].waitForExistence(timeout: 10))
         app.terminate()
         _ = launch(["-devResetClock", "-devResetProgress"])
     }
@@ -133,6 +248,12 @@ final class SequoiaUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Grown from 30 words"].waitForExistence(timeout: 5))
         snapshot("planted-tree-detail")
         try audit(app, "Tree")
+        app.swipeUp(velocity: .slow)
+        // Let the large title finish collapsing, so the bar's frame (used to skip
+        // contrast under it) matches what's on screen.
+        Thread.sleep(forTimeInterval: 1)
+        try audit(app, "Tree scrolled")
+        app.swipeDown()
         let firstWord = app.buttons.matching(NSPredicate(format: "label CONTAINS[c] %@", ",")).firstMatch
         XCTAssertTrue(firstWord.waitForExistence(timeout: 5))
         firstWord.tap()
@@ -144,6 +265,8 @@ final class SequoiaUITests: XCTestCase {
 
     func testShareSheetOffersTheCardImage() throws {
         let app = launch(["-uiTestingInMemoryStore"])
+        XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
+        tapGotIt(app)
         let share = app.buttons["share"]
         XCTAssertTrue(share.waitForExistence(timeout: 10))
         share.tap()
@@ -152,6 +275,43 @@ final class SequoiaUITests: XCTestCase {
         let appeared = sheet.waitForExistence(timeout: 10) || app.navigationBars["UIActivityContentView"].waitForExistence(timeout: 2)
         snapshot("share-sheet")
         XCTAssertTrue(appeared)
+    }
+
+    /// When the saved store won't open, the app says so instead of quietly
+    /// running on a throwaway store, and still works.
+    func testStoreThatWontOpenIsReported() throws {
+        let app = launch(["-devStoreFailure"], skipOnboarding: false)
+        let alert = app.alerts["Sequoia couldn't open your progress"]
+        XCTAssertTrue(alert.waitForExistence(timeout: 10))
+        snapshot("store-error")
+        alert.buttons["Try Again"].tap()
+        XCTAssertTrue(alert.waitForExistence(timeout: 5), "still failing, so asked again")
+        alert.buttons["Continue Without Saving"].tap()
+        // No onboarding over a store that can't keep its choices; Today works.
+        XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 5))
+        XCTAssertFalse(alert.exists)
+    }
+
+    /// Saving the shared card to Photos asks for permission instead of crashing.
+    func testShareSheetSavesTheCardToPhotos() throws {
+        let app = launch(["-uiTestingInMemoryStore"])
+        XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
+        tapGotIt(app)
+        let share = app.buttons["share"]
+        XCTAssertTrue(share.waitForExistence(timeout: 10))
+        share.tap()
+        // The share sheet lists "Save Image" only when the app declares why it adds to Photos.
+        let save = app.cells["Save Image"]
+        XCTAssertTrue(save.waitForExistence(timeout: 10))
+        save.tap()
+        // The add-only Photos prompt comes from the system; accept it if shown.
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        for label in ["Allow Access", "Allow", "OK"] {
+            let button = springboard.alerts.buttons[label]
+            if button.waitForExistence(timeout: 3) { button.tap(); break }
+        }
+        XCTAssertTrue(app.buttons["share"].waitForExistence(timeout: 10))
+        XCTAssertEqual(app.state, .runningForeground)
     }
 
     func testLibraryEmptyStateSearchAndFavorites() throws {
@@ -227,11 +387,18 @@ final class SequoiaUITests: XCTestCase {
         try requireNotificationTests()
         let thirty = minuteAfter(Date.now.addingTimeInterval(30 * 60))
         let app = launch(["-uiTestingDiskStore", "-uiTestingResetStore", "-devReminderInMinutes", "30"], skipOnboarding: false)
-        XCTAssertTrue(app.buttons["onboardingSkip"].waitForExistence(timeout: 10))
-        app.buttons["onboardingSkip"].tap()
+        XCTAssertTrue(app.buttons["onboardingBegin"].waitForExistence(timeout: 10))
+        app.buttons["onboardingBegin"].tap()
+        // Reminders are turned on from Settings here, so today stays unfinished for the banner.
+        XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
+        app.tabBars.buttons["Forest"].tap()
+        app.buttons["Settings"].tap()
+        app.switches["Daily reminder"].switches.firstMatch.tap()
         let allow = springboard.buttons["Allow"]
-        XCTAssertTrue(allow.waitForExistence(timeout: 5), "skipping onboarding asks for notification permission")
+        XCTAssertTrue(allow.waitForExistence(timeout: 5), "turning on the reminder asks for notification permission")
         allow.tap()
+        app.buttons["Done"].tap()
+        app.tabBars.buttons["Today"].tap()
         let title = app.staticTexts["wordTitle"]
         XCTAssertTrue(title.waitForExistence(timeout: 10))
         let word = title.label
@@ -281,11 +448,17 @@ final class SequoiaUITests: XCTestCase {
     func testNotificationPermissionDeniedDegradesGracefully() throws {
         try requireNotificationTests()
         var app = launch(["-uiTestingDiskStore", "-uiTestingResetStore"], skipOnboarding: false)
-        XCTAssertTrue(app.buttons["onboardingSkip"].waitForExistence(timeout: 10))
-        app.buttons["onboardingSkip"].tap()
+        XCTAssertTrue(app.buttons["onboardingBegin"].waitForExistence(timeout: 10))
+        app.buttons["onboardingBegin"].tap()
+        XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
+        app.tabBars.buttons["Forest"].tap()
+        app.buttons["Settings"].tap()
+        app.switches["Daily reminder"].switches.firstMatch.tap()
         let deny = springboard.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Don'")).firstMatch
         XCTAssertTrue(deny.waitForExistence(timeout: 5))
         deny.tap()
+        app.buttons["Done"].tap()
+        app.tabBars.buttons["Today"].tap()
         XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10), "the core loop still works")
 
         // No repeated prompt on relaunch, or when toggling reminders off and on.
@@ -304,18 +477,25 @@ final class SequoiaUITests: XCTestCase {
         XCTAssertFalse(springboard.alerts.firstMatch.waitForExistence(timeout: 3), "no prompt when re-enabling")
         app.buttons["Done"].tap()
         app.tabBars.buttons["Today"].tap()
-        app.buttons["gotIt"].tap()
-        XCTAssertTrue(app.otherElements["growthPanel"].waitForExistence(timeout: 5))
+        tapGotIt(app)
     }
 
     // MARK: - Practice (Step 11)
 
-    func testPracticeIsLockedUntilEnoughWords() throws {
-        let app = launch(["-uiTestingInMemoryStore", "-tab", "practice"])
-        XCTAssertTrue(app.staticTexts["Practice opens soon"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS '3 more words'")).firstMatch.exists,
-                      "one word seen, three to go")
-        snapshot("practice-locked")
+    /// Practice is hidden in Library until there are enough words to quiz.
+    func testPracticeAppearsInLibraryOnceUnlocked() throws {
+        var app = launch(["-devEnable", "-devResetClock", "-devResetProgress", "-devSimulateCheckIns", "3", "-tab", "library"])
+        XCTAssertTrue(app.navigationBars["Library"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["practiceLink"].waitForExistence(timeout: 2), "three words: no practice yet")
+        app.terminate()
+        app = launch(["-devEnable", "-devAdvanceDays", "1", "-tab", "library"])
+        let link = app.buttons["practiceLink"]
+        XCTAssertTrue(link.waitForExistence(timeout: 10), "the fourth word unlocks practice")
+        snapshot("library-with-practice")
+        link.tap()
+        XCTAssertTrue(app.buttons["practiceGame-definitionMatch"].waitForExistence(timeout: 5))
+        app.terminate()
+        _ = launch(["-devResetClock"])
     }
 
     /// Plays a full round, answering each question with the first option.
@@ -336,14 +516,14 @@ final class SequoiaUITests: XCTestCase {
         return answered
     }
 
-    func testPracticeRoundsAwardRings() throws {
+    func testPracticeRoundsGrowFerns() throws {
         let app = launch(["-devEnable", "-devResetClock", "-devResetProgress", "-devSimulateCheckIns", "6", "-tab", "practice"])
         XCTAssertTrue(app.buttons["practiceGame-definitionMatch"].waitForExistence(timeout: 10))
         snapshot("practice-menu")
 
         XCTAssertEqual(playRound(app, game: "definitionMatch", snapshotPrefix: "practice-definition"), 5)
-        let result = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH '+' AND label ENDSWITH ' rings'")).firstMatch
-        XCTAssertTrue(result.waitForExistence(timeout: 5), "a finished round awards bonus rings")
+        let result = app.staticTexts["practiceFern"]
+        XCTAssertTrue(result.waitForExistence(timeout: 5), "a finished round grows a fern")
         snapshot("practice-result")
         app.buttons["practiceDone"].tap()
 
@@ -357,12 +537,12 @@ final class SequoiaUITests: XCTestCase {
 
     // MARK: - Friends / Game Center (Step 12)
 
+    /// Opens Friends from the row at the end of the Forest tab.
     func scrollToFriends(_ app: XCUIApplication, _ identifier: String) -> XCUIElement {
-        let element = app.descendants(matching: .any)[identifier]
-        for _ in 0..<6 where !(element.exists && element.isHittable) { app.swipeUp() }
-        // Friends is the last section: scroll to the end so it clears the floating tab bar.
-        app.swipeUp()
-        return element
+        let link = app.buttons["friendsLink"]
+        for _ in 0..<6 where !(link.exists && link.isHittable) { app.swipeUp() }
+        link.tap()
+        return app.descendants(matching: .any)[identifier]
     }
 
     /// The real Game Center: the simulator isn't signed in, so Forest shows the opt-in.
@@ -375,8 +555,7 @@ final class SequoiaUITests: XCTestCase {
         snapshot("friends-signed-out")
         // Everything else keeps working without Game Center.
         app.tabBars.buttons["Today"].tap()
-        app.buttons["gotIt"].tap()
-        XCTAssertTrue(app.otherElements["growthPanel"].waitForExistence(timeout: 5))
+        tapGotIt(app)
     }
 
     func testFriendsLeaderboardsWithMockFriends() throws {
@@ -391,12 +570,11 @@ final class SequoiaUITests: XCTestCase {
         XCTAssertEqual(app.descendants(matching: .any).matching(identifier: "leaderboardRow").count, 4)
         snapshot("friends-streak")
 
-        app.buttons["Rings"].tap()
-        let ringsRow = app.descendants(matching: .any).matching(NSPredicate(format: "identifier == 'leaderboardRow-you' AND label CONTAINS ', You, '")).firstMatch
-        XCTAssertTrue(ringsRow.waitForExistence(timeout: 5))
-        let ringsScore = Int(ringsRow.label.components(separatedBy: ", ").last ?? "") ?? 0
-        XCTAssertGreaterThan(ringsScore, 3, "rings were submitted too")
-        snapshot("friends-rings")
+        XCTAssertFalse(app.buttons["Rings"].exists, "no rings board")
+        app.buttons["Trees"].tap()
+        let treesRow = app.descendants(matching: .any).matching(NSPredicate(format: "identifier == 'leaderboardRow-you' AND label ENDSWITH ', You, 1'")).firstMatch
+        XCTAssertTrue(treesRow.waitForExistence(timeout: 5), "the welcome tree was submitted")
+        snapshot("friends-trees")
         app.terminate()
         _ = launch(["-devResetClock", "-devMockSocial", "off"])
     }
@@ -453,6 +631,9 @@ final class SequoiaUITests: XCTestCase {
             // The IPA's spoken label ("Pronunciation /…/") is intentionally longer
             // than the visible text, which the clipping check reads as truncation.
             if issue.auditType == .textClipped, issue.element?.label.hasPrefix("Pronunciation ") == true { return true }
+            // A clipping report with no element points at nothing on screen. It shows up
+            // for a row half under the floating tab bar (screens are also audited scrolled).
+            if issue.auditType == .textClipped, issue.element == nil { return true }
             // The system search field's own text, which the app doesn't lay out.
             if issue.auditType == .textClipped, issue.element?.elementType == .searchField { return true }
             issues.append("\(screen): \(issue.auditType) – \(issue.compactDescription) – \(issue.detailedDescription) – \(issue.element?.debugDescription.prefix(120) ?? "")")
@@ -466,7 +647,7 @@ final class SequoiaUITests: XCTestCase {
             Thread.sleep(forTimeInterval: 1)
             try app.performAccessibilityAudit(for: types, handler)
         }
-        if !issues.isEmpty { print("AUDIT ISSUES:\n" + issues.joined(separator: "\n")) }
+        if !issues.isEmpty { print("AUDIT ISSUES:\n" + issues.joined(separator: "\n")); print("Bars: \(bars)") }
         XCTAssertTrue(issues.isEmpty, "\(issues.count) accessibility issue(s) on \(screen)")
     }
 
@@ -474,8 +655,7 @@ final class SequoiaUITests: XCTestCase {
         var app = launch(["-uiTestingInMemoryStore"])
         XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
         try audit(app, "Today")
-        app.buttons["gotIt"].tap()
-        XCTAssertTrue(app.otherElements["growthPanel"].waitForExistence(timeout: 5))
+        tapGotIt(app)
         try audit(app, "Today (done)")
         app.terminate()
         // Enough seen words to unlock practice, and friends on the leaderboard. Four
@@ -484,7 +664,7 @@ final class SequoiaUITests: XCTestCase {
         XCTAssertTrue(app.otherElements["growthPanel"].waitForExistence(timeout: 10))
         app.tabBars.buttons["Library"].tap()
         try audit(app, "Library")
-        app.tabBars.buttons["Practice"].tap()
+        app.buttons["practiceLink"].tap()
         try audit(app, "Practice")
         app.buttons["practiceGame-definitionMatch"].tap()
         try audit(app, "Practice question")
@@ -493,7 +673,14 @@ final class SequoiaUITests: XCTestCase {
         app.tabBars.buttons["Forest"].tap()
         try audit(app, "Forest")
         app.swipeUp(velocity: .slow)
+        // The page is short enough to bounce at the end; audit once it settles.
+        Thread.sleep(forTimeInterval: 1)
+        snapshot("forest-scrolled")
         try audit(app, "Forest scrolled")
+        app.buttons["friendsLink"].tap()
+        XCTAssertTrue(app.navigationBars["Friends"].waitForExistence(timeout: 5))
+        try audit(app, "Friends")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
         app.swipeDown(velocity: .fast)
         app.buttons["Settings"].tap()
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
@@ -504,13 +691,18 @@ final class SequoiaUITests: XCTestCase {
         _ = launch(["-devResetClock", "-devMockSocial", "off"])
     }
 
+    /// The first-run screens: welcome, the first word with its level menu, and
+    /// the reminder offer after the first "Got it".
     func testAccessibilityAuditOnboarding() throws {
         let app = launch(["-uiTestingInMemoryStore"], skipOnboarding: false)
         XCTAssertTrue(app.buttons["onboardingBegin"].waitForExistence(timeout: 10))
         try audit(app, "Onboarding welcome")
         app.buttons["onboardingBegin"].tap()
-        XCTAssertTrue(app.buttons["difficulty-2"].waitForExistence(timeout: 5))
-        try audit(app, "Onboarding difficulty")
+        XCTAssertTrue(app.buttons["wordLevel"].waitForExistence(timeout: 10))
+        try audit(app, "First word")
+        tapGotIt(app)
+        XCTAssertTrue(app.otherElements["reminderOffer"].waitForExistence(timeout: 5))
+        try audit(app, "Reminder offer", allowingDynamicTypeLimitsOn: ["Reminder time"])
     }
 
     /// What VoiceOver announces along the core loop: the word, its pronunciation,
@@ -527,10 +719,9 @@ final class SequoiaUITests: XCTestCase {
         XCTAssertEqual(gotIt.label, "Got it")
         let streak = app.descendants(matching: .any).matching(NSPredicate(format: "label BEGINSWITH 'No streak yet'")).firstMatch
         XCTAssertTrue(streak.exists, "the tree and streak are described: \(streak.label)")
-        gotIt.tap()
+        tapGotIt(app)
         let panel = app.otherElements["growthPanel"]
-        XCTAssertTrue(panel.waitForExistence(timeout: 5))
-        XCTAssertTrue(panel.label.contains("Day 1 complete"), "the result is announced: \(panel.label)")
-        XCTAssertTrue(panel.label.contains("rings"))
+        XCTAssertTrue(panel.label.contains("Your first sequoia is planted"), "the result is announced: \(panel.label)")
+        XCTAssertTrue(panel.label.contains("29 more words"), "and how far the next tree is: \(panel.label)")
     }
 }

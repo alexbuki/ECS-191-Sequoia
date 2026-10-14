@@ -29,7 +29,9 @@ struct WatchSnapshotTests {
             clock.advance(days: days)
             store.refresh()
             let watch = synced.current(today: store.today)
-            #expect(watch == store.watchSnapshot, "after \(days) day(s) the watch agrees without a sync")
+            let phone = store.watchSnapshot
+            #expect(watch.day == phone.day && watch.wordID == phone.wordID, "after \(days) day(s) the watch agrees without a sync")
+            #expect(watch.growth == phone.growth && watch.isCompleted == phone.isCompleted)
         }
     }
 
@@ -39,6 +41,30 @@ struct WatchSnapshotTests {
         store.checkIn()
         #expect(watch == store.watchSnapshot)
         #expect(watch.checkingIn() == nil, "a second Got it changes nothing")
+    }
+
+    @Test func theWatchLeavesThePlantingDayToThePhone() throws {
+        let store = try makeStore()
+        for day in 0..<(store.engine.config.daysToFullGrowth - 1) {
+            if day > 0 { clock.advance(days: 1); store.refresh() }
+            #expect(store.watchSnapshot.plantsTree() == (day == 0), "the welcome tree is planted on the phone too")
+            store.checkIn()
+        }
+        clock.advance(days: 1)
+        store.refresh()
+        #expect(store.watchSnapshot.plantsTree())
+        store.checkIn()
+        #expect(!store.watchSnapshot.plantsTree())
+    }
+
+    @Test func theWatchUsesThePhonesWordsForTheComingWeek() throws {
+        let store = try makeStore()
+        let synced = store.watchSnapshot
+        for day in 1...WatchSnapshot.upcomingDays {
+            clock.advance(days: 1)
+            store.refresh()
+            #expect(synced.current(today: store.today).wordID == store.todayWord.id, "day \(day)")
+        }
     }
 
     @Test func aMissedDayResetsTheTreeOnTheWatchToo() throws {

@@ -83,6 +83,9 @@ public final class SequoiaStore {
     public var currentClock: AppClock { clock() }
     public var stage: TreeStage { engine.stage(of: growth) }
     public var isStreakAtRisk: Bool { engine.isAtRisk(growth, today: today) }
+    /// Whether completing today would plant the in-progress tree. Widgets and
+    /// the watch hand this day to the app, so the planting is seen there.
+    public var todayPlantsTree: Bool { !todayCompleted && engine.checkInPlantsTree(growth, on: today) }
 
     // MARK: - Refreshing
 
@@ -118,7 +121,15 @@ public final class SequoiaStore {
         if let record = fetchDayRecord(day), let word = provider.word(id: record.wordID) {
             return word
         }
-        return selector.word(for: day, difficulty: settings.difficulty)
+        guard day > today else { return selector.word(for: day, difficulty: settings.difficulty) }
+        return upcomingWords(count: day.days(since: today)).last ?? todayWord
+    }
+
+    /// The words for the days after today, as they will be chosen if nothing
+    /// changes (each skips the words seen before it).
+    public func upcomingWords(count: Int) -> [Word] {
+        selector.words(from: today.adding(days: 1), count: count, difficulty: settings.difficulty,
+                       excluding: seenWordIDs().union([todayWord.id]))
     }
 
     // MARK: - Core loop
@@ -140,7 +151,7 @@ public final class SequoiaStore {
             wordRecord.knewIt = wordRecord.knewIt || knewIt
         }
         if outcome.plantedTree {
-            context.insert(PlantedTreeRecord(index: next.plantedTrees - 1, plantedDay: today.dayNumber))
+            context.insert(PlantedTreeRecord(index: next.plantedTrees - 1, plantedDay: today.dayNumber, ceremonyShown: false))
         }
         save()
         refresh()
@@ -149,14 +160,39 @@ public final class SequoiaStore {
 
     /// Bonus rings for a finished practice round. Returns the rings awarded.
     @discardableResult
-    public func recordPractice(correctAnswers: Int) -> Int {
+    public func recordPractice(_ game: PracticeGame? = nil, correctAnswers: Int) -> Int {
         let progress = fetchProgress()
         let (next, rings) = engine.awardPractice(progress.growthState, correctAnswers: correctAnswers)
         progress.growthState = next
         progress.practiceRounds += 1
+        switch game {
+        case .definitionMatch: progress.bestDefinitionMatch = max(progress.bestDefinitionMatch, correctAnswers)
+        case .fillTheBlank: progress.bestFillTheBlank = max(progress.bestFillTheBlank, correctAnswers)
+        case nil: break
+        }
         save()
         refresh()
         return rings
+    }
+
+    /// Records one practice answer: a miss brings the word back in later
+    /// rounds until it's answered right.
+    public func recordAnswer(wordID: String, correct: Bool) {
+        guard let record = fetchWordRecord(wordID) else { return }
+        record.practiceMisses = correct ? max(0, record.practiceMisses - 1) : record.practiceMisses + 1
+        try? context.save()
+    }
+
+    /// Seen words missed in practice and not yet answered right since.
+    public func wordsToRevisit() -> Set<String> {
+        let descriptor = FetchDescriptor<WordRecord>(predicate: #Predicate { $0.practiceMisses > 0 })
+        return Set(((try? context.fetch(descriptor)) ?? []).map(\.wordID))
+    }
+
+    /// The best score so far in a game, out of `PracticeGenerator.questionsPerRound`.
+    public func bestScore(for game: PracticeGame) -> Int {
+        let progress = fetchProgress()
+        return game == .definitionMatch ? progress.bestDefinitionMatch : progress.bestFillTheBlank
     }
 
     // MARK: - Words
@@ -219,7 +255,38 @@ public final class SequoiaStore {
         return records.compactMap { provider.word(id: $0.wordID) }
     }
 
+    /// Whether `tree` is the welcome tree: the first tree, planted on the first
+    /// completed day. (A tree grown the usual way has 30 completed days behind it.)
+    public func isWelcomeTree(_ tree: PlantedTreeRecord) -> Bool {
+        guard tree.index == 0 else { return false }
+        let day = tree.plantedDay
+        let completedOnDay = FetchDescriptor<DayRecord>(
+            predicate: #Predicate { $0.dayNumber == day && $0.completedAt != nil })
+        let completedBefore = FetchDescriptor<DayRecord>(
+            predicate: #Predicate { $0.dayNumber < day && $0.completedAt != nil })
+        return ((try? context.fetchCount(completedOnDay)) ?? 0) > 0
+            && ((try? context.fetchCount(completedBefore)) ?? 0) == 0
+    }
+
     public var practiceRounds: Int { fetchProgress().practiceRounds }
+
+    /// How many seen words are favorites, counted in the store without loading them.
+    public var favoriteCount: Int {
+        (try? context.fetchCount(FetchDescriptor<WordRecord>(predicate: #Predicate { $0.isFavorite }))) ?? 0
+    }
+
+    /// Planted trees whose ceremony hasn't played yet, oldest first.
+    public func treesAwaitingCeremony() -> [PlantedTreeRecord] {
+        let descriptor = FetchDescriptor<PlantedTreeRecord>(predicate: #Predicate { !$0.ceremonyShown },
+                                                            sortBy: [SortDescriptor(\.index)])
+        return (try? context.fetch(descriptor)) ?? []
+    }
+
+    /// Records that every planted tree has had its ceremony.
+    public func markCeremoniesShown() {
+        for tree in treesAwaitingCeremony() { tree.ceremonyShown = true }
+        save()
+    }
 
     // MARK: - Settings
 
@@ -257,6 +324,14 @@ public final class SequoiaStore {
             state.plantedTrees += 1
         }
         progress.growthState = state
+        save()
+        refresh()
+    }
+
+    /// Adds a rain day, up to the cap.
+    public func devGrantRainDay() {
+        let progress = fetchProgress()
+        progress.rainDays = min(engine.config.maxRainDays, progress.rainDays + 1)
         save()
         refresh()
     }
@@ -313,9 +388,14 @@ public final class SequoiaStore {
 
     private func ensureDayRecord(for day: DayStamp, difficulty: Difficulty) -> DayRecord {
         if let existing = fetchDayRecord(day) { return existing }
-        let record = DayRecord(dayNumber: day.dayNumber, wordID: selector.word(for: day, difficulty: difficulty).id)
+        let word = selector.word(for: day, difficulty: difficulty, excluding: seenWordIDs())
+        let record = DayRecord(dayNumber: day.dayNumber, wordID: word.id)
         context.insert(record)
         return record
+    }
+
+    private func seenWordIDs() -> Set<String> {
+        Set(((try? context.fetch(FetchDescriptor<WordRecord>())) ?? []).map(\.wordID))
     }
 
     private func markSeen(wordID: String, on day: DayStamp) {
@@ -326,7 +406,8 @@ public final class SequoiaStore {
     /// A new difficulty takes effect immediately, unless today is already done.
     private func swapTodayWordIfUnfinished(difficulty: Difficulty) {
         guard let record = fetchDayRecord(today), !record.isCompleted else { return }
-        let replacement = selector.word(for: today, difficulty: difficulty)
+        let replacement = selector.word(for: today, difficulty: difficulty,
+                                        excluding: seenWordIDs().subtracting([record.wordID]))
         guard replacement.id != record.wordID else { return }
         if let old = fetchWordRecord(record.wordID), !old.isFavorite, !old.isCompleted, old.firstSeenDay == today.dayNumber {
             context.delete(old)

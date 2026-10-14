@@ -34,8 +34,11 @@ final class WatchModel: NSObject, WCSessionDelegate {
         snapshot = WatchSnapshotStore.current()
     }
 
+    /// Today plants the tree, which happens on the iPhone so it's seen there.
+    var plantsTree: Bool { snapshot.plantsTree() }
+
     func gotIt() {
-        guard let next = snapshot.checkingIn() else { return }
+        guard !plantsTree, let next = snapshot.checkingIn() else { return }
         apply(next)
         checkInCount += 1
         let message: [String: Any] = [WatchSnapshot.gotItKey: next.day.dayNumber]
