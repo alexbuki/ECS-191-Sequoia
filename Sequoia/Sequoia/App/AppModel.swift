@@ -29,6 +29,13 @@ final class AppModel {
     var showsStoreError: Bool { storeError != nil && !storeErrorAcknowledged }
     var hasStoreError: Bool { storeError != nil }
 
+    /// Whether onboarding shows, decided at launch (so a reset brings it back on
+    /// the next launch, not in the middle of Settings).
+    private(set) var needsOnboarding = false
+
+    /// The full-screen "Practice is unlocked" page (set by Today on day four).
+    var showsPracticeUnlocked = false
+
     init(store: SequoiaStore? = nil) {
         #if SEQUOIA_DEV
         LaunchTiming.mark("appmodel-init")
@@ -57,6 +64,7 @@ final class AppModel {
             if DevLaunchActions.opensPractice { selectedTab = .library; opensPractice = true }
         }
         #endif
+        decideOnboarding()
         // Connected after the launch tools run; `storeDidChange` below covers their changes.
         connectStore()
         notifications.app = self
@@ -108,6 +116,7 @@ final class AppModel {
         storeErrorAcknowledged = false
         store = SequoiaStore(container: opened.container)
         setUpFirstLaunch()
+        decideOnboarding()
         connectStore()
         storeDidChange()
     }
@@ -122,33 +131,59 @@ final class AppModel {
     }
 
     /// Erases progress here and in the iCloud backup, so it isn't restored.
+    /// Onboarding comes back on the next launch.
     func resetProgress() {
         cloudBackup.clear()
         store.resetProgress()
+        store.updateSettings { $0.hasCompletedOnboarding = false }
+    }
+
+    /// Onboarding shows until it's finished. Anyone who has already learned a
+    /// word (restored from iCloud, or from the watch) skips it.
+    private func decideOnboarding() {
+        guard storeError == nil else { return needsOnboarding = false }
+        if ProcessInfo.processInfo.arguments.contains("-uiTestingSkipOnboarding"), !store.settings.hasCompletedOnboarding {
+            // As if Begin were tapped with the defaults, so later launches aren't first launches.
+            store.updateSettings { $0.hasCompletedOnboarding = true }
+        }
+        needsOnboarding = !store.settings.hasCompletedOnboarding && store.growth.totalCheckIns == 0
     }
 
     /// Shows the ceremony for any tree planted since the last one played.
     func presentPendingCeremony() {
-        guard ceremony == nil, let moment = PlantedTreeMoment.pending(in: store) else { return }
+        guard ceremony == nil, !needsOnboarding, let moment = PlantedTreeMoment.pending(in: store) else { return }
         ceremony = moment
         store.markCeremoniesShown()
     }
 
-    /// There is no onboarding: the first launch opens on the first word. The
-    /// default difficulty applies (changeable from the first word), and the
-    /// reminder is offered after the first "Got it", once the app has shown its value.
-    /// `hasCompletedOnboarding` now records that these defaults were applied.
+    /// First-launch defaults, applied before onboarding: reminders stay off until
+    /// onboarding turns them on. If onboarding is skipped (an existing tree), the
+    /// reminder is offered after the next "Got it".
     private func setUpFirstLaunch() {
         guard storeError == nil, !store.settings.hasCompletedOnboarding else { return }
         UserDefaults.standard.removeObject(forKey: Self.reminderOfferDismissedKey)
+        UserDefaults.standard.removeObject(forKey: Self.practiceNudgeDismissedKey)
+        store.updateSettings { $0.notificationsEnabled = false }
+    }
+
+    /// Finishes the one-screen onboarding with the chosen word level, and turns
+    /// on the daily reminder (asking for permission) if the user wants one.
+    /// The reminder was asked here, so it isn't offered again after the first "Got it".
+    func completeOnboarding(level: Difficulty, reminderAt time: DateComponents?) {
+        UserDefaults.standard.set(true, forKey: Self.reminderOfferDismissedKey)
         store.updateSettings { settings in
-            settings.notificationsEnabled = false
+            settings.difficulty = level
             settings.hasCompletedOnboarding = true
         }
+        needsOnboarding = false
+        if let time { Task { await enableReminder(at: time) } }
     }
 
     /// Set when the user answers "Not now" to the reminder offer.
     static let reminderOfferDismissedKey = "reminderOfferDismissed"
+
+    /// Set once the "Practice is unlocked" page has been closed.
+    static let practiceNudgeDismissedKey = "practiceNudgeDismissed"
 
     /// Turns on the daily reminder at `time` and asks for permission if needed.
     func enableReminder(at time: DateComponents) async {

@@ -28,7 +28,7 @@ final class WidgetUITests: XCTestCase {
     /// Widgets read the developer store, which the App Group shares with them.
     func launch(_ extra: [String] = []) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-devEnable"] + extra
+        app.launchArguments = ["-devEnable", "-uiTestingSkipOnboarding"] + extra
         app.launch()
         return app
     }

@@ -19,7 +19,10 @@ enum DevLaunchActions {
     /// Applied to the opened store.
     static func apply(to store: SequoiaStore) {
         let arguments = ProcessInfo.processInfo.arguments
-        if arguments.contains("-devResetProgress") { store.resetProgress() }
+        if arguments.contains("-devResetProgress") {
+            store.resetProgress()
+            UserDefaults.standard.removeObject(forKey: AppModel.practiceNudgeDismissedKey)
+        }
         if let count = value(after: "-devFillForest") { store.devFillForest(adding: count) }
         if let raw = value(after: "-devJumpStage"), let stage = TreeStage(rawValue: raw) { store.devJump(to: stage) }
         if let days = value(after: "-devSimulateCheckIns") { simulateCheckIns(days: days, store: store) }

@@ -31,20 +31,19 @@ final class TodayViewModel {
     var treeDays: Int { store.growth.treeDays }
     var daysToFullGrowth: Int { store.engine.config.daysToFullGrowth }
 
-    /// Before the very first "Got it": the word's level can still be changed
-    /// right here, in place of an onboarding question.
+    /// Before the very first "Got it", when a hint explains the button.
     var isFirstWord: Bool { !isCompleted && store.growth.totalCheckIns == 0 }
-
-    var difficulty: Difficulty {
-        get { store.settings.difficulty }
-        set { store.updateSettings { $0.difficulty = newValue } }
-    }
 
     /// Right after the first "Got it", the daily reminder is offered (it isn't
     /// asked during onboarding, before the app has shown what it does).
     var offersReminder: Bool {
         isCompleted && store.growth.totalCheckIns == 1 && !store.settings.notificationsEnabled
             && !store.settings.hasRequestedNotificationPermission
+    }
+
+    /// On the day Practice unlocks (enough words learned to quiz), Today says so.
+    var announcesPractice: Bool {
+        isCompleted && store.growth.totalCheckIns == PracticeGenerator.minimumSeenWords
     }
 
     var reminderTime: DateComponents {

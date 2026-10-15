@@ -7,6 +7,7 @@ struct TodayView: View {
     @State private var model: TodayViewModel
     @Environment(AppModel.self) private var app
     @AppStorage(AppModel.reminderOfferDismissedKey) private var reminderOfferDismissed = false
+    @AppStorage(AppModel.practiceNudgeDismissedKey) private var practiceNudgeDismissed = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -25,9 +26,6 @@ struct TodayView: View {
                         }
                         .buttonStyle(IconButtonStyle())
                         .accessibilityLabel("Play pronunciation")
-                    }
-                    if model.isFirstWord {
-                        wordLevelMenu
                     }
                     // Favorite and share come after the word is learned, so before
                     // "Got it" the screen holds just the word and the button.
@@ -62,6 +60,14 @@ struct TodayView: View {
         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: model.checkInCount)
         .sensoryFeedback(.success, trigger: model.plantedCount)
         .task(id: model.word.id) { model.prepareShareImage() }
+        // On the day Practice unlocks, a moment after the tree grows.
+        .onChange(of: model.announcesPractice, initial: true) { _, announces in
+            guard announces, !practiceNudgeDismissed else { return }
+            Task {
+                try? await Task.sleep(for: .seconds(1.2))
+                app.showsPracticeUnlocked = true
+            }
+        }
         #if SEQUOIA_DEV
         .onAppear { LaunchTiming.wordDidAppear() }
         #endif
@@ -81,27 +87,6 @@ struct TodayView: View {
             StreakChip(stage: model.stage, day: model.streak)
                 .animation(Theme.Motion.growth(reduceMotion: reduceMotion), value: model.streak)
         }
-    }
-
-    /// On the first word only: change its level in place, instead of being
-    /// asked up front before seeing a single word.
-    private var wordLevelMenu: some View {
-        Menu {
-            Picker("Word level", selection: $model.difficulty) {
-                ForEach(Difficulty.allCases) { Text($0.title).tag($0) }
-            }
-        } label: {
-            Label("Word level: \(model.difficulty.title)", systemImage: "slider.horizontal.3")
-                .font(Typography.callout.weight(.semibold))
-                .foregroundStyle(Theme.Palette.bark)
-                .padding(.horizontal, Theme.Spacing.m)
-                .frame(minHeight: Theme.Size.minTapTarget)
-                // On a surface, since the forest stands behind this part of the screen.
-                .background(Theme.Palette.surface, in: Capsule())
-                .contentShape(Capsule())
-        }
-        .accessibilityHint("Swaps today's word for an easier or harder one")
-        .accessibilityIdentifier("wordLevel")
     }
 
     private var secondaryActions: some View {
@@ -147,7 +132,7 @@ struct TodayView: View {
                         .accessibilityIdentifier("rainNote")
                 }
                 if model.isFirstWord {
-                    // There is no onboarding, so the first word says what the button does.
+                    // The first word says what the button does.
                     Text("One word a day. Tap Got it to plant your first tree.")
                         .font(Typography.callout)
                         .foregroundStyle(Theme.Palette.soil)
@@ -286,6 +271,61 @@ struct GrowthPanel: View {
         }
         if isPlanting { return Text("A new seed is planted. See you tomorrow.") }
         return Text("^[\(wordsToGo) more word](inflect: true) to a grown sequoia.")
+    }
+}
+
+/// Shown once, full screen, on the day Practice unlocks: a small celebration.
+struct PracticeUnlockedView: View {
+    let words: Int
+    let done: () -> Void
+    @State private var appeared = false
+
+    var body: some View {
+        // Centered when it fits; scrolls at large text sizes, with Got it pinned below.
+        GeometryReader { geometry in
+            ScrollView {
+                VStack(spacing: Theme.Spacing.l) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 56, weight: .semibold))
+                        .foregroundStyle(Theme.Palette.canopy)
+                        .frame(width: 128, height: 128)
+                        .background(Theme.Palette.moss, in: Circle())
+                        .symbolEffect(.bounce, options: .repeat(2), value: appeared)
+                        .accessibilityHidden(true)
+                    VStack(spacing: Theme.Spacing.s) {
+                        Text("Practice is unlocked!")
+                            .font(Typography.wordHero)
+                            .multilineTextAlignment(.center)
+                            .accessibilityAddTraits(.isHeader)
+                        Text("You've learned \(words) words. Put them to the test with quick games, and every round grows a fern in your forest.")
+                            .font(Typography.body)
+                            .foregroundStyle(Theme.Palette.soilSecondary)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Text("Find it at the top of Library.")
+                            .font(Typography.callout.weight(.semibold))
+                            .foregroundStyle(Theme.Palette.bark)
+                            .multilineTextAlignment(.center)
+                            .padding(.top, Theme.Spacing.xs)
+                    }
+                }
+                .padding(Theme.Spacing.l)
+                .frame(maxWidth: .infinity, minHeight: geometry.size.height)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+        }
+        .safeAreaInset(edge: .bottom) {
+            Button("Got it", action: done)
+                .buttonStyle(.sequoiaPrimary)
+                .accessibilityIdentifier("practiceUnlockedDone")
+                .padding(.horizontal, Theme.Spacing.l)
+                .padding(.bottom, Theme.Spacing.m)
+        }
+        .sequoiaScreen()
+        .sensoryFeedback(.success, trigger: appeared)
+        .onAppear { appeared = true }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("practiceUnlocked")
     }
 }
 
