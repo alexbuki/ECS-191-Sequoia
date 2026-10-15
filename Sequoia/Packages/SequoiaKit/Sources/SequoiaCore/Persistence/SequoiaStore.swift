@@ -213,7 +213,7 @@ public final class SequoiaStore {
 
     /// Every word the user has seen, newest first.
     public func seenWords() -> [SeenWord] {
-        let descriptor = FetchDescriptor<WordRecord>(sortBy: [SortDescriptor(\.firstSeenDay, order: .reverse)])
+        let descriptor = FetchDescriptor<WordRecord>(sortBy: [SortDescriptor(\.firstSeenDay, order: .reverse), SortDescriptor(\.wordID)])
         let records = (try? context.fetch(descriptor)) ?? []
         return records.compactMap { record in
             guard let word = provider.word(id: record.wordID) else { return nil }

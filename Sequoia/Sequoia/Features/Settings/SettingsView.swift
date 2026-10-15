@@ -78,9 +78,9 @@ struct SettingsView: View {
                 }
             }
             .confirmationDialog("Reset all progress?", isPresented: $confirmsReset, titleVisibility: .visible) {
-                Button("Reset progress", role: .destructive) { store.resetProgress() }
+                Button("Reset progress", role: .destructive) { app.resetProgress() }
             } message: {
-                Text("Your streak, forest and word history will be erased.")
+                Text("Your streak, forest and word history will be erased, here and in iCloud.")
             }
             .task { await refreshAuthorization() }
         }

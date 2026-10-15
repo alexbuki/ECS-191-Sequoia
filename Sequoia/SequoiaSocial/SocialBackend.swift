@@ -5,7 +5,7 @@ import Foundation
 // loaded after launch: linking GameKit into the app adds over a second to cold
 // launch on the simulator.
 
-/// The three leaderboards. Their IDs must match the leaderboards configured in
+/// The two leaderboards (streak and trees). Their IDs must match the leaderboards configured in
 /// App Store Connect for the app.
 public enum LeaderboardKind: String, CaseIterable, Identifiable, Sendable {
     case streak, trees

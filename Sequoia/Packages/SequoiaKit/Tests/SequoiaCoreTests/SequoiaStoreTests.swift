@@ -215,3 +215,53 @@ struct SequoiaStoreTests {
         #expect(calls > 0)
     }
 }
+
+@MainActor
+struct BackupTests {
+    let clock = TestClock(Date(timeIntervalSince1970: 1_790_850_000))
+
+    func makeStore() throws -> SequoiaStore {
+        let clock = self.clock
+        return SequoiaStore(container: try Persistence.makeContainer(.inMemory), clock: { clock.clock })
+    }
+
+    @Test func backupRestoresEverythingOnAFreshInstall() throws {
+        let original = try makeStore()
+        for _ in 0..<3 {
+            original.checkIn()
+            clock.advance(days: 1)
+            original.refresh()
+        }
+        original.toggleFavorite(original.todayWord.id)
+        original.recordPractice(.fillTheBlank, correctAnswers: 4)
+        original.updateSettings { $0.difficulty = .erudite; $0.reminderHour = 21 }
+        let backup = original.makeBackup()
+
+        let data = try backup.encoded()
+        let decoded = try Backup(decoding: data)
+        #expect(decoded == backup)
+
+        let fresh = try makeStore()
+        fresh.restore(decoded)
+        #expect(fresh.growth == original.growth)
+        #expect(fresh.completedDays() == original.completedDays())
+        #expect(fresh.seenWords() == original.seenWords())
+        #expect(fresh.plantedTrees().map(\.index) == original.plantedTrees().map(\.index))
+        #expect(fresh.treesAwaitingCeremony().isEmpty)
+        #expect(fresh.settings.difficulty == .erudite)
+        #expect(fresh.settings.reminderHour == 21)
+        #expect(fresh.todayWord == original.todayWord)
+        #expect(fresh.makeBackup() == backup)
+    }
+
+    @Test func fiveYearsOfProgressFitsInKeyValueStorage() throws {
+        let store = try makeStore()
+        for _ in 0..<(365 * 5) {
+            store.checkIn()
+            clock.advance(days: 1)
+            store.refresh()
+        }
+        let size = try store.makeBackup().encoded().count
+        #expect(size < 1_000_000 / 4, "backup is \(size) bytes")
+    }
+}

@@ -62,6 +62,7 @@
 		B54731BAA24A6B6A5FAC1372 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D8A03A60D0E3FC7C38951A0D /* PrivacyInfo.xcprivacy */; };
 		B85AE3AB3713E495697E7521 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4C1DEDB4F8F8EB500BD4488 /* WidgetKit.framework */; };
 		BEDA40345BA85463EEC72FD9 /* SequoiaWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E441C02BD3D2FF20CB48A349 /* SequoiaWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C3FBBCBDFD4726D8B6B0F267 /* CloudBackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12A1C926F1998B140CAAFDEC /* CloudBackupService.swift */; };
 		D1BE122BFBFBC1CDFD2B0C87 /* WordTimelineProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E299AB3E1AC946276BB6D0F /* WordTimelineProvider.swift */; };
 		D2ED48DAF3264A4E0CFC2ED4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E00022954444F63A934D2ADD /* PrivacyInfo.xcprivacy */; };
 		D5A49B913EAD0F4738176E76 /* SequoiaWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE9B468F30728F01468EC35 /* SequoiaWidgetsBundle.swift */; };
@@ -204,6 +205,7 @@
 		0DE9660DEAA5BC7CF8232A31 /* WatchSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSyncService.swift; sourceTree = "<group>"; };
 		0E13A10658D17CA74C4E0091 /* SequoiaWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SequoiaWidgets.entitlements; sourceTree = "<group>"; };
 		1190E18848081C92E5DBB7FA /* DevLaunchActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevLaunchActions.swift; sourceTree = "<group>"; };
+		12A1C926F1998B140CAAFDEC /* CloudBackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudBackupService.swift; sourceTree = "<group>"; };
 		1802828E01CECB8A815682D8 /* Sequoia.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Sequoia.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F179AD0F0D678398B9818D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		24E01A1BA93071AE87693285 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -572,6 +574,7 @@
 		FDB8EF34A9CF307DC2CE9020 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				12A1C926F1998B140CAAFDEC /* CloudBackupService.swift */,
 				D5DF1A160CA93DEA18A2DC46 /* ForestAtmosphere+Store.swift */,
 				B6D9738ECBFCEDD69E70405F /* NotificationService.swift */,
 				EDAB8E33B5583AEFD5927CFD /* PronunciationPlayer.swift */,
@@ -903,6 +906,7 @@
 				707403B17C9F32640C31CBE2 /* AboutView.swift in Sources */,
 				E1B54B441D7DA24BEE6A26F4 /* AppModel.swift in Sources */,
 				3AFEFE1794E64E16F723CB20 /* AppTab.swift in Sources */,
+				C3FBBCBDFD4726D8B6B0F267 /* CloudBackupService.swift in Sources */,
 				27DF2E42AE0A8450667E43B0 /* DeferredGameCenterBackend.swift in Sources */,
 				72D77BEF1C514FB13A97BE6C /* DevLaunchActions.swift in Sources */,
 				59756EDD9D17AB3B70F874EE /* DevModeBadge.swift in Sources */,

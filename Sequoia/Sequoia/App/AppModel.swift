@@ -18,6 +18,7 @@ final class AppModel {
     var ceremony: PlantedTreeMoment?
     let notifications = NotificationService()
     let watchSync = WatchSyncService()
+    let cloudBackup = CloudBackupService()
     private(set) var social: SocialModel
     private var rescheduleTask: Task<Void, Never>?
     /// Set when the saved store wouldn't open and a throwaway one is in use,
@@ -26,6 +27,7 @@ final class AppModel {
     /// The user chose to carry on without saving; asked again on the next failed retry.
     var storeErrorAcknowledged = false
     var showsStoreError: Bool { storeError != nil && !storeErrorAcknowledged }
+    var hasStoreError: Bool { storeError != nil }
 
     init(store: SequoiaStore? = nil) {
         #if SEQUOIA_DEV
@@ -67,6 +69,8 @@ final class AppModel {
             startSocial()
             watchSync.app = self
             watchSync.activate()
+            cloudBackup.app = self
+            cloudBackup.activate()
         }
         #if SEQUOIA_DEV
         LaunchTiming.mark("appmodel-done")
@@ -113,7 +117,14 @@ final class AppModel {
     func sceneDidBecomeActive() {
         if storeError != nil { return rebuildStore() }
         store.reloadFromDisk()
+        cloudBackup.restoreIfRicher()
         storeDidChange()
+    }
+
+    /// Erases progress here and in the iCloud backup, so it isn't restored.
+    func resetProgress() {
+        cloudBackup.clear()
+        store.resetProgress()
     }
 
     /// Shows the ceremony for any tree planted since the last one played.
@@ -165,7 +176,7 @@ final class AppModel {
     }
 
     /// Side effects after any change to user state, coalesced.
-    private func storeDidChange() {
+    func storeDidChange() {
         presentPendingCeremony()
         rescheduleTask?.cancel()
         rescheduleTask = Task { [weak self] in
@@ -174,6 +185,7 @@ final class AppModel {
             WidgetCenter.shared.reloadAllTimelines()
             // A throwaway store would overwrite the watch's copy with empty progress.
             if self.storeError == nil { self.watchSync.send(self.store.watchSnapshot) }
+            self.cloudBackup.save()
             await self.notifications.reschedule(store: self.store)
             await self.social.submitScores(from: self.store.growth)
         }

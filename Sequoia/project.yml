@@ -49,9 +49,13 @@ targets:
       properties:
         com.apple.security.application-groups: [group.app.sequoia.Sequoia]
         com.apple.developer.game-center: true
+        # iCloud key-value storage holds the progress backup (CloudBackupService).
+        com.apple.developer.ubiquity-kvstore-identifier: $(TeamIdentifierPrefix)$(CFBundleIdentifier)
     info:
       path: Sequoia/Info.plist
       properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleDisplayName: Sequoia
         CFBundleURLTypes:
           - CFBundleURLName: app.sequoia.Sequoia
@@ -118,6 +122,8 @@ targets:
     info:
       path: SequoiaWidgets/Info.plist
       properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleDisplayName: Sequoia
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
@@ -176,6 +182,8 @@ targets:
     info:
       path: SequoiaWatchWidgets/Info.plist
       properties:
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleDisplayName: Sequoia
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension

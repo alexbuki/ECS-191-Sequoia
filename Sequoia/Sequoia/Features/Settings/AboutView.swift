@@ -32,6 +32,12 @@ struct AboutView: View {
                     Text("GRE® is a registered trademark of ETS. Sequoia is not endorsed by or affiliated with ETS.")
                 }
 
+                section(title: "Your privacy") {
+                    Text("Sequoia collects nothing. Your progress stays on your iPhone, with a backup in your own iCloud account.")
+                    Link("Privacy Policy", destination: URL(string: "https://github.com/alexbuki/ECS-191-Sequoia/blob/main/PRIVACY.md")!)
+                        .foregroundStyle(Theme.Palette.canopy)
+                }
+
                 Text("Version \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0")")
                     .font(Typography.caption)
                     .foregroundStyle(Theme.Palette.soilSecondary)
