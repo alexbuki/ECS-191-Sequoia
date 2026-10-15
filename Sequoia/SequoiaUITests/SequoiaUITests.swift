@@ -18,9 +18,9 @@ final class SequoiaUITests: XCTestCase {
         }
     }
 
-    func launch(_ arguments: [String], skipOnboarding: Bool = true) -> XCUIApplication {
+    func launch(_ arguments: [String]) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = arguments + (skipOnboarding ? ["-uiTestingSkipOnboarding"] : [])
+        app.launchArguments = arguments
         app.launch()
         return app
     }
@@ -45,20 +45,17 @@ final class SequoiaUITests: XCTestCase {
         XCTAssertTrue(app.otherElements["growthPanel"].waitForExistence(timeout: 5))
     }
 
-    /// Time to magic: one tap from the welcome screen to the first word, and the
-    /// first "Got it" plants a tree with its ceremony.
+    /// Time to magic: the first launch opens on the first word, with no screen
+    /// before it, and the first "Got it" plants a tree with its ceremony.
     func testFirstLaunchReachesTheFirstTreeFast() throws {
-        var app = launch(["-uiTestingDiskStore", "-uiTestingResetStore"], skipOnboarding: false)
-        XCTAssertTrue(app.buttons["onboardingBegin"].waitForExistence(timeout: 10))
-        // The user's time starts when the welcome screen appears, not while
-        // XCUITest sets up its automation session.
-        let start = Date()
-        snapshot("onboarding-welcome")
-        app.buttons["onboardingBegin"].tap()
+        // `launch` waits until the app is idle, so the word must already be the
+        // first screen. (Launch-to-word time itself, about 0.7 s, is logged by
+        // `LaunchTiming` and measured by `testColdLaunchPerformance`; XCUITest's
+        // own setup takes longer than that.)
+        var app = launch(["-uiTestingDiskStore", "-uiTestingResetStore"])
         let word = app.staticTexts["wordTitle"]
-        XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
-        XCTAssertLessThan(Date().timeIntervalSince(start), 10, "the first word is on screen within 10 seconds")
-        XCTAssertFalse(app.buttons["onboardingBegin"].exists)
+        XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 3), "the first launch opens on the first word")
+        XCTAssertTrue(app.staticTexts["firstWordHint"].exists, "the first word says what Got it does")
         XCTAssertEqual(word.value as? String, "Elevated", "the default level, with no question asked")
         XCTAssertFalse(springboard.alerts.firstMatch.exists, "no permission prompt before the first word")
         snapshot("today-first-word")
@@ -92,9 +89,8 @@ final class SequoiaUITests: XCTestCase {
         XCTAssertTrue(offer.waitForNonExistence(timeout: 5))
 
         app.terminate()
-        app = launch(["-uiTestingDiskStore"], skipOnboarding: false)
+        app = launch(["-uiTestingDiskStore"])
         XCTAssertTrue(app.otherElements["growthPanel"].waitForExistence(timeout: 10))
-        XCTAssertFalse(app.buttons["onboardingBegin"].exists, "onboarding shows only on first launch")
         XCTAssertFalse(app.otherElements["reminderOffer"].exists, "Not now is remembered")
         XCTAssertFalse(app.buttons["ceremonyDone"].exists, "the ceremony plays once")
         app.tabBars.buttons["Forest"].tap()
@@ -104,9 +100,7 @@ final class SequoiaUITests: XCTestCase {
 
     /// "Remind me" turns on the daily reminder at the chosen time.
     func testReminderOfferTurnsOnTheReminder() throws {
-        let app = launch(["-uiTestingInMemoryStore"], skipOnboarding: false)
-        XCTAssertTrue(app.buttons["onboardingBegin"].waitForExistence(timeout: 10))
-        app.buttons["onboardingBegin"].tap()
+        let app = launch(["-uiTestingInMemoryStore"])
         XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
         tapGotIt(app)
         let accept = app.buttons["reminderOfferAccept"]
@@ -132,6 +126,32 @@ final class SequoiaUITests: XCTestCase {
         app.buttons["Done"].tap()
         app.tabBars.buttons["Today"].tap()
         XCTAssertEqual(app.staticTexts["wordTitle"].value as? String, "Everyday")
+    }
+
+    func testFirstWordCanSwitchToGREWords() throws {
+        let app = launch(["-uiTestingInMemoryStore"])
+        let title = app.staticTexts["wordTitle"]
+        XCTAssertTrue(title.waitForExistence(timeout: 10))
+        let before = title.label
+        app.buttons["wordLevel"].tap()
+        XCTAssertTrue(app.buttons["GRE"].waitForExistence(timeout: 5))
+        snapshot("word-level-menu")
+        app.buttons["GRE"].tap()
+        XCTAssertTrue(app.buttons["wordLevel"].label.contains("GRE"))
+        XCTAssertNotEqual(title.label, before, "the first word swaps to a GRE word")
+        snapshot("word-level-gre")
+    }
+
+    func testAboutExplainsWhereTheWordsComeFrom() throws {
+        let app = launch(["-uiTestingInMemoryStore"])
+        XCTAssertTrue(app.staticTexts["wordTitle"].waitForExistence(timeout: 10))
+        app.tabBars.buttons["Forest"].tap()
+        app.buttons["Settings"].tap()
+        app.buttons["About Sequoia"].firstMatch.tap()
+        let notice = app.staticTexts.containing(NSPredicate(format: "label CONTAINS 'not endorsed by or affiliated with ETS'")).firstMatch
+        app.swipeUp()
+        XCTAssertTrue(notice.waitForExistence(timeout: 5))
+        snapshot("about-words")
     }
 
     func testShowsThreeTabs() throws {
@@ -280,14 +300,14 @@ final class SequoiaUITests: XCTestCase {
     /// When the saved store won't open, the app says so instead of quietly
     /// running on a throwaway store, and still works.
     func testStoreThatWontOpenIsReported() throws {
-        let app = launch(["-devStoreFailure"], skipOnboarding: false)
+        let app = launch(["-devStoreFailure"])
         let alert = app.alerts["Sequoia couldn't open your progress"]
         XCTAssertTrue(alert.waitForExistence(timeout: 10))
         snapshot("store-error")
         alert.buttons["Try Again"].tap()
         XCTAssertTrue(alert.waitForExistence(timeout: 5), "still failing, so asked again")
         alert.buttons["Continue Without Saving"].tap()
-        // No onboarding over a store that can't keep its choices; Today works.
+        // Today works on a store that can't save.
         XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 5))
         XCTAssertFalse(alert.exists)
     }
@@ -386,9 +406,7 @@ final class SequoiaUITests: XCTestCase {
     func testNotificationFiresWithWordReschedulesAndGotItGrowsTree() throws {
         try requireNotificationTests()
         let thirty = minuteAfter(Date.now.addingTimeInterval(30 * 60))
-        let app = launch(["-uiTestingDiskStore", "-uiTestingResetStore", "-devReminderInMinutes", "30"], skipOnboarding: false)
-        XCTAssertTrue(app.buttons["onboardingBegin"].waitForExistence(timeout: 10))
-        app.buttons["onboardingBegin"].tap()
+        let app = launch(["-uiTestingDiskStore", "-uiTestingResetStore", "-devReminderInMinutes", "30"])
         // Reminders are turned on from Settings here, so today stays unfinished for the banner.
         XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
         app.tabBars.buttons["Forest"].tap()
@@ -447,9 +465,7 @@ final class SequoiaUITests: XCTestCase {
 
     func testNotificationPermissionDeniedDegradesGracefully() throws {
         try requireNotificationTests()
-        var app = launch(["-uiTestingDiskStore", "-uiTestingResetStore"], skipOnboarding: false)
-        XCTAssertTrue(app.buttons["onboardingBegin"].waitForExistence(timeout: 10))
-        app.buttons["onboardingBegin"].tap()
+        var app = launch(["-uiTestingDiskStore", "-uiTestingResetStore"])
         XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
         app.tabBars.buttons["Forest"].tap()
         app.buttons["Settings"].tap()
@@ -463,7 +479,7 @@ final class SequoiaUITests: XCTestCase {
 
         // No repeated prompt on relaunch, or when toggling reminders off and on.
         app.terminate()
-        app = launch(["-uiTestingDiskStore"], skipOnboarding: false)
+        app = launch(["-uiTestingDiskStore"])
         XCTAssertTrue(app.buttons["gotIt"].waitForExistence(timeout: 10))
         XCTAssertFalse(springboard.alerts.firstMatch.waitForExistence(timeout: 3), "no prompt on relaunch")
         app.tabBars.buttons["Forest"].tap()
@@ -602,7 +618,6 @@ final class SequoiaUITests: XCTestCase {
         options.iterationCount = 5
         measure(metrics: [XCTApplicationLaunchMetric(waitUntilResponsive: true)], options: options) {
             let app = XCUIApplication()
-            app.launchArguments = ["-uiTestingSkipOnboarding"]
             app.launch()
         }
     }
@@ -631,9 +646,12 @@ final class SequoiaUITests: XCTestCase {
             // The IPA's spoken label ("Pronunciation /…/") is intentionally longer
             // than the visible text, which the clipping check reads as truncation.
             if issue.auditType == .textClipped, issue.element?.label.hasPrefix("Pronunciation ") == true { return true }
-            // A clipping report with no element points at nothing on screen. It shows up
-            // for a row half under the floating tab bar (screens are also audited scrolled).
-            if issue.auditType == .textClipped, issue.element == nil { return true }
+            // A clipping, contrast or "potentially inaccessible text" report with no element
+            // points at nothing on screen. These come from text the translucent bars blur
+            // (a row half under the tab bar, or content scrolled under the navigation bar),
+            // and the same screen flips between reporting them and not. Screens are also
+            // audited scrolled; reports naming an element stay strict.
+            if [.textClipped, .contrast, .elementDetection].contains(issue.auditType), issue.element == nil { return true }
             // The system search field's own text, which the app doesn't lay out.
             if issue.auditType == .textClipped, issue.element?.elementType == .searchField { return true }
             issues.append("\(screen): \(issue.auditType) – \(issue.compactDescription) – \(issue.detailedDescription) – \(issue.element?.debugDescription.prefix(120) ?? "")")
@@ -672,8 +690,9 @@ final class SequoiaUITests: XCTestCase {
         try audit(app, "Practice answered")
         app.tabBars.buttons["Forest"].tap()
         try audit(app, "Forest")
+        // To the end, so no row is left half under the floating tab bar (see `audit`).
         app.swipeUp(velocity: .slow)
-        // The page is short enough to bounce at the end; audit once it settles.
+        app.swipeUp(velocity: .slow)
         Thread.sleep(forTimeInterval: 1)
         snapshot("forest-scrolled")
         try audit(app, "Forest scrolled")
@@ -691,13 +710,10 @@ final class SequoiaUITests: XCTestCase {
         _ = launch(["-devResetClock", "-devMockSocial", "off"])
     }
 
-    /// The first-run screens: welcome, the first word with its level menu, and
+    /// The first-run screens: the first word with its level menu and hint, and
     /// the reminder offer after the first "Got it".
-    func testAccessibilityAuditOnboarding() throws {
-        let app = launch(["-uiTestingInMemoryStore"], skipOnboarding: false)
-        XCTAssertTrue(app.buttons["onboardingBegin"].waitForExistence(timeout: 10))
-        try audit(app, "Onboarding welcome")
-        app.buttons["onboardingBegin"].tap()
+    func testAccessibilityAuditFirstRun() throws {
+        let app = launch(["-uiTestingInMemoryStore"])
         XCTAssertTrue(app.buttons["wordLevel"].waitForExistence(timeout: 10))
         try audit(app, "First word")
         tapGotIt(app)

@@ -84,7 +84,7 @@ struct TodayView: View {
     }
 
     /// On the first word only: change its level in place, instead of being
-    /// asked during onboarding before seeing a single word.
+    /// asked up front before seeing a single word.
     private var wordLevelMenu: some View {
         Menu {
             Picker("Word level", selection: $model.difficulty) {
@@ -145,6 +145,14 @@ struct TodayView: View {
                         .foregroundStyle(Theme.Palette.soil)
                         .multilineTextAlignment(.center)
                         .accessibilityIdentifier("rainNote")
+                }
+                if model.isFirstWord {
+                    // There is no onboarding, so the first word says what the button does.
+                    Text("One word a day. Tap Got it to plant your first tree.")
+                        .font(Typography.callout)
+                        .foregroundStyle(Theme.Palette.soil)
+                        .multilineTextAlignment(.center)
+                        .accessibilityIdentifier("firstWordHint")
                 }
                 if model.showsFreshStartMessage {
                     Text("Plant a new seed today. Your forest is safe.")

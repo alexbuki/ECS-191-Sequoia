@@ -18,7 +18,6 @@
 		3AFEFE1794E64E16F723CB20 /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDD366CFC9F7E6179E913FEA /* AppTab.swift */; };
 		3D5EFBA0D162AB96E5CF95D9 /* SequoiaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78A4E281EC2B5C5B4BACA4C6 /* SequoiaApp.swift */; };
 		43B5576098F0A560AA991357 /* WatchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F5045BD99FD07B0FED2A59 /* WatchModel.swift */; };
-		455427CE11A7F139E4772286 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBA606C96F83BB11DED39E17 /* OnboardingView.swift */; };
 		47D708D0A9A9AC41D71DE06B /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D9738ECBFCEDD69E70405F /* NotificationService.swift */; };
 		4B9BEBF118BA8798DD82FADB /* PronunciationPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDAB8E33B5583AEFD5927CFD /* PronunciationPlayer.swift */; };
 		4ED3C9C7EA3907FDED0CC700 /* SequoiaUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63FDEB041C4F1B95350FF25E /* SequoiaUITests.swift */; };
@@ -248,7 +247,6 @@
 		B4C1DEDB4F8F8EB500BD4488 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		B6A3961D54377D11B4C9EDE3 /* DeveloperPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperPanelView.swift; sourceTree = "<group>"; };
 		B6D9738ECBFCEDD69E70405F /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
-		BBA606C96F83BB11DED39E17 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		BC7016AC5EFD371847128B29 /* ForestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForestView.swift; sourceTree = "<group>"; };
 		BC975414C8CF6343E13D42DB /* PracticeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeViewModel.swift; sourceTree = "<group>"; };
 		CB2DE0B278A610D439BB5FF3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -338,14 +336,6 @@
 				F23CB7FEDED011D152F41398 /* SocialModel.swift */,
 			);
 			path = Social;
-			sourceTree = "<group>";
-		};
-		0ABBCD020E830B7B7A0C8AF2 /* Onboarding */ = {
-			isa = PBXGroup;
-			children = (
-				BBA606C96F83BB11DED39E17 /* OnboardingView.swift */,
-			);
-			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		0B00A013719489E3F6EEA21A /* Resources */ = {
@@ -559,7 +549,6 @@
 				2423D8911658FC7F8F8E76D9 /* Developer */,
 				FF484B4AD81C859A1E3D9F17 /* Forest */,
 				0D981EF60CBC5DDB8AB5BC12 /* Library */,
-				0ABBCD020E830B7B7A0C8AF2 /* Onboarding */,
 				4C10B61F2ACE9D098D5C9B35 /* Practice */,
 				1EDD00A6C18AD8C4EF7D70EA /* Settings */,
 				4846E2501BE5BF4057DB39AF /* Today */,
@@ -927,7 +916,6 @@
 				A8956AF58B47F6ACD33A39FB /* LibraryViewModel.swift in Sources */,
 				DD337A486BF2F948B413551B /* MockSocialBackend.swift in Sources */,
 				47D708D0A9A9AC41D71DE06B /* NotificationService.swift in Sources */,
-				455427CE11A7F139E4772286 /* OnboardingView.swift in Sources */,
 				803400AC63E495793FF8950B /* PlantedTreesView.swift in Sources */,
 				F8A2F3EB9FB546CFAF98E9EF /* PlantingCeremonyView.swift in Sources */,
 				D9EA9A9A615EBD5A371A4AC4 /* PracticeView.swift in Sources */,

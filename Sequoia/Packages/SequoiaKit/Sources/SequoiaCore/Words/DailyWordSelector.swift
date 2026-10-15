@@ -11,7 +11,7 @@ public struct DailyWordSelector: Sendable {
             // A fixed pseudo-random order, so neighbouring days feel unrelated
             // while staying identical on every device and every launch.
             pools[difficulty] = provider.words
-                .filter { $0.difficulty == difficulty }
+                .filter { difficulty.includes($0) }
                 .sorted { StableHash.of($0.id) < StableHash.of($1.id) }
         }
         self.pools = pools

@@ -27,6 +27,11 @@ struct AboutView: View {
                     Text("Sequoia works the same way: one word a day, a little growth each time, adding up to something lasting.")
                 }
 
+                section(title: "The words") {
+                    Text("Sequoia's definitions, examples and word origins were written for Sequoia with the help of AI, then reviewed and checked against open references: Wiktionary, WordNet and the CMU Pronouncing Dictionary.")
+                    Text("GRE® is a registered trademark of ETS. Sequoia is not endorsed by or affiliated with ETS.")
+                }
+
                 Text("Version \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0")")
                     .font(Typography.caption)
                     .foregroundStyle(Theme.Palette.soilSecondary)

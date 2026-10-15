@@ -1,10 +1,13 @@
 import Foundation
 
-/// How challenging a word is. Users pick a preferred level during onboarding.
+/// How challenging a word is. Users pick a preferred level on their first word or in Settings.
 public enum Difficulty: Int, Codable, CaseIterable, Sendable, Identifiable, Comparable {
     case everyday = 1
     case elevated = 2
     case erudite = 3
+    /// Not a difficulty of its own: the ~1,000 words most worth knowing for
+    /// the GRE, drawn from all three levels (words tagged `gre`).
+    case gre = 4
 
     public var id: Int { rawValue }
 
@@ -13,6 +16,7 @@ public enum Difficulty: Int, Codable, CaseIterable, Sendable, Identifiable, Comp
         case .everyday: String(localized: "Everyday", bundle: .module)
         case .elevated: String(localized: "Elevated", bundle: .module)
         case .erudite: String(localized: "Erudite", bundle: .module)
+        case .gre: String(localized: "GRE", bundle: .module)
         }
     }
 
@@ -21,7 +25,16 @@ public enum Difficulty: Int, Codable, CaseIterable, Sendable, Identifiable, Comp
         case .everyday: String(localized: "Useful words you'll hear this week", bundle: .module)
         case .elevated: String(localized: "Sharper words for writing and work", bundle: .module)
         case .erudite: String(localized: "Rare, literary, delightfully precise", bundle: .module)
+        case .gre: String(localized: "Words common in GRE prep", bundle: .module)
         }
+    }
+
+    /// The tag that puts a word in the GRE set.
+    public static let greTag = "gre"
+
+    /// Whether a word belongs in this level's daily pool.
+    public func includes(_ word: Word) -> Bool {
+        self == .gre ? word.tags.contains(Self.greTag) : word.difficulty == self
     }
 
     public static func < (lhs: Difficulty, rhs: Difficulty) -> Bool { lhs.rawValue < rhs.rawValue }
@@ -76,19 +89,19 @@ public struct Word: Codable, Hashable, Identifiable, Sendable {
 }
 
 public extension Word {
-    /// A sample entry for previews and tests.
+    /// A sample entry for previews and tests, identical to the library entry.
     static let sample = Word(
-        id: "sonder",
-        word: "sonder",
-        ipa: "/ˈsɑːndər/",
-        partOfSpeech: .noun,
-        definition: "The realization that each passerby has a life as vivid and complex as your own.",
+        id: "verdant",
+        word: "verdant",
+        ipa: "/ˈvɜrdənt/",
+        partOfSpeech: .adjective,
+        definition: "Green with lush plant growth.",
         examples: [
-            "Watching the crowded train platform, she felt a quiet wave of sonder.",
-            "Sonder made him kinder to the stranger who cut him off.",
+            "After the rains, the hills turned verdant.",
+            "They hiked through a verdant valley.",
         ],
-        etymology: "Coined in 2012 by John Koenig for The Dictionary of Obscure Sorrows.",
+        etymology: "Perhaps from Old French verdeant, from Latin viridis 'green'.",
         difficulty: .elevated,
-        tags: ["emotion", "society"]
+        tags: ["nature"]
     )
 }

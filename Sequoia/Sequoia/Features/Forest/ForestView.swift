@@ -237,8 +237,10 @@ struct StreakCalendar: View {
                             .frame(maxWidth: .infinity, minHeight: 34)
                             .background(done ? Theme.Palette.moss : .clear, in: Circle())
                             .overlay(Circle().stroke(isToday ? Theme.Palette.bark : .clear, lineWidth: 1.5))
-                            .accessibilityLabel(Text(day.startDate(in: model.store.currentClock.calendar).formatted(date: .long, time: .omitted)))
-                            .accessibilityValue(done ? Text("Completed") : Text("Not completed"))
+                            // Read as shown ("14"), with its weekday and whether it was completed;
+                            // the month is in the header above.
+                            .accessibilityLabel(Text("\(day.day)"))
+                            .accessibilityValue(Text(dayValue(day, done: done)))
                     } else {
                         Color.clear.frame(minHeight: 34).accessibilityHidden(true)
                     }
@@ -247,6 +249,11 @@ struct StreakCalendar: View {
         }
         .padding(Theme.Spacing.m)
         .background(Theme.Palette.surface, in: RoundedRectangle(cornerRadius: Theme.Radius.large, style: .continuous))
+    }
+
+    private func dayValue(_ day: DayStamp, done: Bool) -> String {
+        let weekday = day.startDate(in: model.store.currentClock.calendar).formatted(.dateTime.weekday(.wide))
+        return done ? String(localized: "\(weekday), completed") : String(localized: "\(weekday), not completed")
     }
 }
 

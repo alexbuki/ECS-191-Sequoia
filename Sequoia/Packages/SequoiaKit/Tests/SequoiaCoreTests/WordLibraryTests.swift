@@ -19,6 +19,8 @@ struct WordLibraryTests {
             #expect(!word.id.isEmpty)
             #expect(!word.word.isEmpty)
             #expect(word.ipa.hasPrefix("/") && word.ipa.hasSuffix("/"), "\(word.id) ipa")
+            // General American, so no length marks; IPA letters only (j, not y).
+            #expect(!word.ipa.contains("ː") && !word.ipa.contains("y"), "\(word.id) ipa \(word.ipa)")
             #expect(!word.definition.isEmpty, "\(word.id) definition")
             #expect((1...2).contains(word.examples.count), "\(word.id) examples")
             #expect(!word.etymology.isEmpty, "\(word.id) etymology")
@@ -26,20 +28,36 @@ struct WordLibraryTests {
         }
     }
 
-    @Test func examplesUseTheWord() {
+    /// Every example uses the exact headword once, so any example can be a fill-the-blank.
+    @Test func examplesUseTheWord() throws {
         for word in provider.words {
+            // The same matching as PracticeGenerator.blanked.
+            let pattern = "\\b" + NSRegularExpression.escapedPattern(for: word.word) + "\\b"
+            let regex = try NSRegularExpression(pattern: pattern, options: .caseInsensitive)
             for example in word.examples {
-                #expect(example.localizedCaseInsensitiveContains(word.word), "\(word.id): \(example)")
+                let matches = regex.numberOfMatches(in: example, range: NSRange(example.startIndex..., in: example))
+                #expect(matches == 1, "\(word.id): \(example)")
             }
         }
     }
 
     @Test func everyDifficultyHasWords() {
         let selector = DailyWordSelector(provider: provider)
-        for level in Difficulty.allCases {
+        for level in Difficulty.allCases where level != .gre {
             // Five years of words at each level (with a leap day), so a daily
             // user at one level doesn't see a repeat for five years.
             #expect(selector.pool(for: level).count >= 5 * 365 + 1, "\(level)")
+        }
+    }
+
+    @Test func greSetIsAboutAThousandWordsFromEveryLevel() {
+        let pool = DailyWordSelector(provider: provider).pool(for: .gre)
+        #expect((1_000...1_100).contains(pool.count))
+        for level in Difficulty.allCases where level != .gre {
+            #expect(pool.contains { $0.difficulty == level }, "\(level)")
+        }
+        for id in ["abate", "laconic", "obsequious", "prevaricate", "tacit", "vacillate"] {
+            #expect(pool.contains { $0.id == id }, "\(id)")
         }
     }
 
@@ -47,6 +65,10 @@ struct WordLibraryTests {
         for word in provider.words {
             #expect(PracticeGenerator.blanked(word) != nil, "\(word.id) needs an example with the word on its own")
         }
+    }
+
+    @Test func sampleWordIsALibraryEntry() {
+        #expect(provider.word(id: Word.sample.id) == .sample)
     }
 
     @Test func lookupById() {
@@ -83,7 +105,7 @@ struct DailyWordSelectorTests {
     func difficultyFilteringWorks(difficulty: Difficulty) {
         let selector = DailyWordSelector()
         for offset in 0..<100 {
-            #expect(selector.word(for: start.adding(days: offset), difficulty: difficulty).difficulty == difficulty)
+            #expect(difficulty.includes(selector.word(for: start.adding(days: offset), difficulty: difficulty)))
         }
     }
 

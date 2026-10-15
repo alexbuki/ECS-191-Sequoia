@@ -67,9 +67,9 @@ public struct DesignGalleryView: View {
                 }
 
                 section("Typography") {
-                    Text(verbatim: "Sonder").font(Typography.wordHero)
+                    Text(verbatim: "Verdant").font(Typography.wordHero)
                     Text(verbatim: "Word title").font(Typography.wordTitle)
-                    Text(verbatim: "/ˈsɑːndər/").font(Typography.ipa)
+                    Text(verbatim: "/ˈvɜrdənt/").font(Typography.ipa)
                     Text(verbatim: "Screen title").font(Typography.title)
                     Text(verbatim: "Headline").font(Typography.headline)
                     Text(verbatim: "Body text reads friendly and approachable.").font(Typography.body)

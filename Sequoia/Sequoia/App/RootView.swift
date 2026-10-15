@@ -15,9 +15,6 @@ struct RootView: View {
             tabs
         }
         .background(Theme.Palette.fog.ignoresSafeArea())
-        .fullScreenCover(isPresented: Binding(get: { app.needsOnboarding }, set: { _ in })) {
-            OnboardingView()
-        }
         .presentsCeremony(Binding(get: { app.ceremony }, set: { app.ceremony = $0 })) { app.selectedTab = .forest }
         .alert("Sequoia couldn't open your progress", isPresented: Binding(get: { app.showsStoreError },
                                                                              set: { if !$0 { app.storeErrorAcknowledged = true } })) {

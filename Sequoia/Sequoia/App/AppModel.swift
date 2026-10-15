@@ -27,11 +27,6 @@ final class AppModel {
     var storeErrorAcknowledged = false
     var showsStoreError: Bool { storeError != nil && !storeErrorAcknowledged }
 
-    /// Onboarding shows only until it is finished or skipped once.
-    var needsOnboarding: Bool {
-        storeError == nil && !store.settings.hasCompletedOnboarding && !ProcessInfo.processInfo.arguments.contains("-uiTestingSkipOnboarding")
-    }
-
     init(store: SequoiaStore? = nil) {
         #if SEQUOIA_DEV
         LaunchTiming.mark("appmodel-init")
@@ -47,6 +42,8 @@ final class AppModel {
         #endif
         social = SocialModel(backend: Self.makeSocialBackend())
         storeError = opened?.error
+        // Before the developer launch tools, which may change these settings.
+        setUpFirstLaunch()
         #if SEQUOIA_DEV
         LaunchTiming.mark("social")
         #endif
@@ -106,6 +103,7 @@ final class AppModel {
         storeError = opened.error
         storeErrorAcknowledged = false
         store = SequoiaStore(container: opened.container)
+        setUpFirstLaunch()
         connectStore()
         storeDidChange()
     }
@@ -120,15 +118,17 @@ final class AppModel {
 
     /// Shows the ceremony for any tree planted since the last one played.
     func presentPendingCeremony() {
-        guard ceremony == nil, !needsOnboarding, let moment = PlantedTreeMoment.pending(in: store) else { return }
+        guard ceremony == nil, let moment = PlantedTreeMoment.pending(in: store) else { return }
         ceremony = moment
         store.markCeremoniesShown()
     }
 
-    /// Finishes the one-screen onboarding. Nothing is asked up front: the
+    /// There is no onboarding: the first launch opens on the first word. The
     /// default difficulty applies (changeable from the first word), and the
     /// reminder is offered after the first "Got it", once the app has shown its value.
-    func completeOnboarding() {
+    /// `hasCompletedOnboarding` now records that these defaults were applied.
+    private func setUpFirstLaunch() {
+        guard storeError == nil, !store.settings.hasCompletedOnboarding else { return }
         UserDefaults.standard.removeObject(forKey: Self.reminderOfferDismissedKey)
         store.updateSettings { settings in
             settings.notificationsEnabled = false
