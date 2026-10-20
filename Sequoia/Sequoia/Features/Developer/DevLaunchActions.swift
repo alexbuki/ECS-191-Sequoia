@@ -5,7 +5,8 @@ import SequoiaCore
 /// Launch arguments that drive developer tools from scripts and UI tests:
 /// `-devEnable`, `-devAdvanceDays N`, `-devJumpStage N`, `-devFillForest N`,
 /// `-devResetProgress`, `-devResetClock`, `-devReminderInMinutes N`, `-devCeremony`,
-/// `-devPlantedElsewhere`, `-devRainDays N`, `-devMissDay`, `-devMissWords N`, `-devPracticeRounds N`.
+/// `-devPlantedElsewhere`, `-devRainDays N`, `-devMissDay`, `-devMissWords N`, `-devPracticeRounds N`,
+/// `-devFavorites N`, `-devHideBadge`, `-devPracticeGame definitionMatch|fillTheBlank` (for App Store screenshots).
 /// Compiled only in `SEQUOIA_DEV` builds.
 enum DevLaunchActions {
     /// Applied before the store opens (affects which store and clock are used).
@@ -31,6 +32,9 @@ enum DevLaunchActions {
         if let count = value(after: "-devMissWords") { missWords(count, store: store) }
         if let count = value(after: "-devPracticeRounds") {
             for game in (0..<count).map({ PracticeGame.allCases[$0 % 2] }) { store.recordPractice(game, correctAnswers: 4) }
+        }
+        if let count = value(after: "-devFavorites") {
+            for word in store.seenWords().dropFirst().prefix(count) where !word.isFavorite { store.toggleFavorite(word.id) }
         }
         if let minutes = value(after: "-devReminderInMinutes") { setReminder(minutesFromNow: minutes, store: store) }
         // Trees planted by these tools don't get a ceremony on launch...
@@ -81,6 +85,9 @@ enum DevLaunchActions {
         for word in store.seenWords().prefix(count) { store.recordAnswer(wordID: word.id, correct: false) }
     }
 
+    /// Whether `-devHideBadge` asked to hide the DEV badge (for clean screenshots).
+    static var hidesBadge: Bool { ProcessInfo.processInfo.arguments.contains("-devHideBadge") }
+
     /// Whether `-devCeremony` asked to show the planting ceremony on launch.
     static var showsCeremony: Bool { ProcessInfo.processInfo.arguments.contains("-devCeremony") }
 
@@ -88,6 +95,13 @@ enum DevLaunchActions {
     /// `practice` opens Library with Practice pushed (see `opensPractice`).
     static var initialTab: AppTab? {
         tabArgument.flatMap(AppTab.init(rawValue:))
+    }
+
+    /// The game `-devPracticeGame` asked Practice to start (use with `-tab practice`).
+    static var practiceGame: PracticeGame? {
+        let arguments = ProcessInfo.processInfo.arguments
+        guard let index = arguments.firstIndex(of: "-devPracticeGame"), arguments.indices.contains(index + 1) else { return nil }
+        return PracticeGame(rawValue: arguments[index + 1])
     }
 
     static var opensPractice: Bool { tabArgument == "practice" }

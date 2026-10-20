@@ -1,6 +1,6 @@
 # Sequoia Privacy Policy
 
-_Last updated: October 14, 2026_
+_Last updated: October 15, 2026_
 
 Sequoia is a vocabulary app: one word a day, and each word grows a tree. It is built so that what you do in it stays with you: on your devices and in your own iCloud account.
 
@@ -32,4 +32,4 @@ If this policy changes, the new version will be posted here with a new date.
 
 ## Contact
 
-Questions? Open an issue at [github.com/alexbuki/ECS-191-Sequoia/issues](https://github.com/alexbuki/ECS-191-Sequoia/issues).
+Questions? Use the [Sequoia support form](https://tally.so/r/bZVk8o).

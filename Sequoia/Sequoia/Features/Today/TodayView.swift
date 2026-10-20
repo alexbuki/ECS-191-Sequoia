@@ -1,6 +1,7 @@
 import SwiftUI
 import DesignSystem
 import SequoiaCore
+import StoreKit
 
 /// The home screen. It exists to show today's word.
 struct TodayView: View {
@@ -10,6 +11,7 @@ struct TodayView: View {
     @AppStorage(AppModel.practiceNudgeDismissedKey) private var practiceNudgeDismissed = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.requestReview) private var requestReview
 
     init(store: SequoiaStore) {
         _model = State(initialValue: TodayViewModel(store: store))
@@ -70,6 +72,15 @@ struct TodayView: View {
         }
         #if SEQUOIA_DEV
         .onAppear { LaunchTiming.wordDidAppear() }
+        #else
+        // Once the growth has been seen, so the prompt doesn't cover it.
+        .onChange(of: model.asksForRating) { _, asks in
+            guard asks else { return }
+            Task {
+                try? await Task.sleep(for: .seconds(2.5))
+                requestReview()
+            }
+        }
         #endif
     }
 

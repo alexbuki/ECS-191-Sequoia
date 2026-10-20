@@ -9,7 +9,7 @@ struct DevModeBadge: View {
     @State private var dev = DevModeController.shared
 
     var body: some View {
-        if dev.isEnabled {
+        if dev.isEnabled && !DevLaunchActions.hidesBadge {
             let _ = dev.timeOffset
             Text("DEV · \(dev.simulatedNow.formatted(date: .abbreviated, time: .omitted))")
                 .font(Typography.caption.weight(.semibold))

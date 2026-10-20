@@ -34,7 +34,7 @@ struct AboutView: View {
 
                 section(title: "Your privacy") {
                     Text("Sequoia collects nothing. Your progress stays on your iPhone, with a backup in your own iCloud account.")
-                    Link("Privacy Policy", destination: URL(string: "https://github.com/alexbuki/ECS-191-Sequoia/blob/main/PRIVACY.md")!)
+                    Link("Privacy Policy", destination: URL(string: "https://second-paperback-0e4.notion.site/Sequoia-Privacy-Policy-3ff075d65b0980018bf1c352c392aabd")!)
                         .foregroundStyle(Theme.Palette.canopy)
                 }
 

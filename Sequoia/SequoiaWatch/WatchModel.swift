@@ -41,16 +41,19 @@ final class WatchModel: NSObject, WCSessionDelegate {
         guard !plantsTree, let next = snapshot.checkingIn() else { return }
         apply(next)
         checkInCount += 1
-        let message: [String: Any] = [WatchSnapshot.gotItKey: next.day.dayNumber]
+        let dayNumber = next.day.dayNumber
+        let message: [String: Any] = [WatchSnapshot.gotItKey: dayNumber]
         let session = WCSession.default
         guard WCSession.isSupported(), session.activationState == .activated else { return }
         if session.isReachable {
-            session.sendMessage(message, replyHandler: { [weak self] reply in
+            // WatchConnectivity calls these on a background queue, so they must not
+            // inherit the main actor (that traps at runtime).
+            session.sendMessage(message, replyHandler: { @Sendable [weak self] reply in
                 let data = reply[WatchSnapshot.contextKey] as? Data
                 Task { @MainActor in self?.receive(data) }
-            }, errorHandler: { _ in
+            }, errorHandler: { @Sendable _ in
                 // Not delivered right now: queue it; the phone applies it later.
-                session.transferUserInfo(message)
+                WCSession.default.transferUserInfo([WatchSnapshot.gotItKey: dayNumber])
             })
         } else {
             session.transferUserInfo(message)

@@ -46,6 +46,13 @@ final class TodayViewModel {
         isCompleted && store.growth.totalCheckIns == PracticeGenerator.minimumSeenWords
     }
 
+    /// After a proud moment (five days in a row, or a sequoia planted), the App
+    /// Store rating prompt is offered. iOS decides whether it actually shows.
+    var asksForRating: Bool {
+        guard let lastOutcome, !lastOutcome.plantedWelcomeTree else { return false }
+        return lastOutcome.streak == 5 || lastOutcome.plantedTree
+    }
+
     var reminderTime: DateComponents {
         DateComponents(hour: store.settings.reminderHour, minute: store.settings.reminderMinute)
     }

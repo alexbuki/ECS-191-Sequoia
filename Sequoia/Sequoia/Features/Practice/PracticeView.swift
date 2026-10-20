@@ -25,6 +25,9 @@ struct PracticeView: View {
         .navigationTitle("Practice")
         .navigationBarTitleDisplayMode(.inline)
         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.5), trigger: model.answerCount)
+        #if SEQUOIA_DEV
+        .task { if let game = DevLaunchActions.practiceGame, model.phase == .menu { model.start(game) } }
+        #endif
     }
 
     // MARK: Menu
